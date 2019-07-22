@@ -17,7 +17,7 @@ namespace MikuSharp.Commands
     class Utility : BaseCommandModule
     {
         [Command("anime")]
-        [Description("Search for an Anime")]
+        [Description("Search for an anime")]
         public async Task AnimeGet(CommandContext ctx, [RemainingText] string search)
         {
             try
@@ -65,7 +65,7 @@ namespace MikuSharp.Commands
         }
 
         [Command("avatar")]
-        [Description("Get the Avatar of someone or yourself")]
+        [Description("Get the avatar of someone or yourself")]
         [Priority(2)]
         public async Task Avatar(CommandContext ctx, DiscordMember member = null)
         {
@@ -90,7 +90,7 @@ namespace MikuSharp.Commands
         }
 
         [Command("emojilist")]
-        [Description("List all custom Emoji on this server!")]
+        [Description("Lists all custom emoji on this server")]
         public async Task EmojiList(CommandContext ctx)
         {
             string wat = null;
@@ -102,7 +102,7 @@ namespace MikuSharp.Commands
         }
 
         [Command("guildinfo")]
-        [Description("Get some Info about this guild")]
+        [Description("Get some info about this guild")]
         public async Task GuildInfo(CommandContext ctx)
         {
             var emb = new DiscordEmbedBuilder();
@@ -119,7 +119,7 @@ namespace MikuSharp.Commands
         }
 
         [Command("manga")]
-        [Description("Search for a Manga")]
+        [Description("Search for a manga")]
         public async Task MangaGet(CommandContext ctx, [RemainingText] string search)
         {
             try
@@ -162,7 +162,7 @@ namespace MikuSharp.Commands
 
         [Command("userinfo")]
         [Priority(2)]
-        [Description("Get some Info about a user or yourself")]
+        [Description("Get some info about a user or yourself")]
         public async Task UserInfo(CommandContext ctx, DiscordMember m)
         {
             Console.WriteLine("VIA MEMBER");
