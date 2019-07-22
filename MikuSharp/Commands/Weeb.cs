@@ -38,7 +38,7 @@ namespace MikuSharp.Commands
         public async Task Awooify(CommandContext ctx, string member)
         {
             var AvatarUser = ctx.Guild.Members.Where(x => x.Value.Username.ToLower().Contains(member) | x.Value.DisplayName.ToLower().Contains(member));
-            var e = JsonConvert.DeserializeObject<NekoBot>(await new WebClient().DownloadStringTaskAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={AvatarUser.First().Value.AvatarUrl}"));
+            var e = JsonConvert.DeserializeObject<NekoBot>(await new WebClient().DownloadStringTaskAsync($"https://nekobot.xyz/api/imagegen?type=awooify&text={AvatarUser.First().Value.AvatarUrl}"));
             var embed2 = new DiscordEmbedBuilder();
             embed2.WithImageUrl(e.message);
             await ctx.RespondAsync(embed: embed2.Build());
