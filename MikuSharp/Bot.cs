@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using DSharpPlus.Interactivity.Enums;
 using MikuSharp.Utilities;
 using MikuSharp.Events;
+using System.IO;
 
 namespace MikuSharp
 {
@@ -32,7 +33,7 @@ namespace MikuSharp
 
         public Bot()
         {
-            cfg = JsonConvert.DeserializeObject<BotConfig>(@"config.json");
+            cfg = JsonConvert.DeserializeObject<BotConfig>(File.ReadAllText(@"config.json"));
             cfg.DbConnectString = $"Host={cfg.DbConfig.Hostname};Username={cfg.DbConfig.User};Password={cfg.DbConfig.Password};Database=MikuSharpDB";
             Console.WriteLine("first");
             _cts = new CancellationTokenSource();
