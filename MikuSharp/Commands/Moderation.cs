@@ -49,7 +49,7 @@ namespace MikuSharp.Commands
         [RequirePermissions(DSharpPlus.Permissions.Administrator
             | DSharpPlus.Permissions.BanMembers
             | DSharpPlus.Permissions.ManageGuild)]
-        [Description("unban someone by their ID or Username")]
+        [Description("Unban someone by their ID or username")]
         public async Task UnBan(CommandContext ctx, ulong id)
         {
             var m = await ctx.Guild.GetBansAsync();
