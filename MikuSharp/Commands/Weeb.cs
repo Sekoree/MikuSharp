@@ -27,7 +27,7 @@ namespace MikuSharp.Commands
             {
                 avartURL = member.AvatarUrl;
             }
-            var e = JsonConvert.DeserializeObject<NekoBot>(await new WebClient().DownloadStringTaskAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={avartURL}"));
+            var e = JsonConvert.DeserializeObject<NekoBot>(await new WebClient().DownloadStringTaskAsync($"https://nekobot.xyz/api/imagegen?type=awooify&text={avartURL}"));
             var embed2 = new DiscordEmbedBuilder();
             embed2.WithImageUrl(e.message);
             await ctx.RespondAsync(embed: embed2.Build());
