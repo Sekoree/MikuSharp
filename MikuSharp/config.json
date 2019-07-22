@@ -1,0 +1,25 @@
+{
+  "discordToken": "",
+  "weebShToken": "",
+  "youtubeApiToken": "",
+  "ksoftSiToken": "",
+  "dbConfig": {
+    "hostname": "",
+    "user": "",
+    "password": ""
+  },
+  "lavaConfig": {
+    "hostname": "",
+    "password": "",
+    "port": 2333
+  },
+  "nndConfig": {
+    "mail": "",
+    "password": "",
+    "ftpConfig": {
+      "hostname": "",
+      "user": "",
+      "password": ""
+    }
+  }
+}
