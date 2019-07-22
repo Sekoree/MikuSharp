@@ -125,7 +125,7 @@ namespace MikuSharp.Commands
         [Description("lewd")]
         public async Task Nekopara(CommandContext ctx)
         {
-            var d = await Web.GetDerpy("https://derpyapi.glitch.me/nekoparastatic");
+            var d = await Web.GetDerpy("https://miku.derpyenterprises.org/nekoparajson");
             await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
         }
 
@@ -133,7 +133,7 @@ namespace MikuSharp.Commands
         [Description("lewd")]
         public async Task NekoparaGif(CommandContext ctx)
         {
-            var d = await Web.GetDerpy("https://derpyapi.glitch.me/nekoparagif");
+            var d = await Web.GetDerpy("https://miku.derpyenterprises.org/nekoparagifjson");
             await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
         }
 

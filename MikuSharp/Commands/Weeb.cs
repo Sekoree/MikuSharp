@@ -17,42 +17,29 @@ namespace MikuSharp.Commands
 {
     class Weeb : BaseCommandModule
     {
-        [Command("awooify")]
-        [Priority(2)]
-        [Description("Awooify your or someones avatar!")]
-        public async Task Awooify(CommandContext ctx, DiscordMember member = null)
-        {
-            string avartURL = ctx.Member.AvatarUrl;
-            if (member != null)
-            {
-                avartURL = member.AvatarUrl;
-            }
-            var e = JsonConvert.DeserializeObject<NekoBot>(await new WebClient().DownloadStringTaskAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={avartURL}"));
-            var embed2 = new DiscordEmbedBuilder();
-            embed2.WithImageUrl(e.message);
-            await ctx.RespondAsync(embed: embed2.Build());
-        }
-
-        [Command("awooify")]
-        [Priority(1)]
-        public async Task Awooify(CommandContext ctx, string member)
+        [Command("clyde")]
+        [Description("Make Clyde say something!")]
+        public async Task Clyde(CommandContext ctx, string member)
         {
             var AvatarUser = ctx.Guild.Members.Where(x => x.Value.Username.ToLower().Contains(member) | x.Value.DisplayName.ToLower().Contains(member));
-            var e = JsonConvert.DeserializeObject<NekoBot>(await new WebClient().DownloadStringTaskAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={AvatarUser.First().Value.AvatarUrl}"));
+            var e = JsonConvert.DeserializeObject<NekoBot>(await new WebClient().DownloadStringTaskAsync($"https://nekobot.xyz/api/imagegen?type=awooify&url={AvatarUser.First().Value.AvatarUrl}"));
             var embed2 = new DiscordEmbedBuilder();
             embed2.WithImageUrl(e.message);
+            embed2.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
+            embed2.WithAuthor(name: "via nekobot.xyz", url: "https://nekobot.xyz");
             await ctx.RespondAsync(embed: embed2.Build());
         }
 
         [Command("ddlc")]
-        [Description("Radon DDLC image")]
+        [Description("Random DDLC image")]
         public async Task DDLC(CommandContext ctx)
         {
-            var e = JsonConvert.DeserializeObject<Derpy>(await new WebClient().DownloadStringTaskAsync($"https://derpyapi.glitch.me/ddlc"));
+            var e = JsonConvert.DeserializeObject<Derpy>(await new WebClient().DownloadStringTaskAsync($"https://miku.derpyenterprises.org/ddlcjson"));
             Stream img = new MemoryStream(await new WebClient().DownloadDataTaskAsync(Other.resizeLink(e.url)));
             var em = new DiscordEmbedBuilder();
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by Derpy API");
+            em.WithAuthor(name: "via miku.derpyenterprises.org", url: "https://miku.derpyenterprises.org");
+            em.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             em.WithDescription($"{e.url}");
             await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
         }
@@ -68,7 +55,7 @@ namespace MikuSharp.Commands
                 Description = $"[Full Source Image Link]({myresponse.url.ToString()})",
                 ImageUrl = $"attachment://image.{MimeGuesser.GuessExtension(dataStream2)}"
             };
-            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             Console.WriteLine(MimeGuesser.GuessExtension(dataStream2));
             await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(dataStream2)}", fileData: dataStream2, embed: emim.Build());
@@ -89,7 +76,7 @@ namespace MikuSharp.Commands
             {
                 emim.AddField("Creator", myresponse.creator);
             }
-            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(dataStream2)}", fileData: dataStream2, embed: emim.Build());
         }
@@ -109,7 +96,7 @@ namespace MikuSharp.Commands
             {
                 emim.AddField("Creator", myresponse.creator);
             }
-            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
 
             await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(dataStream2)}", fileData: dataStream2, embed: emim.Build());
@@ -119,11 +106,12 @@ namespace MikuSharp.Commands
         [Description("Random K-On gif")]
         public async Task K_On(CommandContext ctx)
         {
-            var e = JsonConvert.DeserializeObject<Derpy>(await new WebClient().DownloadStringTaskAsync($"https://derpyapi.glitch.me/k-on"));
+            var e = JsonConvert.DeserializeObject<Derpy>(await new WebClient().DownloadStringTaskAsync($"https://miku.derpyenterprises.org/k_onjson"));
             Stream img = new MemoryStream(await new WebClient().DownloadDataTaskAsync(Other.resizeLink(e.url)));
             var em = new DiscordEmbedBuilder();
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by Derpy API");
+            em.WithAuthor(name: "via miku.derpyenterprises.org", url: "https://miku.derpyenterprises.org");
+            em.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             em.WithDescription($"{e.url}");
             await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
         }
@@ -132,11 +120,12 @@ namespace MikuSharp.Commands
         [Description("Random Konosuba image")]
         public async Task Konosuba(CommandContext ctx)
         {
-            var e = JsonConvert.DeserializeObject<Derpy>(await new WebClient().DownloadStringTaskAsync($"https://derpyapi.glitch.me/konosuba"));
+            var e = JsonConvert.DeserializeObject<Derpy>(await new WebClient().DownloadStringTaskAsync($"https://miku.derpyenterprises.org/konosubajson"));
             Stream img = new MemoryStream(await new WebClient().DownloadDataTaskAsync(Other.resizeLink(e.url)));
             var em = new DiscordEmbedBuilder();
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by Derpy API");
+            em.WithAuthor(name: "via miku.derpyenterprises.org", url: "https://miku.derpyenterprises.org");
+            em.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             em.WithDescription($"{e.url}");
             await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
         }
@@ -156,7 +145,7 @@ namespace MikuSharp.Commands
             {
                 emim.AddField("Creator", e.creator);
             }
-            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(dataStream2)}", fileData: dataStream2, embed: emim.Build());
         }
@@ -165,11 +154,12 @@ namespace MikuSharp.Commands
         [Description("Random Love Live gif")]
         public async Task LoveLive(CommandContext ctx)
         {
-            var e = JsonConvert.DeserializeObject<Derpy>(await new WebClient().DownloadStringTaskAsync($"https://derpyapi.glitch.me/lovelive"));
+            var e = JsonConvert.DeserializeObject<Derpy>(await new WebClient().DownloadStringTaskAsync($"https://miku.derpyenterprises.org/lovelivejson"));
             Stream img = new MemoryStream(await new WebClient().DownloadDataTaskAsync(Other.resizeLink(e.url)));
             var em = new DiscordEmbedBuilder();
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by Derpy API");
+            em.WithAuthor(name: "via miku.derpyenterprises.org", url: "https://miku.derpyenterprises.org");
+            em.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             em.WithDescription($"{e.url}");
             await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
         }
@@ -189,7 +179,7 @@ namespace MikuSharp.Commands
             {
                 emim.AddField("Creator", myresponse.creator);
             }
-            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(dataStream2)}", fileData: dataStream2, embed: emim.Build());
         }
@@ -209,7 +199,7 @@ namespace MikuSharp.Commands
             {
                 emim.AddField("Creator", myresponse.creator);
             }
-            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(dataStream2)}", fileData: dataStream2, embed: emim.Build());
         }
@@ -229,7 +219,7 @@ namespace MikuSharp.Commands
             {
                 emim.AddField("Creator", myresponse.creator);
             }
-            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(dataStream2)}", fileData: dataStream2, embed: emim.Build());
         }
@@ -242,7 +232,8 @@ namespace MikuSharp.Commands
             Stream img = new MemoryStream(await new WebClient().DownloadDataTaskAsync(Other.resizeLink(ImgURL.Url)));
             var em = new DiscordEmbedBuilder();
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by nekos.life");
+            em.WithAuthor(name: "via nekos.life", url: "https://nekos.life");
+            em.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             await ctx.RespondWithFileAsync(embed: em.Build(), fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}");
         }
 
@@ -261,7 +252,7 @@ namespace MikuSharp.Commands
             {
                 emim.AddField("Creator", myresponse.creator);
             }
-            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(dataStream2)}", fileData: dataStream2, embed: emim.Build());
         }
@@ -270,12 +261,13 @@ namespace MikuSharp.Commands
         [Description("Random Takagi image")]
         public async Task Takagi(CommandContext ctx)
         {
-            var e = JsonConvert.DeserializeObject<Derpy>(await new WebClient().DownloadStringTaskAsync($"https://derpyapi.glitch.me/takagi"));
+            var e = JsonConvert.DeserializeObject<Derpy>(await new WebClient().DownloadStringTaskAsync($"https://miku.derpyenterprises.org/takagijson"));
             Stream img = new MemoryStream(await new WebClient().DownloadDataTaskAsync(Other.resizeLink(e.url)));
             var em = new DiscordEmbedBuilder();
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by Derpy API");
+            em.WithAuthor(name: "via miku.derpyenterprises.org", url: "https://miku.derpyenterprises.org");
             em.WithDescription($"[Full Image]({e.url})");
+            em.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
         }
 
@@ -294,7 +286,7 @@ namespace MikuSharp.Commands
             {
                 emim.AddField("Creator", myresponse.creator);
             }
-            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+            emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(dataStream2)}", fileData: dataStream2, embed: emim.Build());
         }

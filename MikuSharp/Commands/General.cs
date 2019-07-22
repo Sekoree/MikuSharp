@@ -17,7 +17,7 @@ namespace MikuSharp.Commands
     {
         [Command("donate")]
         [Description("Financial support information")]
-        [LongDescription("Some info on how to support the Bot's development")]
+        [LongDescription("Some info on how to support the bot's development")]
         [Usage("<Prefix>donate")]
         public async Task Donate(CommandContext ctx)
         {
@@ -30,12 +30,12 @@ namespace MikuSharp.Commands
                 WithDescription("Thank you for your interest in supporting the Bot's development!\n" +
                 "Here are some links that may interest you").
                 AddField("Patreon", "[Link](https://patreon.com/speyd3r)", true).
-                AddField("Paypal", "[Link](https://paypal.me/speyd3r)", true);
+                AddField("PayPal", "[Link](https://paypal.me/speyd3r)", true);
             await ctx.RespondAsync(embed: emb.Build());
         }
 
         [Command("feedback")]
-        [Description("Send Feedback!")]
+        [Description("Send feedback!")]
         public async Task Feedback(CommandContext ctx, [RemainingText] string text)
         {
             var guild = await ctx.Client.GetGuildAsync(483279257431441410);
@@ -89,11 +89,11 @@ namespace MikuSharp.Commands
                         disemb.WithDescription(list);
                         disemb.AddField("General Info","" +
                             "Developer of the original bot: ohlookitsderpy#3939\n" +
-                            "Current Developer: Speyd3r#3939\n" +
+                            "Current developer: Speyd3r#3939\n" +
                             "Avatar by: Chillow#1945 [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
-                            "$upport: [Paypal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)");
+                            "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)");
                         await ctx.RespondAsync(embed: disemb.Build());
                         return;
                     }
@@ -148,7 +148,7 @@ namespace MikuSharp.Commands
                             "Avatar by: Chillow#1945 ❤ [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
-                            "$upport: [Paypal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)")));
+                            "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)")));
                 //.WithFooter("Next update at").WithTimestamp(Bot.Guilds[ctx.Guild.Id].UpdateTime)
                 await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, All, timeoutoverride: TimeSpan.FromMinutes(5));
             }
@@ -163,8 +163,8 @@ namespace MikuSharp.Commands
         [Description("Bot invitation link")]
         public async Task Invite(CommandContext ctx)
         {
-            await ctx.RespondAsync("Thanks for you interest in the Hatsune Miku Bot!\n" +
-                "https://meek.moe/miku/");
+            await ctx.RespondAsync("Thanks for your interest in the Hatsune Miku Bot!\n" +
+                "https://meek.moe/miku");
         }
 
         [Command("ping")]
