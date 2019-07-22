@@ -27,10 +27,6 @@
     <PackageReference Include="Mime" Version="3.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Npgsql" Version="4.0.8" />
-    <PackageReference Include="NYoutubeDL" Version="0.10.5" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0006" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0006" />
-    <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.0-beta0007" />
     <PackageReference Include="Weeb.net" Version="1.0.7" />
   </ItemGroup>
 
