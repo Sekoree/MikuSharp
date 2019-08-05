@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using MikuSharp.Utilities;
-using Booru.Net;
 using System.Linq;
 using System.Net.Http;
 using System.IO;
@@ -41,7 +40,7 @@ namespace MikuSharp.Commands
             await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
         }
 
-        [Command("booru")]
+        /*[Command("booru")]
         [Description("lewd")]
         public async Task Booru(CommandContext ctx, params string[] tag)
         {
@@ -63,7 +62,7 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(str)}");
             em.WithFooter("by Danbooru");
             await ctx.RespondWithFileAsync($"image.{MimeGuesser.GuessExtension(str)}", str, embed: em.Build());
-        }
+        }*/
 
         [Command("gonewild")]
         [Description("lewd")]
@@ -81,7 +80,7 @@ namespace MikuSharp.Commands
             await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
         }
 
-        [Command("konachan")]
+        /*[Command("konachan")]
         [Description("lewd")]
         public async Task Konachan(CommandContext ctx, params string[] tag)
         {
@@ -103,7 +102,7 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(str)}");
             em.WithFooter("by Konachan");
             await ctx.RespondWithFileAsync($"image.{MimeGuesser.GuessExtension(str)}", str, embed: em.Build());
-        }
+        }*/
 
         [Command("lewdkitsune")]
         [Description("lewd")]
@@ -153,7 +152,7 @@ namespace MikuSharp.Commands
             await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
         }
 
-        [Command("rule34")]
+        /*[Command("rule34")]
         [Description("lewd")]
         public async Task Rule34(CommandContext ctx, params string[] tag)
         {
@@ -176,7 +175,7 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(str)}");
             em.WithFooter("by Rule34");
             await ctx.RespondWithFileAsync($"image.{MimeGuesser.GuessExtension(str)}", str, embed: em.Build());
-        }
+        }*/
 
         [Command("tighs"), Aliases("thigh")]
         [Description("lewd")]
