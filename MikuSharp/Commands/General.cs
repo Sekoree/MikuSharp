@@ -100,7 +100,7 @@ namespace MikuSharp.Commands
                 }
                 var inter = ctx.Client.GetInteractivity();
                 Dictionary<string, List<DiscordEmbedBuilder>> Helps = new Dictionary<string, List<DiscordEmbedBuilder>>();
-                foreach (var Command in ctx.CommandsNext.RegisteredCommands)
+                foreach (var Command in ctx.CommandsNext.RegisteredCommands.Where(x => x.Value.Module.ModuleType.Name != "MikuGuild"))
                 {
                     if (ctx.CommandsNext.RegisteredCommands.Any(x => x.Value.Aliases.Any(y => y == Command.Key))) continue;
                     var mod = Command.Value.Module.ModuleType.Name;
