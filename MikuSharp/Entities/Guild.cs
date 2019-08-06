@@ -1,6 +1,7 @@
 ﻿using DSharpPlus.Entities;
 using DSharpPlus.Lavalink;
 using MikuSharp.Enums;
+using MikuSharp.Events;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,6 +17,13 @@ namespace MikuSharp.Entities
         public MusicInstance musicInstance{ get; set; }
         public List<Entry> lastPlayedSongs = new List<Entry>();
         public Task AloneCheckThread { get; set; }
+
+        public Guild(int id, MusicInstance mi = null)
+        {
+            shardId = id;
+            musicInstance = mi;
+        }
+
         public async Task CheckAlone()
         {
             while (DateTime.UtcNow.Subtract(musicInstance.aloneTime).Minutes != 5 && !musicInstance.aloneCTS.IsCancellationRequested)

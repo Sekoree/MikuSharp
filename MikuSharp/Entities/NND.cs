@@ -20,14 +20,14 @@ namespace MikuSharp.Entities
     public class Video2
     {
         public string video_id { get; set; }
-        public int length_seconds { get; set; }
-        public int deleted { get; set; }
+        public int? length_seconds { get; set; }
+        public int? deleted { get; set; }
     }
 
     public class User
     {
-        public int user_id { get; set; }
-        public bool is_premium { get; set; }
+        public int? user_id { get; set; }
+        public bool? is_premium { get; set; }
         public string nickname { get; set; }
     }
 
@@ -40,8 +40,8 @@ namespace MikuSharp.Entities
     public class Url
     {
         public string url { get; set; }
-        public bool is_well_known_port { get; set; }
-        public bool is_ssl { get; set; }
+        public bool? is_well_known_port { get; set; }
+        public bool? is_ssl { get; set; }
     }
 
     public class SessionApi
@@ -57,9 +57,9 @@ namespace MikuSharp.Entities
         public string token { get; set; }
         public string signature { get; set; }
         public string content_id { get; set; }
-        public int heartbeat_lifetime { get; set; }
-        public int content_key_timeout { get; set; }
-        public double priority { get; set; }
+        public int? heartbeat_lifetime { get; set; }
+        public int? content_key_timeout { get; set; }
+        public double? priority { get; set; }
         public List<string> transfer_presets { get; set; }
         public List<Url> urls { get; set; }
     }
@@ -67,20 +67,20 @@ namespace MikuSharp.Entities
     public class Url2
     {
         public string url { get; set; }
-        public bool is_well_known_port { get; set; }
-        public bool is_ssl { get; set; }
+        public bool? is_well_known_port { get; set; }
+        public bool? is_ssl { get; set; }
     }
 
     public class Resolution
     {
-        public int width { get; set; }
-        public int height { get; set; }
+        public int? width { get; set; }
+        public int? height { get; set; }
     }
 
     public class SmileInfo
     {
         public string url { get; set; }
-        public bool isSlowLine { get; set; }
+        public bool? isSlowLine { get; set; }
         public string currentQualityId { get; set; }
         public List<string> qualityIds { get; set; }
     }
@@ -98,33 +98,33 @@ namespace MikuSharp.Entities
         public object originalPostedDateTime { get; set; }
         public object width { get; set; }
         public object height { get; set; }
-        public int duration { get; set; }
-        public int viewCount { get; set; }
-        public int mylistCount { get; set; }
-        public bool translation { get; set; }
+        public int? duration { get; set; }
+        public int? viewCount { get; set; }
+        public int? mylistCount { get; set; }
+        public bool? translation { get; set; }
         public object translator { get; set; }
         public string movieType { get; set; }
         public object badges { get; set; }
         public object mainCommunityId { get; set; }
         public object backCommentType { get; set; }
         public object channelId { get; set; }
-        public bool isCommentExpired { get; set; }
+        public bool? isCommentExpired { get; set; }
         public string isWide { get; set; }
         public object isOfficialAnime { get; set; }
         public object isNoBanner { get; set; }
-        public bool isDeleted { get; set; }
-        public bool isTranslated { get; set; }
-        public bool isR18 { get; set; }
-        public bool isAdult { get; set; }
+        public bool? isDeleted { get; set; }
+        public bool? isTranslated { get; set; }
+        public bool? isR18 { get; set; }
+        public bool? isAdult { get; set; }
         public object isNicowari { get; set; }
-        public bool isPublic { get; set; }
+        public bool? isPublic { get; set; }
         public object isPublishedNicoscript { get; set; }
         public object isNoNGS { get; set; }
         public string isCommunityMemberOnly { get; set; }
-        public bool isCommonsTreeExists { get; set; }
-        public bool isNoIchiba { get; set; }
-        public bool isOfficial { get; set; }
-        public bool isMonetized { get; set; }
+        public bool? isCommonsTreeExists { get; set; }
+        public bool? isNoIchiba { get; set; }
+        public bool? isOfficial { get; set; }
+        public bool? isMonetized { get; set; }
         public SmileInfo smileInfo { get; set; }
     }
 
@@ -135,8 +135,8 @@ namespace MikuSharp.Entities
         public string iconURL { get; set; }
         public object nicoliveInfo { get; set; }
         public object channelInfo { get; set; }
-        public bool isUserVideoPublic { get; set; }
-        public bool isUserMyVideoPublic { get; set; }
-        public bool isUserOpenListPublic { get; set; }
+        public bool? isUserVideoPublic { get; set; }
+        public bool? isUserMyVideoPublic { get; set; }
+        public bool? isUserOpenListPublic { get; set; }
     }
 }

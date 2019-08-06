@@ -4,6 +4,7 @@ using MikuSharp.Enums;
 using MikuSharp.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,7 +33,7 @@ namespace MikuSharp.Events
                         }
                     case TrackEndReason.LoadFailed:
                         {
-                            await e.Player.Guild.GetChannel(g.musicInstance.usedChannel).SendMessageAsync(embed: new DiscordEmbedBuilder().WithTitle("Track failed to play")
+                            await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithTitle("Track failed to play")
                                 .WithDescription($"**{g.musicInstance.currentSong.track.Title}**\nby {g.musicInstance.currentSong.track.Author}\n" +
                                 $"**Failed to load, Skipping to next track**"));
                             g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
@@ -80,5 +81,6 @@ namespace MikuSharp.Events
                 Console.WriteLine(ex);
             }
         }
+
     }
 }

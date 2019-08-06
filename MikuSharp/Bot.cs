@@ -15,6 +15,7 @@ using DSharpPlus.Interactivity.Enums;
 using MikuSharp.Utilities;
 using MikuSharp.Events;
 using System.IO;
+using MikuSharp.Enums;
 
 namespace MikuSharp
 {
@@ -29,6 +30,7 @@ namespace MikuSharp
         public static Dictionary<ulong, Guild> Guilds = new Dictionary<ulong, Guild>();
         public IReadOnlyDictionary<int, InteractivityExtension> interC { get; set; }
         public IReadOnlyDictionary<int, CommandsNextExtension> cmdC { get; set; }
+        public IReadOnlyDictionary<int, LavalinkExtension> lavaC { get; set; }
         public static Dictionary<int, LavalinkNodeConnection> LLEU = new Dictionary<int, LavalinkNodeConnection>();
 
         public Bot()
@@ -45,7 +47,6 @@ namespace MikuSharp
                 UseInternalLogHandler = true,
                 ReconnectIndefinitely = true
             });
-
             bot.GuildDownloadCompleted += e =>
             {
                 GameSetThread = Task.Run(setGame);
@@ -91,11 +92,7 @@ namespace MikuSharp
             {
                 foreach (var gg in g.Value.Guilds.ToList())
                 {
-                    Guilds.TryAdd(gg.Key, new Guild
-                    {
-                        musicInstance = null,
-                        shardId = g.Key
-                    });
+                    Guilds.TryAdd(gg.Key, new Guild(g.Key));
                     await Database.CacheLPL(gg.Key);
                 }
                 i++;
@@ -110,6 +107,7 @@ namespace MikuSharp
                 cmdC[g.Key].RegisterCommands<Commands.NSFW>();
                 cmdC[g.Key].RegisterCommands<Commands.Utility>();
                 cmdC[g.Key].RegisterCommands<Commands.Weeb>();
+                cmdC[g.Key].RegisterCommands<Commands.MikuGuild>();
                 bot.ShardClients[g.Key].VoiceStateUpdated += VoiceChat.LeftAlone;
                 Console.WriteLine("Caching Done " + g.Key);
                 cmdC[g.Key].CommandErrored += e =>
@@ -126,7 +124,8 @@ namespace MikuSharp
             await _weeb.Authenticate(cfg.WeebShToken, Weeb.net.TokenType.Wolke);
             await bot.StartAsync();
             var LL = await bot.UseLavalinkAsync();
-            foreach (var shard in LL)
+            lavaC = LL;
+            foreach (var shard in lavaC)
             {
                 var LCon = await shard.Value.ConnectAsync(new LavalinkConfiguration
                 {
@@ -136,6 +135,7 @@ namespace MikuSharp
                 });
                 LLEU.Add(shard.Key, LCon);
             }
+            
             interC = await bot.UseInteractivityAsync(new InteractivityConfiguration
                 {
                 PaginationBehaviour = PaginationBehaviour.WrapAround,

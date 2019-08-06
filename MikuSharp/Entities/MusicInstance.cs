@@ -21,13 +21,15 @@ using FluentFTP;
 using System.Diagnostics;
 using AngleSharp.Dom;
 using System.Threading;
+using DSharpPlus.Lavalink.EventArgs;
 
 namespace MikuSharp.Entities
 {
     public class MusicInstance
     {
         public int shardID { get; set; }
-        public ulong usedChannel { get; set; }
+        public DiscordChannel usedChannel { get; set; }
+        public DiscordChannel voiceChannel { get; set; }
         public Playstate playstate { get; set; }
         public RepeatMode repeatMode { get; set; }
         public int repeatAllPos { get; set; }
@@ -44,13 +46,14 @@ namespace MikuSharp.Entities
         {
             shardID = shard;
             nodeConnection = node;
-            usedChannel = 0;
+            usedChannel = null;
             playstate = Playstate.NotPlaying;
             repeatMode = RepeatMode.Off;
             repeatAllPos = 0;
             shuffleMode = ShuffleMode.Off;
             queue = new List<QueueEntry>();
         }
+
         public async Task<LavalinkGuildConnection> ConnectToChannel(DiscordChannel channel)
         {
             switch (channel.Type)
@@ -58,6 +61,7 @@ namespace MikuSharp.Entities
                 case DSharpPlus.ChannelType.Voice:
                     {
                         guildConnection = await nodeConnection.ConnectAsync(channel);
+                        voiceChannel = channel;
                         return guildConnection;
                     }
                 default: return null;
@@ -101,8 +105,18 @@ namespace MikuSharp.Entities
                 var s = await nodeConnection.GetTracksAsync(new Uri(n));
                 switch (s.LoadResultType)
                 {
-                    case LavalinkLoadResultType.LoadFailed: return null;
-                    case LavalinkLoadResultType.NoMatches: return null;
+                    case LavalinkLoadResultType.LoadFailed:
+                        {
+                            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("Loading this song/playlist failed, please try again, reasons could be:\n" +
+                                "> Playlist is set to private or unlisted\n" +
+                                "> The song is unavailable/deleted").Build());
+                            return null;
+                        };
+                    case LavalinkLoadResultType.NoMatches:
+                        {
+                            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("No song/playlist was found with this URL, please try again/a different one").Build());
+                            return null;
+                        };
                     case LavalinkLoadResultType.PlaylistLoaded:
                         {
                             if (s.PlaylistInfo.SelectedTrack == -1)
@@ -180,15 +194,26 @@ namespace MikuSharp.Entities
                 var s = await nodeConnection.GetTracksAsync(n);
                 switch (s.LoadResultType)
                 {
-                    case LavalinkLoadResultType.LoadFailed: return null;
-                    case LavalinkLoadResultType.NoMatches: return null;
+                    case LavalinkLoadResultType.LoadFailed:
+                        {
+                            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("Loading this song/playlist failed, please try again, reason could be:\n" +
+                                "> The song is unavailable/deleted").Build());
+                            return null;
+                        };
+                    case LavalinkLoadResultType.NoMatches:
+                        {
+                            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("No song was found, please try again").Build());
+                            return null;
+                        };
                     default:
                         {
                             var em = new DiscordEmbedBuilder()
                                 .WithTitle("Results!")
                                 .WithDescription("Please select a track by responding to this with:\n")
                                 .WithAuthor($"Requested by {ctx.Member.Username}#{ctx.Member.Discriminator} || Timeout 25 seconds", iconUrl: ctx.Member.AvatarUrl);
-                            for (int i = 0; i < 5; i++)
+                            int leng = s.Tracks.Count();
+                            if (leng > 5) leng = 5;
+                            for (int i = 0; i < leng; i++)
                             {
                                 em.AddField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})");
                             }
