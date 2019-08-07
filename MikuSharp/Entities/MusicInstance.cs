@@ -271,14 +271,12 @@ namespace MikuSharp.Entities
                 repeatAllPos++;
             if (repeatAllPos >= queue.Count)
                 repeatAllPos = 0;
-            if (shuffleMode == ShuffleMode.Off)
-                currentSong = queue[0];
-            else
-                currentSong = queue[new Random().Next(0, queue.Count)];
             if (repeatMode == RepeatMode.All)
                 currentSong = queue[repeatAllPos];
-            if (repeatMode == RepeatMode.On)
+            else if (repeatMode == RepeatMode.On)
                 currentSong = cur;
+            if (shuffleMode == ShuffleMode.On)
+                currentSong = queue[new Random().Next(0, queue.Count)];
             guildConnection.PlaybackFinished += Lavalink.LavalinkTrackFinish;
             playstate = Playstate.Playing;
             await Task.Run(() => guildConnection.Play(currentSong.track));
