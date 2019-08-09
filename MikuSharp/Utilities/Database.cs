@@ -12,6 +12,7 @@ namespace MikuSharp.Utilities
     {
         public static async Task AddToLPL(ulong g, string ts)
         {
+            return;
             int position = 0;
             var connString = Bot.cfg.DbConnectString;
             var conn = new NpgsqlConnection(connString);
@@ -37,6 +38,7 @@ namespace MikuSharp.Utilities
         
         public static async Task CacheLPL(ulong g)
         {
+            return;
             var connString = Bot.cfg.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();

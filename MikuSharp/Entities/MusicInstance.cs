@@ -38,7 +38,7 @@ namespace MikuSharp.Entities
         public CancellationTokenSource aloneCTS { get; set; }
         public LavalinkNodeConnection nodeConnection { get; set; }
         public LavalinkGuildConnection guildConnection { get; set; }
-        public List<QueueEntry> queue { get; set; }
+        // no use query public List<QueueEntry> queue { get; set; }
         public QueueEntry currentSong { get; set; }
         public QueueEntry lastSong { get; set; }
 
@@ -51,7 +51,7 @@ namespace MikuSharp.Entities
             repeatMode = RepeatMode.Off;
             repeatAllPos = 0;
             shuffleMode = ShuffleMode.Off;
-            queue = new List<QueueEntry>();
+            // queeeeerrryyy queue = new List<QueueEntry>();
         }
 
         public async Task<LavalinkGuildConnection> ConnectToChannel(DiscordChannel channel)
@@ -281,44 +281,6 @@ namespace MikuSharp.Entities
             playstate = Playstate.Playing;
             await Task.Run(() => guildConnection.Play(currentSong.track));
             return currentSong;
-        }
-    }
-
-    public class TrackResult
-    {
-        public LavalinkPlaylistInfo PlaylistInfo { get; set; }
-        public List<LavalinkTrack> Tracks { get; set; }
-        public TrackResult(LavalinkPlaylistInfo pl, IEnumerable<LavalinkTrack> tr)
-        {
-            PlaylistInfo = pl;
-            Tracks = new List<LavalinkTrack>();
-            Tracks.AddRange(tr);
-        }
-        public TrackResult(LavalinkPlaylistInfo pl, LavalinkTrack tr)
-        {
-            PlaylistInfo = pl;
-            Tracks = new List<LavalinkTrack>();
-            Tracks.Add(tr);
-        }
-    }
-
-    public class Entry
-    {
-        public LavalinkTrack track { get; protected set; }
-        public DateTimeOffset additionDate { get; protected set; }
-        public Entry(LavalinkTrack t)
-        {
-            track = t;
-            additionDate = DateTimeOffset.UtcNow;
-        }
-    }
-
-    public class QueueEntry : Entry
-    {
-        public DiscordMember addedBy { set; get; }
-        public QueueEntry(LavalinkTrack t, DiscordMember m) : base(t)
-        {
-            addedBy = m;
         }
     }
 

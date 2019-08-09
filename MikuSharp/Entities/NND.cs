@@ -24,13 +24,6 @@ namespace MikuSharp.Entities
         public int? deleted { get; set; }
     }
 
-    public class User
-    {
-        public int? user_id { get; set; }
-        public bool? is_premium { get; set; }
-        public string nickname { get; set; }
-    }
-
     public class AuthTypes
     {
         public string http { get; set; }
