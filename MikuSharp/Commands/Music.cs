@@ -209,7 +209,7 @@ namespace MikuSharp.Commands
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
             g.musicInstance.usedChannel = ctx.Channel;
             await Task.Run(() => g.musicInstance.guildConnection.Stop());
-            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription("**Stopped**\n(use m%%resume to start playback again)").Build());
+            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription("**Stopped**\n(use m%resume to start playback again)").Build());
         }
 
         [Command("volume"), Aliases("vol")]
@@ -321,7 +321,7 @@ namespace MikuSharp.Commands
 
         [Command("repeat"), Aliases("r")]
         [Description("Repeat the current song or the entire queue")]
-        [Usage("|-> If Repeatmode is on it will be turned off, in any other case it will be turned to single song repeat mode",
+        [Usage("|-> If repeat mode is on it will be turned off, in any other case it will be turned to single song repeat mode",
             "(0,1,2) |-> 0:Off 1:Repeat only the current song 2:Repeat the entire queue",
             "(off, on, all) |-> off:Off on:Repeat only the current song all:Repeat the entire queue")]
         [RequireUserVoicechatConnection]
@@ -345,7 +345,7 @@ namespace MikuSharp.Commands
                     }
                 default: g.musicInstance.repeatMode = RepeatMode.Off; break;
             }
-            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set repeatmode to:\n**{g.musicInstance.repeatMode}**").Build());
+            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set repeat mode to:\n**{g.musicInstance.repeatMode}**").Build());
         }
 
         [Command("repeat")]
@@ -369,7 +369,7 @@ namespace MikuSharp.Commands
                     }
                 default: g.musicInstance.repeatMode = RepeatMode.Off; break;
             }
-            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set repeatmode to:\n**{g.musicInstance.repeatMode}**").Build());
+            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set repeat mode to:\n**{g.musicInstance.repeatMode}**").Build());
         }
 
         [Command("repeat")]
@@ -385,7 +385,7 @@ namespace MikuSharp.Commands
 
         [Command("repeatall"), Aliases("ra")]
         [Description("Repeat the entire queue")]
-        [Usage("|-> If Repeatmode is set to all it will be turned off, in any other case it will be turned to \"all\" repeat mode")]
+        [Usage("|-> If repeat mode is set to all it will be turned off, in any other case it will be turned to \"all\" repeat mode")]
         [RequireUserVoicechatConnection]
         public async Task RepeatAll(CommandContext ctx)
         {
@@ -394,7 +394,7 @@ namespace MikuSharp.Commands
             g.musicInstance.usedChannel = ctx.Channel;
             if (g.musicInstance.repeatMode != RepeatMode.All) g.musicInstance.repeatMode = RepeatMode.All;
             else g.musicInstance.repeatMode = RepeatMode.Off;
-            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set repeatmode to:\n**{g.musicInstance.repeatMode}**").Build());
+            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set repeat mode to:\n**{g.musicInstance.repeatMode}**").Build());
         }
 
         [Command("shuffle"), Aliases("s")]
@@ -407,7 +407,7 @@ namespace MikuSharp.Commands
             g.musicInstance.usedChannel = ctx.Channel;
             if (g.musicInstance.shuffleMode == ShuffleMode.Off) g.musicInstance.shuffleMode = ShuffleMode.On;
             else g.musicInstance.shuffleMode = ShuffleMode.Off;
-            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set Shufflemode to:\n**{g.musicInstance.shuffleMode}**").Build());
+            await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set shuffle mode to:\n**{g.musicInstance.shuffleMode}**").Build());
         }
 
         [Command("queue"), Aliases("q")]
