@@ -15,7 +15,6 @@ namespace MikuSharp.Entities
         public int shardId { get; set; }
         //CustomPrefix stuff
         public MusicInstance musicInstance{ get; set; }
-        public List<Entry> lastPlayedSongs = new List<Entry>();
         public Task AloneCheckThread { get; set; }
 
         public Guild(int id, MusicInstance mi = null)

@@ -22,6 +22,7 @@ using System.Diagnostics;
 using AngleSharp.Dom;
 using System.Threading;
 using DSharpPlus.Lavalink.EventArgs;
+using MikuSharp.Utilities;
 
 namespace MikuSharp.Entities
 {
@@ -38,7 +39,6 @@ namespace MikuSharp.Entities
         public CancellationTokenSource aloneCTS { get; set; }
         public LavalinkNodeConnection nodeConnection { get; set; }
         public LavalinkGuildConnection guildConnection { get; set; }
-        // no use query public List<QueueEntry> queue { get; set; }
         public QueueEntry currentSong { get; set; }
         public QueueEntry lastSong { get; set; }
 
@@ -51,7 +51,6 @@ namespace MikuSharp.Entities
             repeatMode = RepeatMode.Off;
             repeatAllPos = 0;
             shuffleMode = ShuffleMode.Off;
-            // queeeeerrryyy queue = new List<QueueEntry>();
         }
 
         public async Task<LavalinkGuildConnection> ConnectToChannel(DiscordChannel channel)
@@ -69,6 +68,7 @@ namespace MikuSharp.Entities
         }
         public async Task<TrackResult> QueueSong(string n, CommandContext ctx, int pos = -1)
         {
+            var queue = await Database.GetQueue(ctx.Guild);
             var inter = ctx.Client.GetInteractivity();
             if (n.ToLower().StartsWith("http://nicovideo.jp")
                 || n.ToLower().StartsWith("http://sp.nicovideo.jp")
@@ -95,8 +95,8 @@ namespace MikuSharp.Entities
                     await client.UploadAsync(ex, $"{nndID}.mp3", FtpExists.Skip, true);
                 }
                 var Track = await nodeConnection.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
-                if (pos == -1) queue.Add(new QueueEntry(Track.Tracks.First(), ctx.Member));
-                else queue.Insert(pos, new QueueEntry(Track.Tracks.First(), ctx.Member));
+                if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
+                else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                 return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
             }
@@ -137,7 +137,7 @@ namespace MikuSharp.Entities
                                 if (resp.Result.Content == "y" || resp.Result.Content == "yes" || resp.Result.Content == "1")
                                 {
                                     foreach (var e in s.Tracks)
-                                        queue.Add(new QueueEntry(e, ctx.Member));
+                                        await Database.AddToQueue(ctx.Guild, ctx.Member.Id, e.TrackString);
                                     if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                                     return new TrackResult(s.PlaylistInfo, s.Tracks);
                                 }
@@ -161,8 +161,8 @@ namespace MikuSharp.Entities
                                 }
                                 if (resp.Result.Content == "y" || resp.Result.Content == "yes" || resp.Result.Content == "1")
                                 {
-                                    if (pos == -1) queue.Add(new QueueEntry(s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack), ctx.Member));
-                                    else queue.Insert(pos, new QueueEntry(s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack), ctx.Member));
+                                    if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).TrackString);
+                                    else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).TrackString, pos);
                                     if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                                     return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack));
                                 }
@@ -170,10 +170,10 @@ namespace MikuSharp.Entities
                                 {
                                     if (pos == -1)
                                         foreach (var e in s.Tracks)
-                                            queue.Add(new QueueEntry(e, ctx.Member));
+                                            await Database.AddToQueue(ctx.Guild, ctx.Member.Id, e.TrackString);
                                     else
                                         foreach (var e in s.Tracks.Reverse())
-                                            queue.Insert(pos, new QueueEntry(e, ctx.Member));
+                                            await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, e.TrackString, pos);
                                     if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                                     return new TrackResult(s.PlaylistInfo, s.Tracks);
                                 }
@@ -182,8 +182,8 @@ namespace MikuSharp.Entities
                         };
                     default:
                         {
-                            if (pos == -1) queue.Add(new QueueEntry(s.Tracks.First(), ctx.Member));
-                            else queue.Insert(pos, new QueueEntry(s.Tracks.First(), ctx.Member));
+                            if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.First().TrackString);
+                            else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.First().TrackString, pos);
                             if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                             return new TrackResult(s.PlaylistInfo, s.Tracks.First());
                         };
@@ -226,36 +226,36 @@ namespace MikuSharp.Entities
                             }
                             if (resp.Result.Content == "1")
                             {
-                                if (pos == -1)queue.Add(new QueueEntry(s.Tracks.ElementAt(0), ctx.Member));
-                                else queue.Insert(pos,new QueueEntry(s.Tracks.ElementAt(0), ctx.Member));
+                                if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(0).TrackString);
+                                else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(0).TrackString, pos);
                                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                                 return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(0));
                             }
                             if (resp.Result.Content == "2")
                             {
-                                if (pos == -1) queue.Add(new QueueEntry(s.Tracks.ElementAt(1), ctx.Member));
-                                else queue.Insert(pos, new QueueEntry(s.Tracks.ElementAt(1), ctx.Member));
+                                if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(1).TrackString);
+                                else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(1).TrackString, pos);
                                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                                 return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(1));
                             }
                             if (resp.Result.Content == "3")
                             {
-                                if (pos == -1) queue.Add(new QueueEntry(s.Tracks.ElementAt(2), ctx.Member));
-                                else queue.Insert(pos, new QueueEntry(s.Tracks.ElementAt(2), ctx.Member));
+                                if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(2).TrackString);
+                                else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(2).TrackString, pos);
                                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                                 return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(2)); ;
                             }
                             if (resp.Result.Content == "4")
                             {
-                                if (pos == -1) queue.Add(new QueueEntry(s.Tracks.ElementAt(3), ctx.Member));
-                                else queue.Insert(pos, new QueueEntry(s.Tracks.ElementAt(3), ctx.Member));
+                                if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(3).TrackString);
+                                else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(3).TrackString, pos);
                                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                                 return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(3));
                             }
                             if (resp.Result.Content == "5")
                             {
-                                if (pos == -1) queue.Add(new QueueEntry(s.Tracks.ElementAt(4), ctx.Member));
-                                else queue.Insert(pos, new QueueEntry(s.Tracks.ElementAt(4), ctx.Member));
+                                if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(4).TrackString);
+                                else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(4).TrackString, pos);
                                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                                 return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(4));
                             }
@@ -263,20 +263,26 @@ namespace MikuSharp.Entities
                         };
                 }
             }
-        } 
+        }
+
         public async Task<QueueEntry> PlaySong()
         {
+            var queue = await Database.GetQueue(voiceChannel.Guild);
             var cur = lastSong;
             if (queue.Count != 1 && repeatMode == RepeatMode.All)
                 repeatAllPos++;
             if (repeatAllPos >= queue.Count)
                 repeatAllPos = 0;
+            if (shuffleMode == ShuffleMode.Off)
+                currentSong = queue[0];
+            else
+                currentSong = queue[new Random().Next(0, queue.Count)];
             if (repeatMode == RepeatMode.All)
                 currentSong = queue[repeatAllPos];
-            else if (repeatMode == RepeatMode.On)
+            if (repeatMode == RepeatMode.On)
                 currentSong = cur;
-            if (shuffleMode == ShuffleMode.On)
-                currentSong = queue[new Random().Next(0, queue.Count)];
+            Console.WriteLine(queue.Count);
+            Console.WriteLine(currentSong.track.TrackString);
             guildConnection.PlaybackFinished += Lavalink.LavalinkTrackFinish;
             playstate = Playstate.Playing;
             await Task.Run(() => guildConnection.Play(currentSong.track));

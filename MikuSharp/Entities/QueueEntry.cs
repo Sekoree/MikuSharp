@@ -8,9 +8,11 @@ namespace MikuSharp.Entities
 {
     public class QueueEntry : Entry
     {
-        public DiscordMember addedBy { set; get; }
-        public QueueEntry(LavalinkTrack t, DiscordMember m) : base(t)
+        public int position { get; set; }
+        public ulong addedBy { set; get; }
+        public QueueEntry(LavalinkTrack t, ulong m, DateTimeOffset adddate, int pos) : base(t, adddate)
         {
+            position = pos;
             addedBy = m;
         }
     }

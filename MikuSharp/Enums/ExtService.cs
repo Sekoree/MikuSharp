@@ -4,9 +4,10 @@ using System.Text;
 
 namespace MikuSharp.Enums
 {
-    public enum MusicLocked
+    public enum ExtService
     {
-        Unlocked = 0,
-        Locked = 1
+        None = 0,
+        Youtube = 1,
+        Soundcloud = 2
     }
 }

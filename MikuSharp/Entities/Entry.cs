@@ -9,10 +9,10 @@ namespace MikuSharp.Entities
     {
         public LavalinkTrack track { get; protected set; }
         public DateTimeOffset additionDate { get; protected set; }
-        public Entry(LavalinkTrack t)
+        public Entry(LavalinkTrack t, DateTimeOffset addtime)
         {
             track = t;
-            additionDate = DateTimeOffset.UtcNow;
+            additionDate = addtime;
         }
     }
 }
