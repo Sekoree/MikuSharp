@@ -17,6 +17,7 @@ namespace MikuSharp.Events
             try
             {
                 var g = Bot.Guilds[e.Player.Guild.Id];
+                var lastPlayedSongs = await Database.GetLPL(e.Player.Guild);
                 switch (e.Reason)
                 {
                     case TrackEndReason.Stopped:
@@ -37,40 +38,38 @@ namespace MikuSharp.Events
                                 .WithDescription($"**{g.musicInstance.currentSong.track.Title}**\nby {g.musicInstance.currentSong.track.Author}\n" +
                                 $"**Failed to load, Skipping to next track**"));
                             g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-                            g.musicInstance.queue.Remove(g.musicInstance.currentSong);
-                            if (g.lastPlayedSongs.Count == 0)
+                            await Database.RemoveFromQueue(g.musicInstance.currentSong.position, e.Player.Guild);
+                            if (lastPlayedSongs.Count == 0)
                             {
-                                g.lastPlayedSongs.Add(g.musicInstance.currentSong);
                                 await Database.AddToLPL(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
                             }
-                            else if (g.lastPlayedSongs[0].track.Uri != g.musicInstance.currentSong.track.Uri)
+                            else if (lastPlayedSongs[0].track.Uri != g.musicInstance.currentSong.track.Uri)
                             {
-                                g.lastPlayedSongs.Insert(0, g.musicInstance.currentSong);
                                 await Database.AddToLPL(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
                             }
                             g.musicInstance.lastSong = g.musicInstance.currentSong;
                             g.musicInstance.currentSong = null;
-                            if (g.musicInstance.queue.Count != 0) await g.musicInstance.PlaySong();
+                            var queue = await Database.GetQueue(e.Player.Guild);
+                            if (queue.Count != 0) await g.musicInstance.PlaySong();
                             else g.musicInstance.playstate = Playstate.NotPlaying;
                             break;
                         }
                     case TrackEndReason.Finished:
                         {
                             g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-                            if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All) g.musicInstance.queue.Remove(g.musicInstance.currentSong);
-                            if (g.lastPlayedSongs.Count == 0)
+                            if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All) await Database.RemoveFromQueue(g.musicInstance.currentSong.position, e.Player.Guild);
+                            if (lastPlayedSongs.Count == 0)
                             {
-                                g.lastPlayedSongs.Add(g.musicInstance.currentSong);
                                 await Database.AddToLPL(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
                             }
-                            else if (g.lastPlayedSongs[0].track.Uri != g.musicInstance.currentSong.track.Uri)
+                            else if (lastPlayedSongs[0].track.Uri != g.musicInstance.currentSong.track.Uri)
                             {
-                                g.lastPlayedSongs.Insert(0, g.musicInstance.currentSong);
                                 await Database.AddToLPL(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
                             }
                             g.musicInstance.lastSong = g.musicInstance.currentSong;
                             g.musicInstance.currentSong = null;
-                            if (g.musicInstance.queue.Count != 0) await g.musicInstance.PlaySong();
+                            var queue = await Database.GetQueue(e.Player.Guild);
+                            if (queue.Count != 0) await g.musicInstance.PlaySong();
                             else g.musicInstance.playstate = Playstate.NotPlaying;
                             break;
                         }
