@@ -71,7 +71,21 @@ namespace MikuSharp
                     ActivityType = ActivityType.Playing
                 };
                 await bot.UpdateStatusAsync(activity: test, userStatus: UserStatus.Online);
-                await Task.Delay(TimeSpan.FromMinutes(30));
+                await Task.Delay(TimeSpan.FromMinutes(5));
+                DiscordActivity test2 = new DiscordActivity
+                {
+                    Name = "Check the new playlist commands!",
+                    ActivityType = ActivityType.Playing
+                };
+                await bot.UpdateStatusAsync(activity: test2, userStatus: UserStatus.Online);
+                await Task.Delay(TimeSpan.FromMinutes(5));
+                DiscordActivity test3 = new DiscordActivity
+                {
+                    Name = "Full NND support!",
+                    ActivityType = ActivityType.Playing
+                };
+                await bot.UpdateStatusAsync(activity: test3, userStatus: UserStatus.Online);
+                await Task.Delay(TimeSpan.FromMinutes(5));
             }
         }
 
@@ -87,16 +101,7 @@ namespace MikuSharp
 
         public async Task CacheRegister()
         {
-            int i = 0;
-            foreach (var g in bot.ShardClients)
-            {
-                foreach (var gg in g.Value.Guilds.ToList())
-                {
-                    Guilds.TryAdd(gg.Key, new Guild(g.Key));
-                    await Database.CacheLPL(gg.Key);
-                }
-                i++;
-            }
+            await Task.Delay(1);
             foreach(var g in bot.ShardClients)
             {
                 cmdC[g.Key].RegisterCommands<Commands.Action>();
@@ -108,8 +113,14 @@ namespace MikuSharp
                 cmdC[g.Key].RegisterCommands<Commands.Utility>();
                 cmdC[g.Key].RegisterCommands<Commands.Weeb>();
                 cmdC[g.Key].RegisterCommands<Commands.MikuGuild>();
+                cmdC[g.Key].RegisterCommands<Commands.Playlist>();
                 bot.ShardClients[g.Key].VoiceStateUpdated += VoiceChat.LeftAlone;
                 Console.WriteLine("Caching Done " + g.Key);
+                cmdC[g.Key].CommandExecuted += e =>
+                {
+                    Console.WriteLine($"Command: {e.Command.Name} by {e.Context.User.Username}#{e.Context.User.Discriminator}({e.Context.User.Id}) on {e.Context.Guild.Name}({e.Context.Guild.Id})");
+                    return Task.CompletedTask;
+                };
                 cmdC[g.Key].CommandErrored += e =>
                 {
                     Console.WriteLine(e.Exception);

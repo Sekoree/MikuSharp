@@ -136,8 +136,7 @@ namespace MikuSharp.Entities
                                 }
                                 if (resp.Result.Content == "y" || resp.Result.Content == "yes" || resp.Result.Content == "1")
                                 {
-                                    foreach (var e in s.Tracks)
-                                        await Database.AddToQueue(ctx.Guild, ctx.Member.Id, e.TrackString);
+                                    await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ToList());
                                     if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                                     return new TrackResult(s.PlaylistInfo, s.Tracks);
                                 }
@@ -169,11 +168,9 @@ namespace MikuSharp.Entities
                                 if (resp.Result.Content == "a" || resp.Result.Content == "all")
                                 {
                                     if (pos == -1)
-                                        foreach (var e in s.Tracks)
-                                            await Database.AddToQueue(ctx.Guild, ctx.Member.Id, e.TrackString);
+                                        await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ToList());
                                     else
-                                        foreach (var e in s.Tracks.Reverse())
-                                            await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, e.TrackString, pos);
+                                        await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.Reverse().ToList(), pos);
                                     if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                                     return new TrackResult(s.PlaylistInfo, s.Tracks);
                                 }

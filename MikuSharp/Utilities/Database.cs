@@ -15,7 +15,6 @@ namespace MikuSharp.Utilities
     {
         public static async Task AddToLPL(ulong g, string ts)
         {
-            return;
             int position = 0;
             var connString = Bot.cfg.DbConnectString;
             var conn = new NpgsqlConnection(connString);
@@ -49,18 +48,17 @@ namespace MikuSharp.Utilities
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
             int i = 0;
+            string longcmd = "";
             foreach (var qi in queueNow)
             {
-                var cmd2 = new NpgsqlCommand("INSERT INTO queues VALUES (@pos,@guild,@user,@ts,@time)", conn);
-                cmd2.Parameters.AddWithValue("pos", i);
-                cmd2.Parameters.AddWithValue("guild", Convert.ToInt64(g.Id));
-                cmd2.Parameters.AddWithValue("user", Convert.ToInt64(qi.addedBy));
-                cmd2.Parameters.AddWithValue("ts", qi.track.TrackString);
-                cmd2.Parameters.AddWithValue("time", qi.additionDate);
-                await cmd2.ExecuteNonQueryAsync();
-                cmd2.Dispose();
+                string adddate = $"{qi.additionDate.UtcDateTime.Year}-{qi.additionDate.UtcDateTime.Month}-{qi.additionDate.UtcDateTime.Day} {qi.additionDate.UtcDateTime.Hour}:{qi.additionDate.UtcDateTime.Minute}:{qi.additionDate.UtcDateTime.Second}";
+                longcmd += $"INSERT INTO queues VALUES ({i},@guild,'{qi.addedBy}','{qi.track.TrackString}','{adddate}');";
                 i++;
             }
+            var cmd2 = new NpgsqlCommand(longcmd, conn);
+            cmd2.Parameters.AddWithValue("guild", Convert.ToInt64(g.Id));
+            await cmd2.ExecuteNonQueryAsync();
+            cmd2.Dispose();
             conn.Close();
             conn.Dispose();
         }
@@ -75,18 +73,17 @@ namespace MikuSharp.Utilities
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
             int i = 0;
+            string longcmd = "";
             foreach (var qi in queueNow)
             {
-                var cmd2 = new NpgsqlCommand("INSERT INTO queues VALUES (@pos,@guild,@user,@ts,@time)", conn);
-                cmd2.Parameters.AddWithValue("pos", i);
-                cmd2.Parameters.AddWithValue("guild", Convert.ToInt64(g.Id));
-                cmd2.Parameters.AddWithValue("user", Convert.ToInt64(qi.addedBy));
-                cmd2.Parameters.AddWithValue("ts", qi.track.TrackString);
-                cmd2.Parameters.AddWithValue("time", qi.additionDate);
-                await cmd2.ExecuteNonQueryAsync();
-                cmd2.Dispose();
+                string adddate = $"{qi.additionDate.UtcDateTime.Year}-{qi.additionDate.UtcDateTime.Month}-{qi.additionDate.UtcDateTime.Day} {qi.additionDate.UtcDateTime.Hour}:{qi.additionDate.UtcDateTime.Minute}:{qi.additionDate.UtcDateTime.Second}";
+                longcmd += $"INSERT INTO queues VALUES ({i},@guild,'{qi.addedBy}','{qi.track.TrackString}','{adddate}');";
                 i++;
             }
+            var cmd2 = new NpgsqlCommand(longcmd, conn);
+            cmd2.Parameters.AddWithValue("guild", Convert.ToInt64(g.Id));
+            await cmd2.ExecuteNonQueryAsync();
+            cmd2.Dispose();
             conn.Close();
             conn.Dispose();
         }
@@ -122,7 +119,7 @@ namespace MikuSharp.Utilities
             {
                 position = reader.GetInt32(0);
             }
-            Console.WriteLine(position);
+            //Console.WriteLine(position);
             reader.Close();
             cmd2.Dispose();
             var cmd = new NpgsqlCommand("INSERT INTO queues VALUES (@pos,@guild,@user,@ts,@time)", conn);
@@ -137,10 +134,82 @@ namespace MikuSharp.Utilities
             conn.Dispose();
         }
 
+        public static async Task AddToQueue(DiscordGuild g, ulong u, List<LavalinkTrack> ts)
+        {
+            int position = 0;
+            var connString = Bot.cfg.DbConnectString;
+            var conn = new NpgsqlConnection(connString);
+            await conn.OpenAsync();
+            var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM queues WHERE guildId = {g.Id};", conn);
+            var reader = await cmd2.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                position = reader.GetInt32(0);
+            }
+            //Console.WriteLine(position);
+            reader.Close();
+            cmd2.Dispose();
+            string longcmd = "";
+            foreach (var tt in ts)
+            {
+                longcmd += $"INSERT INTO queues VALUES ({position},@guild,@user,'{tt.TrackString}',@time);";
+                position++;
+            }
+            var cmd = new NpgsqlCommand(longcmd, conn);
+            cmd.Parameters.AddWithValue("guild", Convert.ToInt64(g.Id));
+            cmd.Parameters.AddWithValue("user", Convert.ToInt64(u));
+            cmd.Parameters.AddWithValue("time", DateTimeOffset.UtcNow);
+            await cmd.ExecuteNonQueryAsync();
+            cmd.Dispose();
+            conn.Close();
+            conn.Dispose();
+        }
+
+        public static async Task AddToQueue(DiscordGuild g, ulong u, List<PlaylistEntry> ts)
+        {
+            int position = 0;
+            var connString = Bot.cfg.DbConnectString;
+            var conn = new NpgsqlConnection(connString);
+            await conn.OpenAsync();
+            var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM queues WHERE guildId = {g.Id};", conn);
+            var reader = await cmd2.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                position = reader.GetInt32(0);
+            }
+            //Console.WriteLine(position);
+            reader.Close();
+            cmd2.Dispose();
+            string longcmd = "";
+            foreach (var tt in ts)
+            {
+                longcmd += $"INSERT INTO queues VALUES ({position},@guild,@user,'{tt.track.TrackString}',@time);";
+                position++;
+            }
+            var cmd = new NpgsqlCommand(longcmd, conn);
+            cmd.Parameters.AddWithValue("guild", Convert.ToInt64(g.Id));
+            cmd.Parameters.AddWithValue("user", Convert.ToInt64(u));
+            cmd.Parameters.AddWithValue("time", DateTimeOffset.UtcNow);
+            await cmd.ExecuteNonQueryAsync();
+            cmd.Dispose();
+            conn.Close();
+            conn.Dispose();
+        }
+
         public static async Task InsertToQueue(DiscordGuild g, ulong u, string ts, int pos)
         {
             var qnow = await GetQueue(g);
             qnow.Insert(pos, new QueueEntry(LavalinkUtilities.DecodeTrack(ts), u, DateTimeOffset.UtcNow, pos));
+            await RebuildQueue(g, qnow);
+        }
+
+        public static async Task InsertToQueue(DiscordGuild g, ulong u, List<LavalinkTrack> ts, int pos)
+        {
+            var qnow = await GetQueue(g);
+            foreach (var tt in ts)
+            {
+                qnow.Insert(pos, new QueueEntry(LavalinkUtilities.DecodeTrack(tt.TrackString), u, DateTimeOffset.UtcNow, pos));
+            }
             await RebuildQueue(g, qnow);
         }
 

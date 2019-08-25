@@ -88,6 +88,32 @@ namespace MikuSharp.Commands
             {
                 g.musicInstance = new MusicInstance(Bot.LLEU[ctx.Client.ShardId], ctx.Client.ShardId);
             }
+            var curq = await Database.GetQueue(ctx.Guild);
+            if (curq.Count != 0 && g.musicInstance.playstate == Playstate.NotPlaying)
+            {
+                var inter = ctx.Client.GetInteractivity();
+                var msg = await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Recover Queue").WithDescription("The last time the bot disconnected the queue wasnt cleared, do you want to restore and play that old one?\n" +
+                    "Respond with:\n" +
+                    "> ``1``, ``y``, ``yes`` | To Restore and play the old queue or\n" +
+                    "> ``0``, ``n``, ``no`` | To clear the old queue and start anew").Build());
+                var hmm = await inter.WaitForMessageAsync(x => x.Author == ctx.Member, TimeSpan.FromSeconds(15));
+                if (hmm.TimedOut) return;
+                else if (hmm.Result.Content == "1" || hmm.Result.Content == "y" || hmm.Result.Content == "yes")
+                {
+                    await msg.DeleteAsync();
+                    await hmm.Result.DeleteAsync();
+                    await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
+                    await g.musicInstance.PlaySong();
+                    return;
+                }
+                else if (hmm.Result.Content == "0" || hmm.Result.Content == "n" || hmm.Result.Content == "no")
+                {
+                    await Database.ClearQueue(ctx.Guild);
+                    await msg.DeleteAsync();
+                    await hmm.Result.DeleteAsync();
+                }
+                else return;
+            }
             if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false) await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
             if (ctx.Message.Attachments.Count == 0 && song == null) return;
             g.musicInstance.usedChannel = ctx.Channel;
