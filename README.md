@@ -20,6 +20,8 @@ If you want to support the bot and/or fix bugs or add documentation, feel free t
 * [Google Youtube API](https://github.com/googleapis/google-api-dotnet-client) for fancy "now playing" command
 * [Kitsu](https://github.com/KurozeroPB/Kitsu) to get Anime and Manga info
 * [Newtonsoft Json](https://github.com/JamesNK/Newtonsoft.Json) to handle the response of various APIs
-* [Mime](https://github.com/hey-red/Mime) to handle all commands that include files with varying fileformats
+* [Mime](https://github.com/hey-red/Mime) to handle all commands that include files with varying file formats
 * [Npgsql](https://github.com/npgsql/npgsql) to connect to the PostgreSQL DB for playlists and other persistent data
-* [Weeb.net](https://github.com/Daniele122898/Weeb.net) to get stuff from the Weeb.net API
+* [Weeb.net](https://github.com/Daniele122898/Weeb.net) to get stuff from the Weeb.sh API
+
+Original JS bot made by [ohlookitsderpy](https://github.com/ohlookitsderpy)
