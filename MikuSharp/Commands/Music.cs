@@ -57,7 +57,7 @@ namespace MikuSharp.Commands
                 g.musicInstance.playstate = Playstate.NotPlaying;
                 await Task.Run(() => g.musicInstance.guildConnection.Stop());
                 await Task.Run(() => g.musicInstance.guildConnection.Disconnect());
-                g.musicInstance.usedChannel = null;
+                g.musicInstance = null;
                 await ctx.RespondAsync("cya! 💙");
             }
             else
