@@ -207,7 +207,10 @@ namespace MikuSharp.Commands
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
             g.musicInstance.usedChannel = ctx.Channel;
             g.musicInstance.guildConnection.PlaybackFinished -= Lavalink.LavalinkTrackFinish;
-            if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All) await Database.RemoveFromQueue(g.musicInstance.currentSong.position, ctx.Guild);
+            if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All)
+            {
+                await Database.RemoveFromQueue(g.musicInstance.currentSong.position, ctx.Guild);
+            }
             if (lastPlayedSongs.Count == 0)
             {
                 await Database.AddToLPL(ctx.Guild.Id, g.musicInstance.currentSong.track.TrackString);
@@ -216,6 +219,7 @@ namespace MikuSharp.Commands
             {
                 await Database.AddToLPL(ctx.Guild.Id, g.musicInstance.currentSong.track.TrackString);
             }
+            queue = await Database.GetQueue(ctx.Guild);
             g.musicInstance.lastSong = g.musicInstance.currentSong;
             g.musicInstance.currentSong = null;
             if (queue.Count != 0) await g.musicInstance.PlaySong();
