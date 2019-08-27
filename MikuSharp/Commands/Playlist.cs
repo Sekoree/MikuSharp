@@ -199,7 +199,7 @@ namespace MikuSharp.Commands
                 if (name == null) return;
             }
             var pls = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
-            if (pls.Any(x => x == name))
+            if (!pls.Any(x => x == name))
             {
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Show Playlist").WithDescription("**Error** You dont have a playlist with that name!").Build());
                 return;
@@ -275,7 +275,7 @@ namespace MikuSharp.Commands
                 if (name == null) return;
             }
             var pls = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
-            if (pls.Any(x => x == name))
+            if (!pls.Any(x => x == name))
             {
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Delete Playlist").WithDescription("**Error** You dont have a playlist with that name!").Build());
                 return;
