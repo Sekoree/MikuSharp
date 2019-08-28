@@ -5,9 +5,8 @@
 Rewritten from JS to C# with completely redone Music part!
 
 ### Missing Features
-* Playlists
 * Some NSFW Commands need to be updated
-* Descriptions and usages on some commands (and spelling mistakes)
+* Usages on some commands (and spelling mistakes)
 * Some text commands
 
 ### What this is for
