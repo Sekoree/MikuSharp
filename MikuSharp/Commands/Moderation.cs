@@ -13,7 +13,6 @@ namespace MikuSharp.Commands
     class Moderation : BaseCommandModule
     {
         [Command("ban")]
-        [Priority(2)]
         [RequirePermissions(DSharpPlus.Permissions.Administrator | DSharpPlus.Permissions.BanMembers)]
         [Description("Ban someone")]
         public async Task Ban(CommandContext ctx, DiscordMember m)
@@ -23,7 +22,6 @@ namespace MikuSharp.Commands
         }
 
         [Command("kick")]
-        [Priority(2)]
         [RequirePermissions(DSharpPlus.Permissions.Administrator | DSharpPlus.Permissions.KickMembers)]
         [Description("Kick someone")]
         public async Task Kick(CommandContext ctx, DiscordMember m)
@@ -46,6 +44,7 @@ namespace MikuSharp.Commands
         }
 
         [Command("unban")]
+        [Priority(2)]
         [RequirePermissions(DSharpPlus.Permissions.Administrator
             | DSharpPlus.Permissions.BanMembers
             | DSharpPlus.Permissions.ManageGuild)]
@@ -57,6 +56,7 @@ namespace MikuSharp.Commands
         }
 
         [Command("unban")]
+        [Priority(1)]
         [RequirePermissions(DSharpPlus.Permissions.Administrator
             | DSharpPlus.Permissions.BanMembers
             | DSharpPlus.Permissions.ManageGuild)]

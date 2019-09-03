@@ -89,6 +89,7 @@ namespace MikuSharp.Commands
         }
 
         [Command("emojilist")]
+        [Aliases("emotelist","emotes")]
         [Description("Lists all custom emoji on this server")]
         public async Task EmojiList(CommandContext ctx)
         {
@@ -101,6 +102,7 @@ namespace MikuSharp.Commands
         }
 
         [Command("guildinfo")]
+        [Aliases("serverinfo")]
         [Description("Get some info about this guild")]
         public async Task GuildInfo(CommandContext ctx)
         {
