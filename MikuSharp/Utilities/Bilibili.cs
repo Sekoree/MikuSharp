@@ -24,10 +24,10 @@ namespace MikuSharp.Utilities
             try
             {
                 await msg.ModifyAsync("Downloading video(this may take up to 5 min)");
-                var youtubeDl = new YoutubeDL(@"youtube-dl.exe");
+                var youtubeDl = new YoutubeDL(@"youtube-dl");
                 youtubeDl.Options.FilesystemOptions.Output = $@"{s}.mp4";
                 youtubeDl.Options.PostProcessingOptions.ExtractAudio = true;
-                youtubeDl.Options.PostProcessingOptions.FfmpegLocation = @"ffmpeg.exe";
+                youtubeDl.Options.PostProcessingOptions.FfmpegLocation = @"ffmpeg";
                 youtubeDl.Options.PostProcessingOptions.AudioFormat = NYoutubeDL.Helpers.Enums.AudioFormat.mp3;
                 youtubeDl.Options.PostProcessingOptions.AddMetadata = true;
                 youtubeDl.Options.PostProcessingOptions.KeepVideo = false;
