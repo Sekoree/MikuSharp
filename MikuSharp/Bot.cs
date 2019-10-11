@@ -16,6 +16,7 @@ using MikuSharp.Utilities;
 using MikuSharp.Events;
 using System.IO;
 using MikuSharp.Enums;
+using System.Diagnostics;
 
 namespace MikuSharp
 {
@@ -32,6 +33,8 @@ namespace MikuSharp
         public IReadOnlyDictionary<int, CommandsNextExtension> cmdC { get; set; }
         public IReadOnlyDictionary<int, LavalinkExtension> lavaC { get; set; }
         public static Dictionary<int, LavalinkNodeConnection> LLEU = new Dictionary<int, LavalinkNodeConnection>();
+        public static Playstate ps = Playstate.Playing;
+        public static Stopwatch psc = new Stopwatch();
 
         public Bot()
         {
@@ -114,6 +117,7 @@ namespace MikuSharp
                 cmdC[g.Key].RegisterCommands<Commands.Weeb>();
                 cmdC[g.Key].RegisterCommands<Commands.MikuGuild>();
                 cmdC[g.Key].RegisterCommands<Commands.Playlist>();
+                cmdC[g.Key].RegisterCommands<Commands.Settings>();
                 bot.ShardClients[g.Key].VoiceStateUpdated += VoiceChat.LeftAlone;
                 Console.WriteLine("Caching Done " + g.Key);
                 cmdC[g.Key].CommandExecuted += e =>
@@ -136,16 +140,6 @@ namespace MikuSharp
             await bot.StartAsync();
             var LL = await bot.UseLavalinkAsync();
             lavaC = LL;
-            foreach (var shard in lavaC)
-            {
-                var LCon = await shard.Value.ConnectAsync(new LavalinkConfiguration
-                {
-                    SocketEndpoint = new DSharpPlus.Net.ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
-                    RestEndpoint = new DSharpPlus.Net.ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
-                    Password = cfg.LavaConfig.Password
-                });
-                LLEU.Add(shard.Key, LCon);
-            }
             
             interC = await bot.UseInteractivityAsync(new InteractivityConfiguration
                 {
@@ -156,7 +150,8 @@ namespace MikuSharp
             cmdC = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
             {
                 EnableDefaultHelp = false,
-                StringPrefixes = new[] { "m%" }
+                StringPrefixes = new[] {"mm%"}
+                //PrefixResolver = GetPrefix
             });
             foreach (var g in bot.ShardClients)
             {
@@ -181,6 +176,69 @@ namespace MikuSharp
                 await shard.Value.DisconnectAsync();
             }
         }
+
+        /*public async Task<int> GetPrefix(DiscordMessage msg)
+        {
+            try
+            {
+                if (msg.Author.IsBot) return -1;
+                if (msg.Content.StartsWith(bot.CurrentUser.Mention))
+                {
+                    return msg.GetMentionPrefixLength(bot.CurrentUser);
+                }
+                if (msg.Channel.Type == ChannelType.Private)
+                {
+                    var prefixes = await PrefixDB.GetAllUserPrefixes(msg.Author.Id);
+                    if (prefixes.Count == 0 && msg.Content.StartsWith("mm%"))
+                    {
+                        return msg.GetStringPrefixLength("mm%");
+                    }
+                    else if (prefixes.Any(x => x.Key == 0))
+                    {
+                        if (prefixes[0].Any(x => msg.Content.StartsWith(x)))
+                        {
+                            return msg.GetStringPrefixLength(prefixes[0].First(x => msg.Content.StartsWith(x)));
+                        }
+                        else if (msg.Content.StartsWith("mm%"))
+                        {
+                            return msg.GetStringPrefixLength("mm%");
+                        }
+                    }
+                }
+                else if (msg.Channel.Type == ChannelType.Text)
+                {
+                    var userprefixes = await PrefixDB.GetAllUserPrefixes(msg.Author.Id);
+                    var guildprefixes = await PrefixDB.GetGuildPrefixes(msg.Channel.Guild.Id);
+                    Console.WriteLine(guildprefixes.Count);
+                    if (guildprefixes.Count == 0 && msg.Content.StartsWith("mm%"))
+                    {
+                        return msg.GetStringPrefixLength("mm%");
+                    }
+                    if (userprefixes.Any(x => x.Key == msg.Channel.Guild.Id))
+                    {
+                        Console.WriteLine("has one");
+                        if (userprefixes[msg.Channel.Guild.Id].Any(x => msg.Content.StartsWith(x)))
+                        {
+                            Console.WriteLine("Yes here");
+                            return msg.GetStringPrefixLength(userprefixes[msg.Channel.Guild.Id].First(x => msg.Content.StartsWith(x)));
+                        }
+                        else if (userprefixes[0].Any(x => msg.Content.StartsWith(x)))
+                        {
+                            return msg.GetStringPrefixLength(userprefixes[0].First(x => msg.Content.StartsWith(x)));
+                        }
+                    }
+                    else if (guildprefixes.Any(x => msg.Content.StartsWith(x)))
+                    {
+                        return msg.GetStringPrefixLength(guildprefixes.First(x => msg.Content.StartsWith(x)));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return -1;
+        }*/
 
         public void Dispose()
         {
