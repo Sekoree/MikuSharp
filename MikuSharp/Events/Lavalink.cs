@@ -1,4 +1,5 @@
 ﻿using DSharpPlus.Entities;
+using DSharpPlus.Lavalink;
 using DSharpPlus.Lavalink.EventArgs;
 using MikuSharp.Enums;
 using MikuSharp.Utilities;

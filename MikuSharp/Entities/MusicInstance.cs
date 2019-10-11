@@ -100,7 +100,33 @@ namespace MikuSharp.Entities
                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
                 return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
             }
-            if (n.StartsWith("http://") | n.StartsWith("https://"))
+            else if (n.ToLower().StartsWith("https://www.bilibili.com")
+                || n.ToLower().StartsWith("http://www.bilibili.com"))
+            {
+                var msg = await ctx.RespondAsync("Processing Bilibili Video...");
+                var split = n.Split("/".ToCharArray());
+                var nndID = split.First(x => x.StartsWith("anime") || x.StartsWith("av")).Split("?")[0];
+                FtpClient client = new FtpClient(Bot.cfg.NndConfig.FtpConfig.Hostname, new NetworkCredential(Bot.cfg.NndConfig.FtpConfig.User, Bot.cfg.NndConfig.FtpConfig.Password));
+                await client.ConnectAsync();
+                if (!await client.FileExistsAsync($"{nndID}.mp3"))
+                {
+                    await msg.ModifyAsync("Preparing download...");
+                    var ex = await Bilibili.GetBilibili(nndID, msg);
+                    if (ex == null)
+                    {
+                        await msg.ModifyAsync("Please try again or verify the link");
+                        return null;
+                    }
+                    await msg.ModifyAsync("Uploading");
+                    await client.UploadAsync(ex, $"{nndID}.mp3", FtpExists.Skip, true);
+                }
+                var Track = await nodeConnection.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
+                if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
+                else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
+                if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
+                return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
+            }
+            else if (n.StartsWith("http://") | n.StartsWith("https://"))
             {
                 var s = await nodeConnection.GetTracksAsync(new Uri(n));
                 switch (s.LoadResultType)

@@ -1,5 +1,7 @@
 ﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
+using DSharpPlus.Interactivity;
 using MikuSharp.Attributes;
 using System;
 using System.Collections.Generic;
@@ -24,5 +26,6 @@ namespace MikuSharp.Commands
             await ctx.Member.GrantRoleAsync(ctx.Guild.GetRole(607989212696018945));
             await ctx.RespondAsync("Welcome to smolcar");
         }
+
     }
 }

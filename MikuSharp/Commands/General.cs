@@ -138,30 +138,38 @@ namespace MikuSharp.Commands
         [Priority(0)]
         public async Task Help(CommandContext ctx, [RemainingText] params string[] command)
         {
+            foreach(var e in ctx.CommandsNext.RegisteredCommands)
+            {
+                Console.WriteLine(e.Value.Module.ModuleType.Name);
+            }
             try
             {
                 if (command.Length == 1)
                 {
                     command[0] = command[0].ToLower();
-                    if (ctx.CommandsNext.RegisteredCommands.Any(x => x.Value.Module.ModuleType.Name.ToLower() == command[0].ToLower()) && !(ctx.CommandsNext.RegisteredCommands[command[0]] is CommandGroup))
+                    Console.WriteLine(ctx.CommandsNext.RegisteredCommands.Any(x => x.Value.Module.ModuleType.Name.ToLower() == command[0]));
+                    if (!(ctx.CommandsNext.RegisteredCommands.Any(x => x.Key == command[0])))
                     {
-                        var disemb = new DiscordEmbedBuilder().WithTitle($"List of {ctx.CommandsNext.RegisteredCommands.First(x => x.Value.Module.ModuleType.Name.ToLower() == command[0].ToLower()).Value.Module.ModuleType.Name}");
-                        string list = "";
-                        foreach (var Command in ctx.CommandsNext.RegisteredCommands.Where(x => x.Value.Module.ModuleType.Name.ToLower() == command[0].ToLower()))
+                        if (ctx.CommandsNext.RegisteredCommands.Any(x => x.Value.Module.ModuleType.Name.ToLower() == command[0].ToLower()))
                         {
-                            if (ctx.Prefix.Contains(ctx.Client.CurrentUser.Id.ToString())) list += $"\n**m%{Command.Key}** *|-|* {Command.Value.Description}";
-                            else list += $"\n**{ctx.Prefix}{Command.Key}** *|-|* {Command.Value.Description}";
+                            var disemb = new DiscordEmbedBuilder().WithTitle($"List of {ctx.CommandsNext.RegisteredCommands.First(x => x.Value.Module.ModuleType.Name.ToLower() == command[0].ToLower()).Value.Module.ModuleType.Name}");
+                            string list = "";
+                            foreach (var Command in ctx.CommandsNext.RegisteredCommands.Where(x => x.Value.Module.ModuleType.Name.ToLower() == command[0].ToLower()))
+                            {
+                                if (ctx.Prefix.Contains(ctx.Client.CurrentUser.Id.ToString())) list += $"\n**m%{Command.Key}** *|-|* {Command.Value.Description}";
+                                else list += $"\n**{ctx.Prefix}{Command.Key}** *|-|* {Command.Value.Description}";
+                            }
+                            disemb.WithDescription(list);
+                            disemb.AddField("General Info", "" +
+                                "Developer of the original bot: ohlookitsderpy#3939\n" +
+                                "Current developer: Speyd3r#3939\n" +
+                                "Avatar by: Chillow#1945 [Twitter](https://twitter.com/SaikoSamurai)\n" +
+                                "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
+                                "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
+                                "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)");
+                            await ctx.RespondAsync(embed: disemb.Build());
+                            return;
                         }
-                        disemb.WithDescription(list);
-                        disemb.AddField("General Info", "" +
-                            "Developer of the original bot: ohlookitsderpy#3939\n" +
-                            "Current developer: Speyd3r#3939\n" +
-                            "Avatar by: Chillow#1945 [Twitter](https://twitter.com/SaikoSamurai)\n" +
-                            "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
-                            "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
-                            "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)");
-                        await ctx.RespondAsync(embed: disemb.Build());
-                        return;
                     }
                     else if (ctx.CommandsNext.RegisteredCommands[command[0]] is CommandGroup cmd2)
                     {
@@ -187,7 +195,7 @@ namespace MikuSharp.Commands
                         await ctx.RespondAsync(embed: disemb.Build());
                         return;
                     }
-                    else if(ctx.CommandsNext.RegisteredCommands.FirstOrDefault(x => x.Key == command[0]).Value is Command cmd)
+                    else if (ctx.CommandsNext.RegisteredCommands.FirstOrDefault(x => x.Key == command[0]).Value is Command cmd)
                     {
                         string usg = "";
                         Usage Usage = new Usage("not available currently");
@@ -207,6 +215,7 @@ namespace MikuSharp.Commands
                         await ctx.RespondAsync(embed: emb.Build());
                         return;
                     }
+
                 }
                 else
                 {

@@ -177,7 +177,8 @@ namespace MikuSharp.Commands
             await ctx.RespondWithFileAsync($"image.{MimeGuesser.GuessExtension(str)}", str, embed: em.Build());
         }*/
 
-        [Command("tighs"), Aliases("thigh")]
+        [Command("thighs")]
+        [Aliases("thigh")]
         [Description("lewd")]
         public async Task Thighs(CommandContext ctx)
         {

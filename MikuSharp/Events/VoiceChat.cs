@@ -33,12 +33,20 @@ namespace MikuSharp.Events
                     {
                         g.musicInstance.guildConnection.Pause();
                         g.musicInstance.playstate = Playstate.Paused;
-                        await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("**Paused** since everyone left the VC, connect back and use m%resume to continue playback otherwise I will disconnect in 5 min").Build());
+                        try
+                        {
+                            await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("**Paused** since everyone left the VC, connect back and use m%resume to continue playback otherwise I will disconnect in 5 min").Build());
+                        }
+                        catch { }
                     }
                     else
                     {
-                        await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("Since everyone left the VC I will disconnect too in 5 min").Build());
-                    }
+                        try
+                        {
+                            await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("Since everyone left the VC I will disconnect too in 5 min").Build());
+                        }
+                        catch { }
+        }
                     g.musicInstance.aloneTime = DateTime.UtcNow;
                     g.musicInstance.aloneCTS = new CancellationTokenSource();
                     g.AloneCheckThread = Task.Run(g.CheckAlone);
