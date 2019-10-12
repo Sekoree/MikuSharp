@@ -140,7 +140,16 @@ namespace MikuSharp
             await bot.StartAsync();
             var LL = await bot.UseLavalinkAsync();
             lavaC = LL;
-            
+            foreach (var shard in lavaC)
+            {
+                var LCon = await shard.Value.ConnectAsync(new LavalinkConfiguration
+                {
+                    SocketEndpoint = new DSharpPlus.Net.ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
+                    RestEndpoint = new DSharpPlus.Net.ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
+                    Password = cfg.LavaConfig.Password
+                });
+                LLEU.Add(shard.Key, LCon);
+            }
             interC = await bot.UseInteractivityAsync(new InteractivityConfiguration
                 {
                 PaginationBehaviour = PaginationBehaviour.WrapAround,
@@ -150,7 +159,7 @@ namespace MikuSharp
             cmdC = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
             {
                 EnableDefaultHelp = false,
-                StringPrefixes = new[] {"mm%"}
+                StringPrefixes = new[] {"m%"}
                 //PrefixResolver = GetPrefix
             });
             foreach (var g in bot.ShardClients)
