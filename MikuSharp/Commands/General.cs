@@ -37,20 +37,25 @@ namespace MikuSharp.Commands
         [Description("Send feedback!")]
         public async Task Feedback(CommandContext ctx, [RemainingText] string text)
         {
-            if(String.IsNullOrWhiteSpace(text))
+        if (String.IsNullOrWhiteSpace(value: text))
             {
-                await ctx.RespondAsync($"I can't submit an empty feedback {DiscordEmoji.FromGuildEmote(ctx.Client, 609551531620171784)}");
+                await ctx.RespondAsync(content: $"I can't submit an empty feedback {DiscordEmoji.FromGuildEmote(client: ctx.Client, id: 609551531620171784)}");
                 await ctx.Message.DeleteAsync();
                 return;
             }
-            var guild = await ctx.Client.GetGuildAsync(483279257431441410);
+            var guild = await ctx.Client.GetGuildAsync(id: 483279257431441410);
             var emb = new DiscordEmbedBuilder();
-            emb.WithAuthor(ctx.Member.Username).
-                WithTitle("Feedback").
-                WithDescription(text);
-            await guild.GetChannel(484698873411928075).SendMessageAsync(embed: emb.Build());
-            await ctx.RespondAsync($"Feedback sent {DiscordEmoji.FromGuildEmote(ctx.Client, 623933340520546306)}");
-            await ctx.Message.DeleteAsync();
+            emb.WithAuthor(name: $"{ctx.Member.Username}#{ctx.Member.Discriminator}", iconUrl: ctx.Member.AvatarUrl).
+                WithTitle(title: "Feedback").
+                WithDescription(description: text).
+                WithFooter(text: $"Sent from {ctx.Guild.Name}");
+            emb.AddField(name: "User", value: $"{ctx.Member.Mention}", inline: true);
+            emb.AddField(name: "ID", value: $"{ctx.Guild.Id}", inline: true);
+            var embed = await guild.GetChannel(484698873411928075).SendMessageAsync(embed: emb.Build());
+            await embed.CreateReactionAsync(DiscordEmoji.FromName(client: ctx.Client, name: ":thumbsup:"));
+            await embed.CreateReactionAsync(DiscordEmoji.FromName(client: ctx.Client, name: ":thumbsdown:"));
+            await ctx.RespondAsync($"Feedback sent {DiscordEmoji.FromGuildEmote(client: ctx.Client, id: 623933340520546306)}");
+            await ctx.Message.DeleteAsync("Cleanup");
         }
 
         [Command("help")]
