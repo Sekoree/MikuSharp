@@ -39,18 +39,21 @@ namespace MikuSharp.Commands
         {
             if(String.IsNullOrWhiteSpace(text))
             {
-                await ctx.RespondAsync($"I can't submit an empty feedback {DiscordEmoji.FromGuildEmote(ctx.Client, 609551531620171784)}");
+                await ctx.RespondAsync(content: $"I can't submit an empty feedback {DiscordEmoji.FromGuildEmote(client: ctx.Client, id: 724802815716884570)}");
                 await ctx.Message.DeleteAsync();
                 return;
             }
-            var guild = await ctx.Client.GetGuildAsync(483279257431441410);
+            var guild = await ctx.Client.GetGuildAsync(id: 802866811841675314);
             var emb = new DiscordEmbedBuilder();
-            emb.WithAuthor(ctx.Member.Username).
-                WithTitle("Feedback").
-                WithDescription(text);
-            await guild.GetChannel(484698873411928075).SendMessageAsync(embed: emb.Build());
-            await ctx.RespondAsync($"Feedback sent {DiscordEmoji.FromGuildEmote(ctx.Client, 623933340520546306)}");
-            await ctx.Message.DeleteAsync();
+            emb.WithAuthor(name: ctx.Member.Username, iconUrl: ctx.Member.AvatarUrl).
+                WithTitle(title: "Feedback").
+                WithDescription(description: text).
+                WithFooter(text: $"Sent from {ctx.Guild.Name}");
+            var embed = await guild.GetChannel(802912806403571712).SendMessageAsync(embed: emb.Build());
+            await embed.CreateReactionAsync(DiscordEmoji.FromName(client: ctx.Client, name: ":thumbsup:"));
+            await embed.CreateReactionAsync(DiscordEmoji.FromName(client: ctx.Client, name: ":thumbsdown:"));
+            await ctx.RespondAsync($"Feedback sent {DiscordEmoji.FromGuildEmote(client: ctx.Client, id: 724802737635852328)}");
+            await ctx.Message.DeleteAsync("Cleanup");
         }
 
         [Command("help")]
