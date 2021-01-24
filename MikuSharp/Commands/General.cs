@@ -50,7 +50,7 @@ namespace MikuSharp.Commands
                 WithDescription(description: text).
                 WithFooter(text: $"Sent from {ctx.Guild.Name}");
             emb.AddField(name: "User", value: $"{ctx.Member.Mention}", inline: true);
-            emb.AddField(name: "ID", value: $"{ctx.Member.Id}", inline: true);
+            emb.AddField(name: "ID", value: $"{ctx.Guild.Id}", inline: true);
             var embed = await guild.GetChannel(802912806403571712).SendMessageAsync(embed: emb.Build());
             await embed.CreateReactionAsync(DiscordEmoji.FromName(client: ctx.Client, name: ":thumbsup:"));
             await embed.CreateReactionAsync(DiscordEmoji.FromName(client: ctx.Client, name: ":thumbsdown:"));
