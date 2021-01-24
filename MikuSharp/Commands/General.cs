@@ -37,12 +37,20 @@ namespace MikuSharp.Commands
         [Description("Send feedback!")]
         public async Task Feedback(CommandContext ctx, [RemainingText] string text)
         {
+            if(String.IsNullOrWhiteSpace(text))
+            {
+                await ctx.RespondAsync($"I can't submit an empty feedback {DiscordEmoji.FromGuildEmote(ctx.Client, 609551531620171784)}");
+                await ctx.Message.DeleteAsync();
+                return;
+            }
             var guild = await ctx.Client.GetGuildAsync(483279257431441410);
             var emb = new DiscordEmbedBuilder();
             emb.WithAuthor(ctx.Member.Username).
                 WithTitle("Feedback").
                 WithDescription(text);
             await guild.GetChannel(484698873411928075).SendMessageAsync(embed: emb.Build());
+            await ctx.RespondAsync($"Feedback sent {DiscordEmoji.FromGuildEmote(ctx.Client, 623933340520546306)}");
+            await ctx.Message.DeleteAsync();
         }
 
         [Command("help")]
