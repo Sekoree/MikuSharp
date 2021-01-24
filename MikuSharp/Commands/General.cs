@@ -36,7 +36,8 @@ namespace MikuSharp.Commands
         [Command("feedback")]
         [Description("Send feedback!")]
         public async Task Feedback(CommandContext ctx, [RemainingText] string text)
-        {            if (String.IsNullOrWhiteSpace(value: text))
+        {
+        if (String.IsNullOrWhiteSpace(value: text))
             {
                 await ctx.RespondAsync(content: $"I can't submit an empty feedback {DiscordEmoji.FromGuildEmote(client: ctx.Client, id: 609551531620171784)}");
                 await ctx.Message.DeleteAsync();
