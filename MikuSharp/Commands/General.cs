@@ -124,6 +124,8 @@ namespace MikuSharp.Commands
                     }
                 }
                 cats += "**";
+                var derpy = await ctx.Client.GetUserAsync(145557815287611393);
+                var spey = await ctx.Client.GetUserAsync(174970757468651520);
                 All.Insert(0, new Page(embed: new DiscordEmbedBuilder()
                     .WithTitle("Hatsune Miku Discord Bot")
                     .WithDescription("Heyo! This is the new and updated version of the Hatsune Miku Discord Bot, currently still in development, so things like\n" +
@@ -132,8 +134,8 @@ namespace MikuSharp.Commands
                     $"Current Category List consists of {cats}, all commands are displayed on the following pages (use the reactions to switch pages)\n" +
                     $"For a more indepth view if certain commands you can use ``{ctx.Prefix}help (commandname)`` to see A more detailed description and usage\n")
                     .AddField("General Info", "" +
-                            "Developer of the original bot: ohlookitsderpy#3939\n" +
-                            "Current Developer: Speyd3r#3939\n" +
+                            $"Developer of the original bot: {derpy.Mention}\n" +
+                            $"Current Developer: {spey.Mention}\n" +
                             "Avatar by: Chillow#1945 ❤ [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
@@ -172,10 +174,12 @@ namespace MikuSharp.Commands
                                 if (ctx.Prefix.Contains(ctx.Client.CurrentUser.Id.ToString())) list += $"\n**m%{Command.Key}** *|-|* {Command.Value.Description}";
                                 else list += $"\n**{ctx.Prefix}{Command.Key}** *|-|* {Command.Value.Description}";
                             }
+                            var derpy = await ctx.Client.GetUserAsync(145557815287611393);
+                            var spey = await ctx.Client.GetUserAsync(174970757468651520);
                             disemb.WithDescription(list);
                             disemb.AddField("General Info", "" +
-                                "Developer of the original bot: ohlookitsderpy#3939\n" +
-                                "Current developer: Speyd3r#3939\n" +
+                                $"Developer of the original bot: {derpy.Mention}\n" +
+                                $"Current Developer: {spey.Mention}\n" +
                                 "Avatar by: Chillow#1945 [Twitter](https://twitter.com/SaikoSamurai)\n" +
                                 "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                                 "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
@@ -197,10 +201,12 @@ namespace MikuSharp.Commands
                         {
                             disemb.AddField("Group aliases", $"``{string.Join("``, ``", cmd2.Aliases)}``");
                         }
+                        var derpy = await ctx.Client.GetUserAsync(145557815287611393);
+                        var spey = await ctx.Client.GetUserAsync(174970757468651520);
                         disemb.WithDescription(list);
                         disemb.AddField("General Info", "" +
-                            "Developer of the original bot: ohlookitsderpy#3939\n" +
-                            "Current developer: Speyd3r#3939\n" +
+                            $"Developer of the original bot: {derpy.Mention}\n" +
+                            $"Current Developer: {spey.Mention}\n" +
                             "Avatar by: Chillow#1945 [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
