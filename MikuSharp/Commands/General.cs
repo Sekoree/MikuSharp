@@ -16,7 +16,7 @@ namespace MikuSharp.Commands
     class General : BaseCommandModule
     {
         private string botdev = "davidjcralph#9721";
-        private string curbotdev = "Speyd3r (Hiatus)#3939";
+        private string curbotdev = "Speyd3r (Hiatus)#3939 [Contact via Sekoree#3939]";
     
         [Command("donate")]
         [Description("Financial support information")]
