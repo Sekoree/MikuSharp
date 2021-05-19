@@ -15,6 +15,9 @@ namespace MikuSharp.Commands
 {
     class General : BaseCommandModule
     {
+        private string botdev = "davidjcralph#9721";
+        private string curbotdev = "Speyd3r (Hiatus)#3939 [Contact via Sekoree#3939]";
+    
         [Command("donate")]
         [Description("Financial support information")]
         [Usage("<Prefix>donate")]
@@ -132,8 +135,8 @@ namespace MikuSharp.Commands
                     $"Current Category List consists of {cats}, all commands are displayed on the following pages (use the reactions to switch pages)\n" +
                     $"For a more indepth view if certain commands you can use ``{ctx.Prefix}help (commandname)`` to see A more detailed description and usage\n")
                     .AddField("General Info", "" +
-                            "Developer of the original bot: ohlookitsderpy#3939\n" +
-                            "Current Developer: Speyd3r#3939\n" +
+                            $"Developer of the original bot: {botdev}\n" +
+                            $"Current Developer: {curbotdev}\n" +
                             "Avatar by: Chillow#1945 ❤ [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
@@ -174,8 +177,8 @@ namespace MikuSharp.Commands
                             }
                             disemb.WithDescription(list);
                             disemb.AddField("General Info", "" +
-                                "Developer of the original bot: ohlookitsderpy#3939\n" +
-                                "Current developer: Speyd3r#3939\n" +
+                                $"Developer of the original bot: {botdev}\n" +
+                                $"Current Developer: {curbotdev}\n" +
                                 "Avatar by: Chillow#1945 [Twitter](https://twitter.com/SaikoSamurai)\n" +
                                 "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                                 "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
@@ -199,8 +202,8 @@ namespace MikuSharp.Commands
                         }
                         disemb.WithDescription(list);
                         disemb.AddField("General Info", "" +
-                            "Developer of the original bot: ohlookitsderpy#3939\n" +
-                            "Current developer: Speyd3r#3939\n" +
+                            $"Developer of the original bot: {botdev}\n" +
+                            $"Current Developer: {curbotdev}\n" +
                             "Avatar by: Chillow#1945 [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
