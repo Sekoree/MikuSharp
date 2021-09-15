@@ -104,7 +104,7 @@ namespace MikuSharp.Commands
             builder.WithEmbed(em.Build());
             await ctx.RespondAsync(builder);
         }
-
+        /*
         [Command("duck")]
         [Description("Radnom duck image")]
         public async Task Duck(CommandContext ctx)
@@ -121,7 +121,7 @@ namespace MikuSharp.Commands
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             builder.WithEmbed(em.Build());
             await ctx.RespondAsync(builder);
-        }
+        }*/
 
         [Command("eyeify")]
         [Description("eyeify your message :eyes:")]
@@ -136,7 +136,7 @@ namespace MikuSharp.Commands
         {
             await ctx.RespondAsync("This command is not implemented yet.");
         }
-
+        /*
         [Command("lion")]
         [Description("Get a random lion image")]
         public async Task Lion(CommandContext ctx)
@@ -148,7 +148,7 @@ namespace MikuSharp.Commands
             DiscordMessageBuilder builder = new DiscordMessageBuilder();
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             await ctx.RespondAsync(builder);
-        }
+        }*/
 
         [Command("lizard")]
         [Description("Get a random lizard image")]
@@ -162,7 +162,7 @@ namespace MikuSharp.Commands
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             await ctx.RespondAsync(builder);
         }
-
+        /*
         [Command("panda")]
         [Description("Random panda image")]
         public async Task Panda(CommandContext ctx)
@@ -187,7 +187,7 @@ namespace MikuSharp.Commands
             DiscordMessageBuilder builder = new DiscordMessageBuilder();
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             await ctx.RespondAsync(builder);
-        }
+        }*/
 
         [Command("pirate")]
         [Description("Convert some test into Pirate speech")]
@@ -196,7 +196,7 @@ namespace MikuSharp.Commands
             //soon
             await ctx.RespondAsync("This command is not implemented yet.");
         }
-
+        /*
         [Command("redpanda")]
         [Description("Random red panda image")]
         public async Task RedPanda(CommandContext ctx)
@@ -208,7 +208,7 @@ namespace MikuSharp.Commands
             DiscordMessageBuilder builder = new DiscordMessageBuilder();
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             await ctx.RespondAsync(builder);
-        }
+        }*/
 
         [Command("rps")]
         [Description("Play rock paper scissors!")]
@@ -217,7 +217,7 @@ namespace MikuSharp.Commands
             var rock = new[] { $"Rock {DiscordEmoji.FromName(ctx.Client, ":black_circle:")}", $"Paper {DiscordEmoji.FromName(ctx.Client, ":pencil:")}", $"Scissors {DiscordEmoji.FromName(ctx.Client, ":scissors:")}"};
             await ctx.RespondAsync(rock[new Random().Next(0, rock.Length)]);
         }
-
+        /*
         [Command("tiger")]
         [Description("Radnom tiger image")]
         public async Task Tiger(CommandContext ctx)
@@ -229,7 +229,7 @@ namespace MikuSharp.Commands
             DiscordMessageBuilder builder = new DiscordMessageBuilder();
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             await ctx.RespondAsync(builder);
-        }
+        }*/
 
         [Command("tiny")]
         [Description("Make some text tiny")]
@@ -238,7 +238,7 @@ namespace MikuSharp.Commands
             //soon
             await ctx.RespondAsync("This command is not implemented yet.");
         }
-
+        /*
         [Command("trumptweet")]
         [Description("generate a tweet by Trump")]
         public async Task TrumpTweet(CommandContext ctx, [RemainingText]string text)
@@ -251,11 +251,6 @@ namespace MikuSharp.Commands
             DiscordMessageBuilder builder = new DiscordMessageBuilder();
             builder.WithFile($"trump.png", img);
             await ctx.RespondAsync(builder);
-        }
-
-        
-
-        
-
+        }*/
     }
 }

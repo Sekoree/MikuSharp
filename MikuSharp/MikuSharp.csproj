@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <StartupObject>MikuSharp.Program</StartupObject>
     <ApplicationIcon />
@@ -21,28 +21,30 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="config.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AlbumArtExtraction" Version="1.0.2" />
     <PackageReference Include="AngleSharp" Version="0.16.0" />
-    <PackageReference Include="DisCatSharp" Version="9.8.2" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="9.8.2" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.2" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.2" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.2" />
+    <PackageReference Include="DisCatSharp" Version="9.8.3-nightly-00104" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.3-nightly-00104" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.3-nightly-00104" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.3-nightly-00104" />
     <PackageReference Include="DiscordBotsList.Api" Version="1.4.0" />
     <PackageReference Include="FluentFTP" Version="35.0.4" />
     <PackageReference Include="Google.Apis" Version="1.55.0" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.55.0.2440" />
     <PackageReference Include="Kitsu" Version="1.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Mime" Version="3.2.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Npgsql" Version="5.0.7" />
+    <PackageReference Include="Npgsql" Version="5.0.10" />
     <PackageReference Include="NYoutubeDL" Version="0.11.2" />
     <PackageReference Include="Weeb.net" Version="1.0.7" />
     <PackageReference Include="YoutubeExplode" Version="6.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

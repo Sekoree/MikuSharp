@@ -53,10 +53,12 @@ namespace MikuSharp
             {
                 Token = cfg.DiscordToken,
                 TokenType = DisCatSharp.TokenType.Bot,
-                MinimumLogLevel = LogLevel.Debug,
-                ReconnectIndefinitely = true,
+                MinimumLogLevel = LogLevel.Trace,
                 AutoReconnect = true,
-                Intents = DiscordIntents.AllUnprivileged
+                Intents = DiscordIntents.AllUnprivileged,
+                MessageCacheSize = 2048,
+                ShardCount = 1,
+                ShardId = 0
             });
             bot.GuildDownloadCompleted += (sender, args) =>
             {
@@ -145,9 +147,29 @@ namespace MikuSharp
         {
             int i = 0;
             await _weeb.Authenticate(cfg.WeebShToken, Weeb.net.TokenType.Wolke);
-            await bot.StartAsync();
             var LL = await bot.UseLavalinkAsync();
             lavaC = LL;
+            interC = await bot.UseInteractivityAsync(new InteractivityConfiguration
+                {
+                PaginationBehaviour = PaginationBehaviour.WrapAround,
+                PaginationDeletion = PaginationDeletion.DeleteEmojis,
+                Timeout = TimeSpan.FromMinutes(2),
+                PollBehaviour = PollBehaviour.DeleteEmojis,
+                AckPaginationButtons = true
+
+            });
+            cmdC = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
+            {
+                EnableDefaultHelp = false,
+                StringPrefixes = new[] {"m%"},
+                CaseSensitive = true,
+                EnableDms = true,
+                DmHelp = true,
+                EnableMentionPrefix = true
+                //PrefixResolver = GetPrefix
+            });
+            await CacheRegister();
+            await bot.StartAsync();
             foreach (var shard in lavaC)
             {
                 var LCon = await shard.Value.ConnectAsync(new LavalinkConfiguration
@@ -158,18 +180,6 @@ namespace MikuSharp
                 });
                 LLEU.Add(shard.Key, LCon);
             }
-            interC = await bot.UseInteractivityAsync(new InteractivityConfiguration
-                {
-                PaginationBehaviour = PaginationBehaviour.WrapAround,
-                PaginationDeletion = PaginationDeletion.DeleteEmojis,
-                Timeout = TimeSpan.FromMinutes(2)
-            });
-            cmdC = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
-            {
-                EnableDefaultHelp = false,
-                StringPrefixes = new[] {"m%"}
-                //PrefixResolver = GetPrefix
-            });
             foreach (var g in bot.ShardClients)
             {
                 g.Value.GuildDownloadCompleted += (sender, args) =>
@@ -182,8 +192,7 @@ namespace MikuSharp
             {
                 await Task.Delay(1000);
             }
-            await Task.Run(CacheRegister);
-            StatusThread = Task.Run(ShowConnections);
+            //StatusThread = Task.Run(ShowConnections);
             while (!_cts.IsCancellationRequested)
             {
                 await Task.Delay(25);
