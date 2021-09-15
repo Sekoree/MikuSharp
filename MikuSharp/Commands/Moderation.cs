@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
+
+using DisCatSharp;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
 
 namespace MikuSharp.Commands
 {
     class Moderation : BaseCommandModule
     {
         [Command("ban")]
-        [Priority(2)]
-        [RequirePermissions(DSharpPlus.Permissions.Administrator | DSharpPlus.Permissions.BanMembers)]
+        [RequirePermissions(Permissions.Administrator | Permissions.BanMembers)]
         [Description("Ban someone")]
         public async Task Ban(CommandContext ctx, DiscordMember m)
         {
@@ -23,8 +24,7 @@ namespace MikuSharp.Commands
         }
 
         [Command("kick")]
-        [Priority(2)]
-        [RequirePermissions(DSharpPlus.Permissions.Administrator | DSharpPlus.Permissions.KickMembers)]
+        [RequirePermissions(Permissions.Administrator | Permissions.KickMembers)]
         [Description("Kick someone")]
         public async Task Kick(CommandContext ctx, DiscordMember m)
         {
@@ -33,10 +33,10 @@ namespace MikuSharp.Commands
         }
 
         [Command("purge")]
-        [RequirePermissions(DSharpPlus.Permissions.Administrator 
-            | DSharpPlus.Permissions.ManageMessages 
-            | DSharpPlus.Permissions.ManageChannels
-            | DSharpPlus.Permissions.ManageGuild)]
+        [RequirePermissions(Permissions.Administrator 
+            | Permissions.ManageMessages 
+            | Permissions.ManageChannels
+            | Permissions.ManageGuild)]
         [Description("Delete a large amount of messages fast")]
         public async Task Purge(CommandContext ctx, int amount)
         {
@@ -46,9 +46,10 @@ namespace MikuSharp.Commands
         }
 
         [Command("unban")]
-        [RequirePermissions(DSharpPlus.Permissions.Administrator
-            | DSharpPlus.Permissions.BanMembers
-            | DSharpPlus.Permissions.ManageGuild)]
+        [Priority(2)]
+        [RequirePermissions(Permissions.Administrator
+            | Permissions.BanMembers
+            | Permissions.ManageGuild)]
         [Description("Unban someone by their ID or username")]
         public async Task UnBan(CommandContext ctx, ulong id)
         {
@@ -57,9 +58,10 @@ namespace MikuSharp.Commands
         }
 
         [Command("unban")]
-        [RequirePermissions(DSharpPlus.Permissions.Administrator
-            | DSharpPlus.Permissions.BanMembers
-            | DSharpPlus.Permissions.ManageGuild)]
+        [Priority(1)]
+        [RequirePermissions(Permissions.Administrator
+            | Permissions.BanMembers
+            | Permissions.ManageGuild)]
         public async Task UnBan(CommandContext ctx, string name)
         {
             var m = await ctx.Guild.GetBansAsync();

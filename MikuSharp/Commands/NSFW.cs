@@ -1,16 +1,12 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using MikuSharp.Utilities;
-using Booru.Net;
-using System.Linq;
-using System.Net.Http;
-using System.IO;
-using DSharpPlus.Entities;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+
 using HeyRed.Mime;
+
+using MikuSharp.Utilities;
+
+using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
 {
@@ -22,7 +18,11 @@ namespace MikuSharp.Commands
         public async Task FourK(CommandContext ctx)
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=4k");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("anal")]
@@ -30,7 +30,11 @@ namespace MikuSharp.Commands
         public async Task Anal(CommandContext ctx)
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=anal");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("ass")]
@@ -38,10 +42,14 @@ namespace MikuSharp.Commands
         public async Task Ass(CommandContext ctx)
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=ass");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
-        [Command("booru")]
+        /*[Command("booru")]
         [Description("lewd")]
         public async Task Booru(CommandContext ctx, params string[] tag)
         {
@@ -62,15 +70,23 @@ namespace MikuSharp.Commands
             var em = new DiscordEmbedBuilder();
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(str)}");
             em.WithFooter("by Danbooru");
-            await ctx.RespondWithFileAsync($"image.{MimeGuesser.GuessExtension(str)}", str, embed: em.Build());
-        }
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(str)}", srt);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
+        }*/
 
         [Command("gonewild")]
         [Description("lewd")]
         public async Task Gonewild(CommandContext ctx)
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=gonewild");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("hentai")]
@@ -78,10 +94,14 @@ namespace MikuSharp.Commands
         public async Task Hentai(CommandContext ctx)
         {
             var d = await Web.GetKsoftSiRanImg("hentai_gif", true);
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
-        [Command("konachan")]
+        /*[Command("konachan")]
         [Description("lewd")]
         public async Task Konachan(CommandContext ctx, params string[] tag)
         {
@@ -102,15 +122,23 @@ namespace MikuSharp.Commands
             var em = new DiscordEmbedBuilder();
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(str)}");
             em.WithFooter("by Konachan");
-            await ctx.RespondWithFileAsync($"image.{MimeGuesser.GuessExtension(str)}", str, embed: em.Build());
-        }
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(str)}", srt);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
+        }*/
 
         [Command("lewdkitsune")]
         [Description("lewd")]
         public async Task LewdKitsune(CommandContext ctx)
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=lewdkitsune");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("lewdneko")]
@@ -118,7 +146,11 @@ namespace MikuSharp.Commands
         public async Task LewdNeko(CommandContext ctx)
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=lewdneko");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("nekopara")]
@@ -126,7 +158,11 @@ namespace MikuSharp.Commands
         public async Task Nekopara(CommandContext ctx)
         {
             var d = await Web.GetDerpy("https://miku.derpyenterprises.org/nekoparajson");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("nekoparagif")]
@@ -134,7 +170,11 @@ namespace MikuSharp.Commands
         public async Task NekoparaGif(CommandContext ctx)
         {
             var d = await Web.GetDerpy("https://miku.derpyenterprises.org/nekoparagifjson");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("porngif")]
@@ -142,7 +182,11 @@ namespace MikuSharp.Commands
         public async Task PornGif(CommandContext ctx)
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=pgif");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("pussy")]
@@ -150,10 +194,14 @@ namespace MikuSharp.Commands
         public async Task Pussy(CommandContext ctx)
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=pussy");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
 
-        [Command("rule34")]
+        /*[Command("rule34")]
         [Description("lewd")]
         public async Task Rule34(CommandContext ctx, params string[] tag)
         {
@@ -175,15 +223,24 @@ namespace MikuSharp.Commands
             Console.WriteLine(MimeGuesser.GuessExtension(str));
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(str)}");
             em.WithFooter("by Rule34");
-            await ctx.RespondWithFileAsync($"image.{MimeGuesser.GuessExtension(str)}", str, embed: em.Build());
-        }
 
-        [Command("tighs"), Aliases("thigh")]
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(str)}", srt);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
+        }*/
+
+        [Command("thighs")]
+        [Aliases("thigh")]
         [Description("lewd")]
         public async Task Thighs(CommandContext ctx)
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/v2/image/thighs");
-            await ctx.RespondWithFileAsync($"image.{d.Filetype}", d.Data, embed: d.Embed);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{d.Filetype}", d.Data);
+            builder.WithEmbed(d.Embed);
+            await ctx.RespondAsync(builder);
         }
     }
 }

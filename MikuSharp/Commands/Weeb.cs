@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+
+using HeyRed.Mime;
+
+using MikuSharp.Utilities;
+
+using Newtonsoft.Json;
+
+using System;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using Newtonsoft.Json;
-using HeyRed.Mime;
-using MikuSharp.Utilities;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
 {
@@ -59,7 +59,11 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by Derpy API");
             em.WithDescription($"{e.url}");
-            await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("diva")]
@@ -80,7 +84,11 @@ namespace MikuSharp.Commands
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
             Console.WriteLine(MimeGuesser.GuessExtension(img));
-            await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(img)}", fileData: img, embed: emim.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("gumi")]
@@ -104,7 +112,11 @@ namespace MikuSharp.Commands
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
-            await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(img)}", fileData: img, embed: emim.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("kaito")]
@@ -128,7 +140,11 @@ namespace MikuSharp.Commands
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
-            await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(img)}", fileData: img, embed: emim.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("k-on")]
@@ -145,7 +161,11 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by Derpy API");
             em.WithDescription($"{e.url}");
-            await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("konosuba")]
@@ -162,7 +182,11 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by Derpy API");
             em.WithDescription($"{e.url}");
-            await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("len")]
@@ -186,7 +210,11 @@ namespace MikuSharp.Commands
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
-            await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(img)}", fileData: img, embed: emim.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("lovelive")]
@@ -203,7 +231,11 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by Derpy API");
             em.WithDescription($"{e.url}");
-            await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("luka")]
@@ -227,7 +259,11 @@ namespace MikuSharp.Commands
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
-            await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(img)}", fileData: img, embed: emim.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("meiko")]
@@ -251,7 +287,11 @@ namespace MikuSharp.Commands
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
-            await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(img)}", fileData: img, embed: emim.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("miku")]
@@ -275,7 +315,11 @@ namespace MikuSharp.Commands
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
-            await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(img)}", fileData: img, embed: emim.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("neko")]
@@ -288,7 +332,11 @@ namespace MikuSharp.Commands
             var em = new DiscordEmbedBuilder();
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by nekos.life");
-            await ctx.RespondWithFileAsync(embed: em.Build(), fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}");
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("rin")]
@@ -312,7 +360,11 @@ namespace MikuSharp.Commands
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
-            await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(img)}", fileData: img, embed: emim.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("takagi")]
@@ -329,7 +381,11 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by Derpy API");
             em.WithDescription($"[Full Image]({e.url})");
-            await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("teto")]
@@ -353,7 +409,11 @@ namespace MikuSharp.Commands
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
-            await ctx.RespondWithFileAsync(fileName: $"image.{MimeGuesser.GuessExtension(img)}", fileData: img, embed: emim.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(emim.Build());
+            await ctx.RespondAsync(builder);
         }
     }
 }
