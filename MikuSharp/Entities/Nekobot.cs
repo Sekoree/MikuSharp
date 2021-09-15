@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MikuSharp.Entities
+﻿namespace MikuSharp.Entities
 {
     public class NekoBot : Img_Data
     {

@@ -1,5 +1,5 @@
 ﻿using AngleSharp.Html.Parser;
-using DSharpPlus.Entities;
+using DisCatSharp.Entities;
 using MikuSharp.Entities;
 using Newtonsoft.Json;
 using NYoutubeDL;

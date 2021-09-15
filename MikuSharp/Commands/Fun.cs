@@ -1,18 +1,19 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+
+using HeyRed.Mime;
+
+using MikuSharp.Entities;
+using MikuSharp.Utilities;
+
 using Newtonsoft.Json;
+
 using System;
 using System.IO;
 using System.Net;
-using System.Threading.Tasks;
-using System.Linq;
-using HeyRed.Mime;
-using System.Collections.Generic;
-using MikuSharp.Entities;
-using MikuSharp.Utilities;
 using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
 {
@@ -33,7 +34,11 @@ namespace MikuSharp.Commands
         public async Task Cat(CommandContext ctx)
         {
             var ImgURL = await Web.GetNekos_Life("https://nekos.life/api/v2/img/meow");
-            await ctx.RespondWithFileAsync(embed: ImgURL.Embed, fileData: ImgURL.Data, fileName: $"image.{ImgURL.Filetype}");
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{ImgURL.Filetype}", ImgURL.Data);
+            builder.WithEmbed(ImgURL.Embed);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("cucknorris")]
@@ -58,7 +63,10 @@ namespace MikuSharp.Commands
             var c = new HttpClient();
             var e = JsonConvert.DeserializeObject<NekoBot>(await c.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}"));
             Stream img = new MemoryStream(await c.GetByteArrayAsync(e.message));
-            await ctx.RespondWithFileAsync(fileName: "clyde.png", fileData: img);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"clyde.png", img);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("coinflip")]
@@ -90,7 +98,11 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by dog.ceo", "https://dog.ceo/img/favicon.png");
             em.WithDescription($"[Full Image]({dc.message})");
-            await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}",embed: em.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("duck")]
@@ -104,7 +116,11 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by random-d.uk", "https://random-d.uk/favicon.png");
             em.WithDescription($"[Full Image]({dc.message})");
-            await ctx.RespondWithFileAsync(fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}", embed: em.Build());
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("eyeify")]
@@ -118,7 +134,7 @@ namespace MikuSharp.Commands
         [Description("Convert something to leetspeak")]
         public async Task Leet(CommandContext ctx, [RemainingText] string text)
         {
-            //soon
+            await ctx.RespondAsync("This command is not implemented yet.");
         }
 
         [Command("lion")]
@@ -128,7 +144,10 @@ namespace MikuSharp.Commands
             var c = new HttpClient();
             var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await c.GetStringAsync("https://animals.anidiots.guide/lion"));
             Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
-            await ctx.RespondWithFileAsync(fileName: "image." + MimeGuesser.GuessExtension(img), fileData: img);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("lizard")]
@@ -138,7 +157,10 @@ namespace MikuSharp.Commands
             var c = new HttpClient();
             var get = await Web.GetNekos_Life("https://nekos.life/api/lizard");
             Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(get.Url)));
-            await ctx.RespondWithFileAsync(fileName: "image." + MimeGuesser.GuessExtension(img), fileData: img);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("panda")]
@@ -148,7 +170,10 @@ namespace MikuSharp.Commands
             var c = new HttpClient();
             var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await c.GetStringAsync("https://animals.anidiots.guide/panda"));
             Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
-            await ctx.RespondWithFileAsync(fileName: "image." + MimeGuesser.GuessExtension(img), fileData: img);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("penguin")]
@@ -158,7 +183,10 @@ namespace MikuSharp.Commands
             var c = new HttpClient();
             var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await c.GetStringAsync("https://animals.anidiots.guide/penguin"));
             Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
-            await ctx.RespondWithFileAsync(fileName: "image." + MimeGuesser.GuessExtension(img), fileData: img);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("pirate")]
@@ -166,6 +194,7 @@ namespace MikuSharp.Commands
         public async Task Pirate(CommandContext ctx)
         {
             //soon
+            await ctx.RespondAsync("This command is not implemented yet.");
         }
 
         [Command("redpanda")]
@@ -175,7 +204,10 @@ namespace MikuSharp.Commands
             var c = new HttpClient();
             var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await c.GetStringAsync("https://animals.anidiots.guide/red_panda"));
             Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
-            await ctx.RespondWithFileAsync(fileName: "image." + MimeGuesser.GuessExtension(img), fileData: img);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("rps")]
@@ -193,7 +225,10 @@ namespace MikuSharp.Commands
             var c = new HttpClient();
             var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await c.GetStringAsync("https://animals.anidiots.guide/tiger"));
             Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
-            await ctx.RespondWithFileAsync(fileName: "image." + MimeGuesser.GuessExtension(img), fileData: img);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            await ctx.RespondAsync(builder);
         }
 
         [Command("tiny")]
@@ -201,6 +236,7 @@ namespace MikuSharp.Commands
         public async Task Tiny(CommandContext ctx)
         {
             //soon
+            await ctx.RespondAsync("This command is not implemented yet.");
         }
 
         [Command("trumptweet")]
@@ -211,7 +247,10 @@ namespace MikuSharp.Commands
             var c = new HttpClient();
             var e = JsonConvert.DeserializeObject<NekoBot>(await c.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=trumptweet&text={text}"));
             Stream img = new MemoryStream(await c.GetByteArrayAsync(e.message));
-            await ctx.RespondWithFileAsync(fileName: "trump.png", fileData: img);
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"trump.png", img);
+            await ctx.RespondAsync(builder);
         }
 
         

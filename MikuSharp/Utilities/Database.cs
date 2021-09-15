@@ -1,13 +1,13 @@
-﻿using MikuSharp.Entities;
+﻿using DisCatSharp.Entities;
+using DisCatSharp.Lavalink;
+
+using MikuSharp.Entities;
+
 using Npgsql;
-using DSharpPlus.Lavalink;
+
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using DSharpPlus.Entities;
-using System.Linq;
-using NpgsqlTypes;
 
 namespace MikuSharp.Utilities
 {

@@ -1,16 +1,12 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Lavalink;
-using FluentFTP;
+﻿using DisCatSharp.Lavalink;
+
 using MikuSharp.Enums;
-using MikuSharp.Utilities;
+
 using Npgsql;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Entities
@@ -58,7 +54,7 @@ namespace MikuSharp.Entities
             }
             else
             {
-                var trs = await Bot.LLEU.First().Value.GetTracksAsync(new Uri(Url));
+                var trs = await Bot.LLEU.First().Value.ConnectedGuilds.First().Value.GetTracksAsync(new Uri(Url));
                 int i = 0;
                 foreach (var t in trs.Tracks)
                 {

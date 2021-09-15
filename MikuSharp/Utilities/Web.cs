@@ -1,16 +1,18 @@
-﻿using MikuSharp.Entities;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.Entities;
+
 using HeyRed.Mime;
-using DSharpPlus.Entities;
+
+using MikuSharp.Entities;
+
+using Newtonsoft.Json;
+
 using System.IO;
-using DSharpPlus.CommandsNext;
-using Weeb.net;
+using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
+
+using Weeb.net;
 
 namespace MikuSharp.Utilities
 {
@@ -20,8 +22,10 @@ namespace MikuSharp.Utilities
         {
             var hc = new HttpClient();
             var dl = JsonConvert.DeserializeObject<Nekos_Life>(await hc.GetStringAsync(url));
-            MemoryStream str = new MemoryStream(await hc.GetByteArrayAsync(Other.resizeLink(dl.Url)));
-            str.Position = 0;
+            MemoryStream str = new MemoryStream(await hc.GetByteArrayAsync(Other.resizeLink(dl.Url)))
+            {
+                Position = 0
+            };
             dl.Data = str;
             dl.Filetype = MimeGuesser.GuessExtension(str);
             var em = new DiscordEmbedBuilder();
@@ -50,8 +54,10 @@ namespace MikuSharp.Utilities
         {
             var hc = new HttpClient();
             var dl = JsonConvert.DeserializeObject<NekoBot>(await hc.GetStringAsync(url));
-            MemoryStream str = new MemoryStream(await hc.GetByteArrayAsync(Other.resizeLink(dl.message)));
-            str.Position = 0;
+            MemoryStream str = new MemoryStream(await hc.GetByteArrayAsync(Other.resizeLink(dl.message)))
+            {
+                Position = 0
+            };
             dl.Data = str;
             dl.Filetype = MimeGuesser.GuessExtension(str);
             var em = new DiscordEmbedBuilder();
@@ -65,8 +71,10 @@ namespace MikuSharp.Utilities
         {
             var hc = new HttpClient();
             var dl = JsonConvert.DeserializeObject<Derpy>(await hc.GetStringAsync(url));
-            MemoryStream str = new MemoryStream(await hc.GetByteArrayAsync(Other.resizeLink(dl.url)));
-            str.Position = 0;
+            MemoryStream str = new MemoryStream(await hc.GetByteArrayAsync(Other.resizeLink(dl.url)))
+            {
+                Position = 0
+            };
             dl.Data = str;
             dl.Filetype = MimeGuesser.GuessExtension(str);
             var em = new DiscordEmbedBuilder();
@@ -80,8 +88,10 @@ namespace MikuSharp.Utilities
         {
             var weeurl = await Bot._weeb.GetRandomAsync(query, tags, nsfw: nsfw);
             var hc = new HttpClient();
-            MemoryStream img = new MemoryStream(await hc.GetByteArrayAsync(weeurl.Url));
-            img.Position = 0;
+            MemoryStream img = new MemoryStream(await hc.GetByteArrayAsync(weeurl.Url))
+            {
+                Position = 0
+            };
             var em = new DiscordEmbedBuilder();
             //em.WithDescription($"{ctx.Member.Mention} hugs {m.Mention} uwu");
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");

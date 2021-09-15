@@ -13,7 +13,7 @@ Rewritten from JS to C# with completely redone Music part!
 If you want to support the bot and/or fix bugs or add documentation, feel free to fork this and then submit a pull request with changes! New features will remain in the "update" branch and the current version will always be the "master" branch!
 
 ### Used libraries ❤
-* [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) as Discord bot library
+* [DisCatSharp](https://github.com/Aiko-IT-Systems/DisCatSharp) as Discord bot library
 * [AngleSharp](https://github.com/AngleSharp/AngleSharp) for various HTML parsing things
 * [FluentFTP](https://github.com/robinrodricks/FluentFTP) for saving the NND stuff
 * [Google Youtube API](https://github.com/googleapis/google-api-dotnet-client) for fancy "now playing" command

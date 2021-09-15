@@ -1,12 +1,11 @@
-﻿using DSharpPlus;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
+﻿using DisCatSharp;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+
 using MikuSharp.Utilities;
-using System;
-using System.Collections.Generic;
+
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
