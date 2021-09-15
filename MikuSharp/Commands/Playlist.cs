@@ -2,6 +2,7 @@
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink;
 
@@ -185,7 +186,7 @@ namespace MikuSharp.Commands
             {
                 Pages.Remove(eP);
             }
-            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, timeoutoverride: TimeSpan.FromMinutes(5));
+            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
         }
 
         [Command("show")]
@@ -261,7 +262,7 @@ namespace MikuSharp.Commands
             {
                 Pages.Remove(eP);
             }
-            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, timeoutoverride: TimeSpan.FromMinutes(5));
+            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
         }
 
         [Command("delete")]
@@ -321,6 +322,7 @@ namespace MikuSharp.Commands
         [Description("Add a song to a playlist")]
         [Usage("(playlistname) |-> Adds a song(s) to the playlist (You will be asked for the song link/search a song seperately)",
             "|-> You will be asked to select a playlist and a song will be added to the selected one (You will be asked for the song link/search a song seperately) ")]
+        [RequireUserAndBotVoicechatConnection]
         public async Task Add(CommandContext ctx, [RemainingText] string name = null)
         {
             if (name == null)
@@ -365,6 +367,7 @@ namespace MikuSharp.Commands
         [Description("Insert a song into a playlist (refer to show command)")]
         [Usage("(position) (playlist) |-> Inserts a songs(s) to a playlist at the entered position (You will be asked for the song link/search a song seperately)",
             "(position) |-> You will be asked to select a playlist and in selected one a song(s) will inserted at the entered position (Link/Serach a song will be seperately))")]
+        [RequireUserAndBotVoicechatConnection]
         public async Task Insert(CommandContext ctx, int pos, [RemainingText] string name = null)
         {
             if (name == null)

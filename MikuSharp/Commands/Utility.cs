@@ -2,6 +2,7 @@
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
 
 using Kitsu.Anime;
@@ -52,7 +53,7 @@ namespace MikuSharp.Commands
                     ress.Add(new Page(embed: aa));
                     i++;
                 }
-                await ine.SendPaginatedMessageAsync(ctx.Channel, ctx.User, ress, timeoutoverride:TimeSpan.FromMinutes(2.5));
+                await ine.SendPaginatedMessageAsync(ctx.Channel, ctx.User, ress, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch (Exception ex)
             {
@@ -154,7 +155,7 @@ namespace MikuSharp.Commands
                     ress.Add(new Page(embed: aa));
                     i++;
                 }
-                await ine.SendPaginatedMessageAsync(ctx.Channel, ctx.User, ress, timeoutoverride: TimeSpan.FromMinutes(2.5));
+                await ine.SendPaginatedMessageAsync(ctx.Channel, ctx.User, ress, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch
             {
@@ -196,7 +197,7 @@ namespace MikuSharp.Commands
             emb.AddField("Username", $"{m.Username}#{m.Discriminator}", true);
             if (m.DisplayName != m.Username) emb.AddField("Nickname", $"{m.DisplayName}", true);
             emb.AddField("ID", $"{m.Id}", true);
-            emb.AddField("Status", $"{m.Presence.Status}", true);
+            //emb.AddField("Status", $"{m.Presence.Status}", true); // Requires presence intent
             emb.AddField("Account Creation", $"{m.CreationTimestamp}", true);
             emb.WithThumbnail(m.AvatarUrl);
             await ctx.RespondAsync(embed: emb.Build());

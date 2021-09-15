@@ -46,7 +46,7 @@ namespace MikuSharp.Commands
             embed2.WithImageUrl(e.message);
             await ctx.RespondAsync(embed: embed2.Build());
         }
-
+        /*
         [Command("ddlc")]
         [Description("Radon DDLC image")]
         public async Task DDLC(CommandContext ctx)
@@ -65,7 +65,7 @@ namespace MikuSharp.Commands
             builder.WithEmbed(em.Build());
             await ctx.RespondAsync(builder);
         }
-
+        */
         [Command("diva")]
         [Description("Radnom PJD Loading image")]
         public async Task DivaPic(CommandContext ctx)
@@ -146,7 +146,7 @@ namespace MikuSharp.Commands
             builder.WithEmbed(emim.Build());
             await ctx.RespondAsync(builder);
         }
-
+        /*
         [Command("k-on")]
         [Description("Random K-On gif")]
         public async Task K_On(CommandContext ctx)
@@ -188,7 +188,7 @@ namespace MikuSharp.Commands
             builder.WithEmbed(em.Build());
             await ctx.RespondAsync(builder);
         }
-
+        */
         [Command("len")]
         [Description("Random Len image")]
         public async Task KLenPic(CommandContext ctx)
@@ -216,7 +216,7 @@ namespace MikuSharp.Commands
             builder.WithEmbed(emim.Build());
             await ctx.RespondAsync(builder);
         }
-
+        /*
         [Command("lovelive")]
         [Description("Random Love Live gif")]
         public async Task LoveLive(CommandContext ctx)
@@ -236,7 +236,7 @@ namespace MikuSharp.Commands
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             builder.WithEmbed(em.Build());
             await ctx.RespondAsync(builder);
-        }
+        }*/
 
         [Command("luka")]
         [Description("Random Luka image")]
@@ -366,7 +366,7 @@ namespace MikuSharp.Commands
             builder.WithEmbed(emim.Build());
             await ctx.RespondAsync(builder);
         }
-
+        /*
         [Command("takagi")]
         [Description("Random Takagi image")]
         public async Task Takagi(CommandContext ctx)
@@ -387,7 +387,7 @@ namespace MikuSharp.Commands
             builder.WithEmbed(em.Build());
             await ctx.RespondAsync(builder);
         }
-
+        */
         [Command("teto")]
         [Description("Random Teto image")]
         public async Task KTetoPic(CommandContext ctx)

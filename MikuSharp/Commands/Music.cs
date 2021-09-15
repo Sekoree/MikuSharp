@@ -4,6 +4,7 @@ using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
 
 using Google.Apis.Services;
@@ -617,7 +618,7 @@ namespace MikuSharp.Commands
                 {
                     Pages.Remove(eP);
                 }
-                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, timeoutoverride: TimeSpan.FromMinutes(5));
+                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch (Exception ex)
             {
@@ -986,7 +987,7 @@ namespace MikuSharp.Commands
                 {
                     Pages.Remove(eP);
                 }
-                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, timeoutoverride: TimeSpan.FromMinutes(5));
+                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch (Exception ex)
             {

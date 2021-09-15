@@ -2,6 +2,7 @@
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
 
 using MikuSharp.Attributes;
@@ -9,6 +10,7 @@ using MikuSharp.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
@@ -141,7 +143,8 @@ namespace MikuSharp.Commands
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
                             "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)")));
-                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, All, timeoutoverride: TimeSpan.FromMinutes(5));
+                //await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, All, null, PaginationBehaviour.WrapAround, PaginationDeletion.DeleteEmojis, TimeSpan.FromMinutes(5));
+                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, All, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch (Exception ex)
             {
@@ -271,8 +274,11 @@ namespace MikuSharp.Commands
         [Description("Bot invitation link")]
         public async Task Invite(CommandContext ctx)
         {
-            await ctx.RespondAsync("Thanks for your interest in the Hatsune Miku Bot!\n" +
-                "https://meek.moe/miku");
+            var invite = ctx.Client.GetInAppOAuth(DisCatSharp.Permissions.Administrator).AbsoluteUri;
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithContent($"Thanks for your interest in the {ctx.Client.CurrentUser.Username} Bot!");
+            builder.AddComponents(new DiscordLinkButtonComponent(invite, $"Add {ctx.Client.CurrentUser.Username}", false)); // , new DiscordComponentEmoji(704730096220635296)
+            await ctx.RespondAsync(builder);
         }
 
         [Command("ping")]
@@ -303,6 +309,7 @@ namespace MikuSharp.Commands
             }
             var emb = new DiscordEmbedBuilder().
                 WithTitle("Stats").
+                WithDescription("Some stats of the Bot!").
                 AddField("Guilds", GuildCount.ToString(), true).
                 AddField("Users(Without Bots)", $"{UserCount}({NoBotCount})", true).
                 AddField("Channels", ChannelCount.ToString(), true).
