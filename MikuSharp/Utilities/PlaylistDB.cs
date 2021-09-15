@@ -89,7 +89,7 @@ namespace MikuSharp.Utilities
                 {
                     try
                     {
-                        var ss = await Bot.LLEU.First().Value.GetGuildConnection(guild).GetTracksAsync(new Uri(Convert.ToString(reader2["url"])));
+                        var ss = await Bot.LLEU.First().Value.Rest.GetTracksAsync(new Uri(Convert.ToString(reader2["url"])));
                         am = ss.Tracks.Count();
                     }
                     catch { }
@@ -364,12 +364,12 @@ namespace MikuSharp.Utilities
                     await msg.ModifyAsync("Uploading");
                     await client.UploadAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
                 }
-                var Track = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
+                var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
                 return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
             }
             if (n.StartsWith("http://") | n.StartsWith("https://"))
             {
-                var s = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri(n));
+                var s = await nodeConnection.Rest.GetTracksAsync(new Uri(n));
                 switch (s.LoadResultType)
                 {
                     case LavalinkLoadResultType.LoadFailed:
@@ -442,7 +442,7 @@ namespace MikuSharp.Utilities
             }
             else
             {
-                var s = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(n);
+                var s = await nodeConnection.Rest.GetTracksAsync(n);
                 switch (s.LoadResultType)
                 {
                     case LavalinkLoadResultType.LoadFailed:

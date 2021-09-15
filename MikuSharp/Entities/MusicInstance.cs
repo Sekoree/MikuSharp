@@ -86,7 +86,7 @@ namespace MikuSharp.Entities
                     await msg.ModifyAsync("Uploading");
                     await client.UploadAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
                 }
-                var Track = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
+                var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
                 if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
                 else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
@@ -112,7 +112,7 @@ namespace MikuSharp.Entities
                     await msg.ModifyAsync("Uploading");
                     await client.UploadAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
                 }
-                var Track = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
+                var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
                 if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
                 else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
@@ -120,7 +120,7 @@ namespace MikuSharp.Entities
             }
             else if (n.StartsWith("http://") | n.StartsWith("https://"))
             {
-                var s = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri(n));
+                var s = await nodeConnection.Rest.GetTracksAsync(new Uri(n));
                 switch (s.LoadResultType)
                 {
                     case LavalinkLoadResultType.LoadFailed:
@@ -206,7 +206,7 @@ namespace MikuSharp.Entities
             }
             else
             {
-                var s = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(n);
+                var s = await nodeConnection.Rest.GetTracksAsync(n);
                 switch (s.LoadResultType)
                 {
                     case LavalinkLoadResultType.LoadFailed:
