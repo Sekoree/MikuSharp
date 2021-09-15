@@ -277,7 +277,7 @@ namespace MikuSharp.Commands
             var invite = ctx.Client.GetInAppOAuth(DisCatSharp.Permissions.Administrator).AbsoluteUri;
             DiscordMessageBuilder builder = new DiscordMessageBuilder();
             builder.WithContent($"Thanks for your interest in the {ctx.Client.CurrentUser.Username} Bot!");
-            builder.AddComponents(new DiscordLinkButtonComponent(invite, $"Add {ctx.Client.CurrentUser.Username}", false)); // , new DiscordComponentEmoji(704730096220635296)
+            builder.AddComponents(new DiscordLinkButtonComponent(invite, $"Add {ctx.Client.CurrentUser.Username}", false, new DiscordComponentEmoji(704730096220635296)));
             await ctx.RespondAsync(builder);
         }
 
