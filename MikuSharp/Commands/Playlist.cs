@@ -1,16 +1,19 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Lavalink;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+
 using MikuSharp.Attributes;
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 using MikuSharp.Utilities;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
@@ -81,7 +84,7 @@ namespace MikuSharp.Commands
             LavalinkLoadResult s = null;
             try
             {
-                s = await Bot.LLEU[ctx.Client.ShardId].GetTracksAsync(new Uri(gets.Result.Content));
+                s = await Bot.LLEU[ctx.Client.ShardId].Rest.GetTracksAsync(new Uri(gets.Result.Content));
             }
             catch
             {
@@ -90,7 +93,7 @@ namespace MikuSharp.Commands
                     "> The playlist is unavailable (for example set to private)").Build());
                 return;
             }
-            if (s.LoadResultType != DSharpPlus.Lavalink.LavalinkLoadResultType.PlaylistLoaded)
+            if (s.LoadResultType != LavalinkLoadResultType.PlaylistLoaded)
             {
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription("**Error** Reasons could be:\n" +
                     "> The provided link was not a playlist\n" +
@@ -114,7 +117,7 @@ namespace MikuSharp.Commands
         [Usage("|-> Shows all your playlists")]
         public async Task List(CommandContext ctx)
         {
-            var pls = await PlaylistDB.GetPlaylists(ctx.Member.Id);
+            var pls = await PlaylistDB.GetPlaylists(ctx.Guild, ctx.Member.Id);
             if (pls.Count == 0)
             {
                 await ctx.RespondAsync("You dont have any playlists");
@@ -183,7 +186,7 @@ namespace MikuSharp.Commands
             {
                 Pages.Remove(eP);
             }
-            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, timeoutoverride: TimeSpan.FromMinutes(5));
+            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
         }
 
         [Command("show")]
@@ -204,7 +207,7 @@ namespace MikuSharp.Commands
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Show Playlist").WithDescription("**Error** You dont have a playlist with that name!").Build());
                 return;
             }
-            var q = await PlaylistDB.GetPlaylist(ctx.Member.Id, name);
+            var q = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, name);
             var queue = await q.GetEntries();
             if (queue.Count == 0)
             {
@@ -259,7 +262,7 @@ namespace MikuSharp.Commands
             {
                 Pages.Remove(eP);
             }
-            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, timeoutoverride: TimeSpan.FromMinutes(5));
+            await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
         }
 
         [Command("delete")]
@@ -303,7 +306,7 @@ namespace MikuSharp.Commands
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Rename Playlist").WithDescription("**Error** You dont have a playlist with that name!").Build());
                 return;
             }
-            var pls = await PlaylistDB.GetPlaylist(ctx.Member.Id, name);
+            var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, name);
             await pls.GetEntries();
             var msg = await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Rename Playlist").WithDescription($"Please enter the new playlistname now!\n" +
                 $"No prefix needed!").Build());
@@ -333,7 +336,7 @@ namespace MikuSharp.Commands
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Add Song").WithDescription("**Error** You dont have a playlist with that name!").Build());
                 return;
             }
-            var pls = await PlaylistDB.GetPlaylist(ctx.Member.Id, name);
+            var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, name);
             if (pls.ExternalService != ExtService.None)
             {
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Add Song").WithDescription("**Error** This playlist is a fixed one, you cant add songs to this!").Build());
@@ -370,7 +373,7 @@ namespace MikuSharp.Commands
                 name = await SelectPL(ctx);
                 if (name == null) return;
             }
-            pos = pos - 1;
+            pos--;
             var inter = ctx.Client.GetInteractivity();
             var p = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
             if (!p.Any(x => x == name))
@@ -378,7 +381,7 @@ namespace MikuSharp.Commands
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Insert Song").WithDescription("**Error** You dont have a playlist with that name!").Build());
                 return;
             }
-            var pls = await PlaylistDB.GetPlaylist(ctx.Member.Id, name);
+            var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, name);
             if (pls.ExternalService != ExtService.None)
             {
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Insert Song").WithDescription("**Error** This playlist is a fixed one, you cant add songs to this!").Build());
@@ -391,7 +394,7 @@ namespace MikuSharp.Commands
             var got = await PlaylistDB.GetSong(hm2.Result.Content, ctx);
             if (got == null) return;
             got.Tracks.Reverse();
-            await PlaylistDB.InsertEntry(name, ctx.Member.Id,got.Tracks, pos);
+            await PlaylistDB.InsertEntry(ctx.Guild, name, ctx.Member.Id,got.Tracks, pos);
             var ent = await pls.GetEntries();
             if (got.Tracks.Count > 1)
             {
@@ -416,15 +419,15 @@ namespace MikuSharp.Commands
                 pl = await SelectPL(ctx);
                 if (pl == null) return;
             }
-            oldpos = oldpos - 1;
-            newpos = newpos - 1;
+            oldpos--;
+            newpos--;
             var p = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
             if (!p.Any(x => x == pl))
             {
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Insert Song").WithDescription("**Error** You dont have a playlist with that name!").Build());
                 return;
             }
-            var pls = await PlaylistDB.GetPlaylist(ctx.Member.Id, pl);
+            var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, pl);
             if (pls.ExternalService != ExtService.None)
             {
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Insert Song").WithDescription("**Error** This playlist is a fixed one, you cant move songs!").Build());
@@ -432,7 +435,7 @@ namespace MikuSharp.Commands
             }
             var e = await pls.GetEntries();
             if (e[newpos] == null | e[oldpos] == null) return;
-            await PlaylistDB.MoveListItems(pl, ctx.Member.Id, oldpos, newpos);
+            await PlaylistDB.MoveListItems(ctx.Guild, pl, ctx.Member.Id, oldpos, newpos);
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Move Song").WithDescription($"Moved entry -> {e[oldpos].track.Title} to position {newpos+1}!").Build());
         }
 
@@ -470,16 +473,16 @@ namespace MikuSharp.Commands
                 pl = await SelectPL(ctx);
                 if (pl == null) return;
             }
-            pos = pos - 1;
+            pos--;
             var p = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
             if (!p.Any(x => x == pl))
             {
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Remove Song").WithDescription("**Error** You dont have a playlist with that name!").Build());
                 return;
             }
-            var ents = await PlaylistDB.GetPlaylist(ctx.Member.Id, pl);
+            var ents = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, pl);
             var en = await ents.GetEntries();
-            await PlaylistDB.RemoveFromList(pos, pl, ctx.Member.Id);
+            await PlaylistDB.RemoveFromList(ctx.Guild, pos, pl, ctx.Member.Id);
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Remove Song").WithDescription($"Entry removed! -> {en[pos].track.Title}").Build());
         }
 
@@ -496,13 +499,13 @@ namespace MikuSharp.Commands
                 pl = await SelectPL(ctx);
                 if (pl == null) return;
             }
-            var ps = await PlaylistDB.GetPlaylists(ctx.Member.Id);
+            var ps = await PlaylistDB.GetPlaylists(ctx.Guild, ctx.Member.Id);
             if (!ps.Any(x => x.Key == pl))
             {
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithTitle("Play Playlist").WithDescription("**Error** You dont have a playlist with that name!").Build());
                 return;
             }
-            var pls = await PlaylistDB.GetPlaylist(ctx.Member.Id, pl);
+            var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, pl);
             var p = await pls.GetEntries();
             Console.WriteLine("Done");
             if (!Bot.Guilds.Any(x => x.Key == ctx.Guild.Id))
@@ -531,7 +534,7 @@ namespace MikuSharp.Commands
                 await ctx.RespondAsync("You dont have any playlists");
                 return null;
             }
-            var pls = await PlaylistDB.GetPlaylists(ctx.Member.Id);
+            var pls = await PlaylistDB.GetPlaylists(ctx.Guild, ctx.Member.Id);
             string plss = "";
             int i = 1;
             foreach(var pl in pls)

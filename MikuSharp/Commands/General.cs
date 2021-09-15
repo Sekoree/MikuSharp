@@ -1,22 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.Extensions;
+
 using MikuSharp.Attributes;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
 {
     class General : BaseCommandModule
     {
-        private string botdev = "davidjcralph#9721";
-        private string curbotdev = "Speyd3r (Hiatus)#3939 [Contact via Sekoree#3939]";
+        private readonly string botdev = "davidjcralph#9721";
+        private readonly string curbotdev = "Speyd3r (Hiatus)#3939 [Contact via Sekoree#3939]";
     
         [Command("donate")]
         [Description("Financial support information")]
@@ -24,7 +26,7 @@ namespace MikuSharp.Commands
         public async Task Donate(CommandContext ctx)
         {
             var emb = new DiscordEmbedBuilder();
-            emb.WithThumbnailUrl(ctx.Client.CurrentUser.AvatarUrl).
+            emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl).
                 WithTitle("Donate Page!").
                 WithAuthor("Miku Bot uwu").
                 WithUrl("https://meek.moe/").
@@ -137,15 +139,16 @@ namespace MikuSharp.Commands
                     .AddField("General Info", "" +
                             $"Developer of the original bot: {botdev}\n" +
                             $"Current Developer: {curbotdev}\n" +
-                            "Avatar by: Chillow#1945 ❤ [Twitter](https://twitter.com/SaikoSamurai)\n" +
+                            "Avatar by: Chillow ❤ [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
                             "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)")));
-                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, All, timeoutoverride: TimeSpan.FromMinutes(5));
+                //await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, All, null, PaginationBehaviour.WrapAround, PaginationDeletion.DeleteEmojis, TimeSpan.FromMinutes(5));
+                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, All, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch (Exception ex)
             {
-                await ctx.RespondAsync("Something went wrong :( either I'm missing the permissions to add reactions, to use embeds, to manage messages or all of those. If you are sure that I have all those permissions, join discord.gg/YPPA2Pu and slap ``@Speyd3r#3939``");
+                await ctx.RespondAsync("Something went wrong :( either I'm missing the permissions to add reactions, to use embeds, to manage messages or all of those. If you are sure that I have all those permissions, join discord.gg/YPPA2Pu and slap ``@Sekoree#3939``");
                 Console.WriteLine(ex);
             }
         }
@@ -179,7 +182,7 @@ namespace MikuSharp.Commands
                             disemb.AddField("General Info", "" +
                                 $"Developer of the original bot: {botdev}\n" +
                                 $"Current Developer: {curbotdev}\n" +
-                                "Avatar by: Chillow#1945 [Twitter](https://twitter.com/SaikoSamurai)\n" +
+                                "Avatar by: Chillow [Twitter](https://twitter.com/SaikoSamurai)\n" +
                                 "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                                 "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
                                 "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)");
@@ -204,7 +207,7 @@ namespace MikuSharp.Commands
                         disemb.AddField("General Info", "" +
                             $"Developer of the original bot: {botdev}\n" +
                             $"Current Developer: {curbotdev}\n" +
-                            "Avatar by: Chillow#1945 [Twitter](https://twitter.com/SaikoSamurai)\n" +
+                            "Avatar by: Chillow [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
                             "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)");
@@ -271,8 +274,11 @@ namespace MikuSharp.Commands
         [Description("Bot invitation link")]
         public async Task Invite(CommandContext ctx)
         {
-            await ctx.RespondAsync("Thanks for your interest in the Hatsune Miku Bot!\n" +
-                "https://meek.moe/miku");
+            var invite = ctx.Client.GetInAppOAuth(DisCatSharp.Permissions.Administrator).AbsoluteUri;
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithContent($"Thanks for your interest in the {ctx.Client.CurrentUser.Username} Bot!");
+            builder.AddComponents(new DiscordLinkButtonComponent(invite, $"Add {ctx.Client.CurrentUser.Username}", false, new DiscordComponentEmoji(704730096220635296)));
+            await ctx.RespondAsync(builder);
         }
 
         [Command("ping")]
@@ -290,23 +296,27 @@ namespace MikuSharp.Commands
             int UserCount = 0;
             int NoBotCount = 0;
             int ChannelCount = 0;
+            int CommandCount = ctx.Client.GetCommandsNext().RegisteredCommands.Count;
             foreach (var client in Bot.bot.ShardClients)
             {
-                GuildCount = GuildCount + client.Value.Guilds.Count;
+                GuildCount += client.Value.Guilds.Count;
                 foreach (var guild in client.Value.Guilds)
                 {
-                    UserCount = UserCount + guild.Value.MemberCount;
-                    NoBotCount = NoBotCount + guild.Value.Members.Where(x => !x.Value.IsBot).Count();
-                    ChannelCount = ChannelCount + guild.Value.Channels.Count;
+                    UserCount += guild.Value.MemberCount;
+                    NoBotCount += guild.Value.Members.Where(x => !x.Value.IsBot).Count();
+                    ChannelCount += guild.Value.Channels.Count;
                 }
             }
             var emb = new DiscordEmbedBuilder().
                 WithTitle("Stats").
+                WithDescription("Some stats of the Bot!").
                 AddField("Guilds", GuildCount.ToString(), true).
                 AddField("Users(Without Bots)", $"{UserCount}({NoBotCount})", true).
                 AddField("Channels", ChannelCount.ToString(), true).
+                AddField("Top-Level Commands", CommandCount.ToString(), true).
                 AddField("Ping", ctx.Client.Ping.ToString(), true).
-                WithThumbnailUrl(ctx.Client.CurrentUser.AvatarUrl);
+                AddField("Lib (Version)", ctx.Client.BotLibrary + " " + ctx.Client.VersionString, true).
+                WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);
             await ctx.RespondAsync(embed: emb.Build());
         }
 
@@ -318,7 +328,7 @@ namespace MikuSharp.Commands
                 WithTitle("Support Server").
                 WithDescription("Need help or is something broken?\n" +
                 "[Join the support server](https://discord.gg/YPPA2Pu)").
-                WithThumbnailUrl(ctx.Client.CurrentUser.AvatarUrl);
+                WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);
             await ctx.RespondAsync(embed: emb.Build());
         }
     }

@@ -1,8 +1,6 @@
-﻿using DSharpPlus.Entities;
-using System;
-using System.Collections.Generic;
+﻿using DisCatSharp.Entities;
+
 using System.IO;
-using System.Text;
 
 namespace MikuSharp.Entities
 {

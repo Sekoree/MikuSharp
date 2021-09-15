@@ -1,15 +1,17 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.Extensions;
+
+using Kitsu.Anime;
+using Kitsu.Manga;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Kitsu.Anime;
-using Kitsu.Manga;
-using Kitsu;
 
 namespace MikuSharp.Commands
 {
@@ -39,7 +41,7 @@ namespace MikuSharp.Commands
                     if (aa.Attributes.AgeRating != null) emb.AddField("Age Rating", $"{aa.Attributes.AgeRating}", true);
                     if (aa.Attributes.AverageRating != null) emb.AddField("Score", $"{aa.Attributes.AverageRating}", true);
                     emb.AddField("NSFW", $"{aa.Attributes.Nsfw}", true);
-                    if (aa.Attributes.CoverImage?.Small != null) emb.WithThumbnailUrl(aa.Attributes.CoverImage.Small);
+                    if (aa.Attributes.CoverImage?.Small != null) emb.WithThumbnail(aa.Attributes.CoverImage.Small);
                     res.Add(emb);
                     emb = new DiscordEmbedBuilder();
                 }
@@ -51,7 +53,7 @@ namespace MikuSharp.Commands
                     ress.Add(new Page(embed: aa));
                     i++;
                 }
-                await ine.SendPaginatedMessageAsync(ctx.Channel, ctx.User, ress, timeoutoverride:TimeSpan.FromMinutes(2.5));
+                await ine.SendPaginatedMessageAsync(ctx.Channel, ctx.User, ress, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch (Exception ex)
             {
@@ -109,7 +111,7 @@ namespace MikuSharp.Commands
             var emb = new DiscordEmbedBuilder();
             emb.WithTitle(ctx.Guild.Name);
             emb.WithColor(new DiscordColor(0212255));
-            emb.WithThumbnailUrl(ctx.Guild.IconUrl);
+            emb.WithThumbnail(ctx.Guild.IconUrl);
             emb.AddField("Owner",ctx.Guild.Owner.Mention, true);
             emb.AddField("Region",ctx.Guild.VoiceRegion.Name, true);
             emb.AddField("ID",ctx.Guild.Id.ToString(), true);
@@ -140,7 +142,7 @@ namespace MikuSharp.Commands
                     if (aa.Attributes.EndDate != null) emb.AddField("End Date", $"{aa.Attributes.EndDate}", true);
                     if (aa.Attributes.AgeRating != null) emb.AddField("Age Rating", $"{aa.Attributes.AgeRating}", true);
                     if (aa.Attributes.AverageRating != null) emb.AddField("Score", $"{aa.Attributes.AverageRating}", true);
-                    if (aa.Attributes.CoverImage?.Small != null) emb.WithThumbnailUrl(aa.Attributes.CoverImage.Small);
+                    if (aa.Attributes.CoverImage?.Small != null) emb.WithThumbnail(aa.Attributes.CoverImage.Small);
                     emb.WithFooter("via Kitsu.io", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
                     res.Add(emb);
                     emb = new DiscordEmbedBuilder();
@@ -153,7 +155,7 @@ namespace MikuSharp.Commands
                     ress.Add(new Page(embed: aa));
                     i++;
                 }
-                await ine.SendPaginatedMessageAsync(ctx.Channel, ctx.User, ress, timeoutoverride: TimeSpan.FromMinutes(2.5));
+                await ine.SendPaginatedMessageAsync(ctx.Channel, ctx.User, ress, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch
             {
@@ -175,7 +177,7 @@ namespace MikuSharp.Commands
             emb.AddField("ID", $"{m.Id}", true);
             emb.AddField("Status", $"{m.Presence.Status}", true);
             emb.AddField("Account Creation", $"{m.CreationTimestamp}", true);
-            emb.WithThumbnailUrl(m.AvatarUrl);
+            emb.WithThumbnail(m.AvatarUrl);
             await ctx.RespondAsync(embed: emb.Build());
         }
 
@@ -195,9 +197,9 @@ namespace MikuSharp.Commands
             emb.AddField("Username", $"{m.Username}#{m.Discriminator}", true);
             if (m.DisplayName != m.Username) emb.AddField("Nickname", $"{m.DisplayName}", true);
             emb.AddField("ID", $"{m.Id}", true);
-            emb.AddField("Status", $"{m.Presence.Status}", true);
+            //emb.AddField("Status", $"{m.Presence.Status}", true); // Requires presence intent
             emb.AddField("Account Creation", $"{m.CreationTimestamp}", true);
-            emb.WithThumbnailUrl(m.AvatarUrl);
+            emb.WithThumbnail(m.AvatarUrl);
             await ctx.RespondAsync(embed: emb.Build());
         }
     }

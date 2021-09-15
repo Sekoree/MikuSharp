@@ -1,7 +1,6 @@
-﻿using DSharpPlus.Lavalink;
-using System;
+﻿using DisCatSharp.Lavalink;
+
 using System.Collections.Generic;
-using System.Text;
 
 namespace MikuSharp.Entities
 {
@@ -18,8 +17,10 @@ namespace MikuSharp.Entities
         public TrackResult(LavalinkPlaylistInfo pl, LavalinkTrack tr)
         {
             PlaylistInfo = pl;
-            Tracks = new List<LavalinkTrack>();
-            Tracks.Add(tr);
+            Tracks = new List<LavalinkTrack>
+            {
+                tr
+            };
         }
     }
 }

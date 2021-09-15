@@ -1,24 +1,29 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
+﻿using AlbumArtExtraction;
+
+using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.Extensions;
+
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
+
+using HeyRed.Mime;
+
 using MikuSharp.Attributes;
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 using MikuSharp.Events;
 using MikuSharp.Utilities;
-using AlbumArtExtraction;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http;
 using System.IO;
-using HeyRed.Mime;
-using DSharpPlus.CommandsNext.Converters;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
 {
@@ -36,7 +41,7 @@ namespace MikuSharp.Commands
             var g = Bot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null)
             {
-                g.musicInstance = new Entities.MusicInstance(Bot.LLEU[ctx.Client.ShardId], ctx.Client.ShardId);
+                g.musicInstance = new MusicInstance(Bot.LLEU[ctx.Client.ShardId], ctx.Client.ShardId);
             }
             if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false) await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
             g.musicInstance.usedChannel = ctx.Channel;
@@ -55,15 +60,15 @@ namespace MikuSharp.Commands
             if (Options?.ToLower() == "k" || Options?.ToLower() == "keep")
             {
                 g.musicInstance.playstate = Playstate.NotPlaying;
-                await Task.Run(() => g.musicInstance.guildConnection.Stop());
-                await Task.Run(() => g.musicInstance.guildConnection.Disconnect());
+                await Task.Run(async () => await g.musicInstance.guildConnection.StopAsync());
+                await Task.Run(async () => await g.musicInstance.guildConnection.DisconnectAsync());
                 g.musicInstance = null;
                 await ctx.RespondAsync("cya! 💙");
             }
             else
             {
                 g.musicInstance.playstate = Playstate.NotPlaying;
-                await Task.Run(() => g.musicInstance.guildConnection.Disconnect());
+                await Task.Run(async () => await g.musicInstance.guildConnection.DisconnectAsync());
                 await Task.Delay(500);
                 await Database.ClearQueue(ctx.Guild);
                 g.musicInstance = null;
@@ -226,7 +231,7 @@ namespace MikuSharp.Commands
             else
             {
                 g.musicInstance.playstate = Playstate.NotPlaying;
-                g.musicInstance.guildConnection.Stop();
+                await g.musicInstance.guildConnection.StopAsync();
             }
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"**Skipped:**\n{g.musicInstance.lastSong.track.Title}").Build());
         }
@@ -239,7 +244,7 @@ namespace MikuSharp.Commands
             var g = Bot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
             g.musicInstance.usedChannel = ctx.Channel;
-            await Task.Run(() => g.musicInstance.guildConnection.Stop());
+            await Task.Run(async () => await g .musicInstance.guildConnection.StopAsync());
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription("**Stopped**\n(use m%resume to start playback again)").Build());
         }
 
@@ -254,7 +259,7 @@ namespace MikuSharp.Commands
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
             g.musicInstance.usedChannel = ctx.Channel;
             if (vol > 150) vol = 150;
-            g.musicInstance.guildConnection.SetVolume(vol);
+            await g.musicInstance.guildConnection.SetVolumeAsync(vol);
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"**Set volume to {vol}**").Build());
         }
 
@@ -273,13 +278,13 @@ namespace MikuSharp.Commands
             }
             else if (g.musicInstance.playstate == Playstate.Playing)
             {
-                g.musicInstance.guildConnection.Pause();
+                await g.musicInstance.guildConnection.PauseAsync();
                 g.musicInstance.playstate = Playstate.Paused;
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription("**Paused**").Build());
             }
             else
             {
-                g.musicInstance.guildConnection.Resume();
+                await g.musicInstance.guildConnection.ResumeAsync();
                 g.musicInstance.playstate = Playstate.Playing;
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription("**Resumed**").Build());
             }
@@ -300,16 +305,16 @@ namespace MikuSharp.Commands
             }
             else
             {
-                g.musicInstance.guildConnection.Resume();
+                await g.musicInstance.guildConnection.ResumeAsync();
                 g.musicInstance.playstate = Playstate.Playing;
                 await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription("**Resumed**").Build());
             }
         }
 
-        [Command("queuerclear"), Aliases("qc")]
+        [Command("queueclear"), Aliases("qc")]
         [Description("Clears the queue")]
         [RequireUserVoicechatConnection]
-        public async Task QueuecClear(CommandContext ctx)
+        public async Task QueueClear(CommandContext ctx)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
@@ -613,7 +618,7 @@ namespace MikuSharp.Commands
                 {
                     Pages.Remove(eP);
                 }
-                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, timeoutoverride: TimeSpan.FromMinutes(5));
+                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch (Exception ex)
             {
@@ -765,7 +770,12 @@ namespace MikuSharp.Commands
             }
             else
             {
-                await ctx.RespondWithFileAsync(embed: eb.Build(), fileData: img, fileName: $"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[g.musicInstance.currentSong.track.Uri.ToString().Split('/').Count() - 2]}.{MimeGuesser.GuessExtension(img)}");
+
+
+                DiscordMessageBuilder builder = new DiscordMessageBuilder();
+                builder.WithFile($"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[g.musicInstance.currentSong.track.Uri.ToString().Split('/').Count() - 2]}.{MimeGuesser.GuessExtension(img)}", img);
+                builder.WithEmbed(eb.Build());
+                await ctx.RespondAsync(builder);
                 File.Delete($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[g.musicInstance.currentSong.track.Uri.ToString().Split('/').Count() - 2]}.{g.musicInstance.currentSong.track.Uri.ToString().Split('/').Last()}");
             }
         }
@@ -857,7 +867,7 @@ namespace MikuSharp.Commands
                     img = null;
                     File.Delete($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
                 }
-                string time2 = "";
+                string time2;
                 if (lastPlayedSongs[0].track.Length.Hours < 1)
                 {
                     time2 = lastPlayedSongs[0].track.Length.ToString(@"mm\:ss");
@@ -882,7 +892,7 @@ namespace MikuSharp.Commands
             }
             else
             {
-                string time2 = "";
+                string time2;
                 if (lastPlayedSongs[0].track.Length.Hours < 1)
                 {
                     time2 = lastPlayedSongs[0].track.Length.ToString(@"mm\:ss");
@@ -907,7 +917,10 @@ namespace MikuSharp.Commands
             }
             else
             {
-                await ctx.RespondWithFileAsync(embed: eb.Build(), fileData: img, fileName: $"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{MimeGuesser.GuessExtension(img)}");
+                DiscordMessageBuilder builder = new DiscordMessageBuilder();
+                builder.WithFile($"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{MimeGuesser.GuessExtension(img)}", img);
+                builder.WithEmbed(eb.Build());
+                await ctx.RespondAsync(builder);
                 File.Delete($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
             }
         }
@@ -974,7 +987,7 @@ namespace MikuSharp.Commands
                 {
                     Pages.Remove(eP);
                 }
-                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, timeoutoverride: TimeSpan.FromMinutes(5));
+                await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch (Exception ex)
             {

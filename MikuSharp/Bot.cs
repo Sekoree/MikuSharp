@@ -1,29 +1,38 @@
-﻿using DSharpPlus;
-using DSharpPlus.Entities;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Lavalink;
+﻿using DisCatSharp;
+using DisCatSharp.Enums;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.EventHandling;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+using DisCatSharp.Net;
+
+using Microsoft.Extensions.Logging;
+
+using MikuSharp.Entities;
+using MikuSharp.Enums;
+using MikuSharp.Events;
+
+using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
-using MikuSharp.Entities;
+
 using Weeb.net;
-using Newtonsoft.Json;
-using DSharpPlus.Interactivity.Enums;
-using MikuSharp.Utilities;
-using MikuSharp.Events;
-using System.IO;
-using MikuSharp.Enums;
-using System.Diagnostics;
 
 namespace MikuSharp
 {
     class Bot : IDisposable
     {
         public static BotConfig cfg { get; set; } 
-        public static WeebClient _weeb = new WeebClient("Hatsune Miku Bot C# Rewrite", "0.0.1");
+        public static WeebClient _weeb = new WeebClient("Hatsune Miku Bot C# Rewrite", "0.0.2");
         public Task GameSetThread { get; set; }
         public Task StatusThread { get; set; }
         public static DiscordShardedClient bot { get; set; }
@@ -45,20 +54,23 @@ namespace MikuSharp
             bot = new DiscordShardedClient(new DiscordConfiguration
             {
                 Token = cfg.DiscordToken,
-                TokenType = DSharpPlus.TokenType.Bot,
-                LogLevel = LogLevel.Debug,
-                UseInternalLogHandler = true,
-                ReconnectIndefinitely = true
+                TokenType = DisCatSharp.TokenType.Bot,
+                MinimumLogLevel = LogLevel.Trace,
+                AutoReconnect = true,
+                Intents = DiscordIntents.AllUnprivileged,
+                MessageCacheSize = 2048,
+                ShardCount = 1,
+                ShardId = 0
             });
-            bot.GuildDownloadCompleted += e =>
+            bot.GuildDownloadCompleted += (sender, args) =>
             {
                 GameSetThread = Task.Run(setGame);
                 return Task.CompletedTask;
             };
-            bot.ClientErrored += e =>
+            bot.ClientErrored += (sender, args) =>
             {
-                Console.WriteLine(e.Exception.Message);
-                Console.WriteLine(e.Exception.StackTrace);
+                Console.WriteLine(args.Exception.Message);
+                Console.WriteLine(args.Exception.StackTrace);
                 return Task.CompletedTask;
             };
         }
@@ -120,14 +132,14 @@ namespace MikuSharp
                 cmdC[g.Key].RegisterCommands<Commands.Settings>();
                 bot.ShardClients[g.Key].VoiceStateUpdated += VoiceChat.LeftAlone;
                 Console.WriteLine("Caching Done " + g.Key);
-                cmdC[g.Key].CommandExecuted += e =>
+                cmdC[g.Key].CommandExecuted += (sender, args) =>
                 {
-                    Console.WriteLine($"Command: {e.Command.Name} by {e.Context.User.Username}#{e.Context.User.Discriminator}({e.Context.User.Id}) on {e.Context.Guild.Name}({e.Context.Guild.Id})");
+                    Console.WriteLine($"Command: {args.Command.Name} by {args.Context.User.Username}#{args.Context.User.Discriminator}({args.Context.User.Id}) on {args.Context.Guild.Name}({args.Context.Guild.Id})");
                     return Task.CompletedTask;
                 };
-                cmdC[g.Key].CommandErrored += e =>
+                cmdC[g.Key].CommandErrored += (sender, args) =>
                 {
-                    Console.WriteLine(e.Exception);
+                    Console.WriteLine(args.Exception);
                     return Task.CompletedTask;
                 };
             }
@@ -137,34 +149,52 @@ namespace MikuSharp
         {
             int i = 0;
             await _weeb.Authenticate(cfg.WeebShToken, Weeb.net.TokenType.Wolke);
-            await bot.StartAsync();
             var LL = await bot.UseLavalinkAsync();
             lavaC = LL;
-            foreach (var shard in lavaC)
-            {
-                var LCon = await shard.Value.ConnectAsync(new LavalinkConfiguration
-                {
-                    SocketEndpoint = new DSharpPlus.Net.ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
-                    RestEndpoint = new DSharpPlus.Net.ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
-                    Password = cfg.LavaConfig.Password
-                });
-                LLEU.Add(shard.Key, LCon);
-            }
             interC = await bot.UseInteractivityAsync(new InteractivityConfiguration
-                {
+            {
+                Timeout = TimeSpan.FromMinutes(2),
                 PaginationBehaviour = PaginationBehaviour.WrapAround,
                 PaginationDeletion = PaginationDeletion.DeleteEmojis,
-                Timeout = TimeSpan.FromMinutes(2)
+                PollBehaviour = PollBehaviour.DeleteEmojis,
+                AckPaginationButtons = true,
+                ButtonBehavior = ButtonPaginationBehavior.Disable,
+                PaginationButtons = new PaginationButtons()
+                {
+                    SkipLeft = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-left", "First", false, new DiscordComponentEmoji("⏮️")),
+                    Left = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-left", "Previous", false, new DiscordComponentEmoji("◀️")),
+                    Stop = new DiscordButtonComponent(ButtonStyle.Danger, "pgb-stop", "Cancel", false, new DiscordComponentEmoji("⏹️")),
+                    Right = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-right", "Next", false, new DiscordComponentEmoji("▶️")),
+                    SkipRight = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-right", "Last", false, new DiscordComponentEmoji("⏭️"))
+                },
+                ResponseMessage = "Something went wrong.",
+                ResponseBehavior = InteractionResponseBehavior.Respond
             });
             cmdC = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
             {
                 EnableDefaultHelp = false,
-                StringPrefixes = new[] {"m%"}
+                StringPrefixes = new[] {"m%"},
+                CaseSensitive = true,
+                EnableDms = true,
+                DmHelp = true,
+                EnableMentionPrefix = true
                 //PrefixResolver = GetPrefix
             });
+            await CacheRegister();
+            await bot.StartAsync();
+            foreach (var shard in lavaC)
+            {
+                var LCon = await shard.Value.ConnectAsync(new LavalinkConfiguration
+                {
+                    SocketEndpoint = new ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
+                    RestEndpoint = new ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
+                    Password = cfg.LavaConfig.Password
+                });
+                LLEU.Add(shard.Key, LCon);
+            }
             foreach (var g in bot.ShardClients)
             {
-                g.Value.GuildDownloadCompleted += e =>
+                g.Value.GuildDownloadCompleted += (sender, args) =>
                 {
                     i++;
                     return Task.CompletedTask;
@@ -174,8 +204,7 @@ namespace MikuSharp
             {
                 await Task.Delay(1000);
             }
-            await Task.Run(CacheRegister);
-            StatusThread = Task.Run(ShowConnections);
+            //StatusThread = Task.Run(ShowConnections);
             while (!_cts.IsCancellationRequested)
             {
                 await Task.Delay(25);
