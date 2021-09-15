@@ -1,8 +1,10 @@
 ﻿using DisCatSharp;
+using DisCatSharp.Enums;
 using DisCatSharp.CommandsNext;
 using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.EventHandling;
 using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Net;
@@ -150,13 +152,23 @@ namespace MikuSharp
             var LL = await bot.UseLavalinkAsync();
             lavaC = LL;
             interC = await bot.UseInteractivityAsync(new InteractivityConfiguration
-                {
+            {
+                Timeout = TimeSpan.FromMinutes(2),
                 PaginationBehaviour = PaginationBehaviour.WrapAround,
                 PaginationDeletion = PaginationDeletion.DeleteEmojis,
-                Timeout = TimeSpan.FromMinutes(2),
                 PollBehaviour = PollBehaviour.DeleteEmojis,
-                AckPaginationButtons = true
-
+                AckPaginationButtons = true,
+                ButtonBehavior = ButtonPaginationBehavior.Disable,
+                PaginationButtons = new PaginationButtons()
+                {
+                    SkipLeft = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-left", "First", false, new DiscordComponentEmoji("⏮️")),
+                    Left = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-left", "Previous", false, new DiscordComponentEmoji("◀️")),
+                    Stop = new DiscordButtonComponent(ButtonStyle.Danger, "pgb-stop", "Cancel", false, new DiscordComponentEmoji("⏹️")),
+                    Right = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-right", "Next", false, new DiscordComponentEmoji("▶️")),
+                    SkipRight = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-right", "Last", false, new DiscordComponentEmoji("⏭️"))
+                },
+                ResponseMessage = "Something went wrong.",
+                ResponseBehavior = InteractionResponseBehavior.Respond
             });
             cmdC = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
             {
