@@ -84,7 +84,7 @@ namespace MikuSharp.Commands
             LavalinkLoadResult s = null;
             try
             {
-                s = await Bot.LLEU[ctx.Client.ShardId].GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri(gets.Result.Content));
+                s = await Bot.LLEU[ctx.Client.ShardId].Rest.GetTracksAsync(new Uri(gets.Result.Content));
             }
             catch
             {
@@ -322,7 +322,6 @@ namespace MikuSharp.Commands
         [Description("Add a song to a playlist")]
         [Usage("(playlistname) |-> Adds a song(s) to the playlist (You will be asked for the song link/search a song seperately)",
             "|-> You will be asked to select a playlist and a song will be added to the selected one (You will be asked for the song link/search a song seperately) ")]
-        [RequireUserAndBotVoicechatConnection]
         public async Task Add(CommandContext ctx, [RemainingText] string name = null)
         {
             if (name == null)
@@ -367,7 +366,6 @@ namespace MikuSharp.Commands
         [Description("Insert a song into a playlist (refer to show command)")]
         [Usage("(position) (playlist) |-> Inserts a songs(s) to a playlist at the entered position (You will be asked for the song link/search a song seperately)",
             "(position) |-> You will be asked to select a playlist and in selected one a song(s) will inserted at the entered position (Link/Serach a song will be seperately))")]
-        [RequireUserAndBotVoicechatConnection]
         public async Task Insert(CommandContext ctx, int pos, [RemainingText] string name = null)
         {
             if (name == null)
