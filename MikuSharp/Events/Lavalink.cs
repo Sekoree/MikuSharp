@@ -1,19 +1,18 @@
-﻿using DSharpPlus.Entities;
-using DSharpPlus.Lavalink;
-using DSharpPlus.Lavalink.EventArgs;
+﻿using DisCatSharp.Entities;
+using DisCatSharp.Lavalink;
+using DisCatSharp.Lavalink.EventArgs;
+
 using MikuSharp.Enums;
 using MikuSharp.Utilities;
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Events
 {
     public class Lavalink
     {
-        public static async Task LavalinkTrackFinish(TrackFinishEventArgs e)
+        public static async Task LavalinkTrackFinish(LavalinkGuildConnection lava, TrackFinishEventArgs e)
         {
             try
             {

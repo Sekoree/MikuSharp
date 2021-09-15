@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.CommandsNext.Attributes;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.Entities;
+
 using HeyRed.Mime;
+
 using MikuSharp.Utilities;
+
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
 {
@@ -23,7 +20,11 @@ namespace MikuSharp.Commands
         {
             var WSH = await Web.GetWeebSh(ctx, "hug", new[] { "" });
             WSH.Embed.WithDescription($"{ctx.Member.Mention} hugs {m.Mention} uwu");
-            await ctx.RespondWithFileAsync(embed: WSH.Embed.Build(), fileData: WSH.ImgData, fileName: $"image.{WSH.Extension}");
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{WSH.Extension}", WSH.ImgData);
+            builder.WithEmbed(WSH.Embed.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("kiss")]
@@ -32,7 +33,11 @@ namespace MikuSharp.Commands
         {
             var WSH = await Web.GetWeebSh(ctx, "kiss", new[] { "" });
             WSH.Embed.WithDescription($"{ctx.Member.Mention} kisses {m.Mention} >~<");
-            await ctx.RespondWithFileAsync(embed: WSH.Embed.Build(), fileData: WSH.ImgData, fileName: $"image.{WSH.Extension}");
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{WSH.Extension}", WSH.ImgData);
+            builder.WithEmbed(WSH.Embed.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("lick")]
@@ -41,7 +46,11 @@ namespace MikuSharp.Commands
         {
             var WSH = await Web.GetWeebSh(ctx, "lick", new[] { "" });
             WSH.Embed.WithDescription($"{ctx.Member.Mention} licks {m.Mention} owo");
-            await ctx.RespondWithFileAsync(embed: WSH.Embed.Build(), fileData: WSH.ImgData, fileName: $"image.{WSH.Extension}");
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{WSH.Extension}", WSH.ImgData);
+            builder.WithEmbed(WSH.Embed.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("pat")]
@@ -55,7 +64,11 @@ namespace MikuSharp.Commands
             em.WithDescription($"{ctx.Member.Mention} pats {m.Mention} #w#");
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by nekos.life");
-            await ctx.RespondWithFileAsync(embed: em.Build(), fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}");
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("poke")]
@@ -69,7 +82,11 @@ namespace MikuSharp.Commands
             em.WithDescription($"{ctx.Member.Mention} pokes {m.Mention} ÓwÒ");
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by nekos.life");
-            await ctx.RespondWithFileAsync(embed: em.Build(), fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}");
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
 
         [Command("slap")]
@@ -83,7 +100,11 @@ namespace MikuSharp.Commands
             em.WithDescription($"{ctx.Member.Mention} slaps {m.Mention} ÒwÓ");
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by nekos.life");
-            await ctx.RespondWithFileAsync(embed: em.Build(), fileData: img, fileName: $"image.{MimeGuesser.GuessExtension(img)}");
+
+            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+            builder.WithEmbed(em.Build());
+            await ctx.RespondAsync(builder);
         }
     }
 }

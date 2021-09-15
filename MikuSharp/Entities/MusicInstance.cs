@@ -1,28 +1,20 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.Entities;
-using DSharpPlus.Lavalink;
-using DSharpPlus.Interactivity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MikuSharp.Events;
-using MikuSharp.Enums;
-using System.Net;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.IO;
-using HeyRed.Mime;
-using System.Net.Http.Headers;
-using AngleSharp.Html.Parser;
-using System.Text.RegularExpressions;
+﻿using DisCatSharp;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+
 using FluentFTP;
-using System.Diagnostics;
-using AngleSharp.Dom;
-using System.Threading;
-using DSharpPlus.Lavalink.EventArgs;
+
+using MikuSharp.Enums;
+using MikuSharp.Events;
 using MikuSharp.Utilities;
+
+using System;
+using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MikuSharp.Entities
 {
@@ -57,7 +49,7 @@ namespace MikuSharp.Entities
         {
             switch (channel.Type)
             {
-                case DSharpPlus.ChannelType.Voice:
+                case ChannelType.Voice:
                     {
                         guildConnection = await nodeConnection.ConnectAsync(channel);
                         voiceChannel = channel;
@@ -92,9 +84,9 @@ namespace MikuSharp.Entities
                         return null;
                     }
                     await msg.ModifyAsync("Uploading");
-                    await client.UploadAsync(ex, $"{nndID}.mp3", FtpExists.Skip, true);
+                    await client.UploadAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
                 }
-                var Track = await nodeConnection.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
+                var Track = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
                 if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
                 else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
@@ -118,9 +110,9 @@ namespace MikuSharp.Entities
                         return null;
                     }
                     await msg.ModifyAsync("Uploading");
-                    await client.UploadAsync(ex, $"{nndID}.mp3", FtpExists.Skip, true);
+                    await client.UploadAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
                 }
-                var Track = await nodeConnection.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
+                var Track = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
                 if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
                 else await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
                 if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped)) await PlaySong();
@@ -128,7 +120,7 @@ namespace MikuSharp.Entities
             }
             else if (n.StartsWith("http://") | n.StartsWith("https://"))
             {
-                var s = await nodeConnection.GetTracksAsync(new Uri(n));
+                var s = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri(n));
                 switch (s.LoadResultType)
                 {
                     case LavalinkLoadResultType.LoadFailed:
@@ -214,7 +206,7 @@ namespace MikuSharp.Entities
             }
             else
             {
-                var s = await nodeConnection.GetTracksAsync(n);
+                var s = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(n);
                 switch (s.LoadResultType)
                 {
                     case LavalinkLoadResultType.LoadFailed:
@@ -308,7 +300,7 @@ namespace MikuSharp.Entities
             Console.WriteLine(currentSong.track.TrackString);
             guildConnection.PlaybackFinished += Lavalink.LavalinkTrackFinish;
             playstate = Playstate.Playing;
-            await Task.Run(() => guildConnection.Play(currentSong.track));
+            await Task.Run(async () => await guildConnection.PlayAsync(currentSong.track));
             return currentSong;
         }
     }

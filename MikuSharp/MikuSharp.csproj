@@ -2,9 +2,16 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <StartupObject>MikuSharp.Program</StartupObject>
     <ApplicationIcon />
+    <Version>2.0.0</Version>
+    <Authors>MikuSharp Team</Authors>
+    <RepositoryUrl>https://github.com/Speyd3r/MikuSharp/</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/Speyd3r/MikuSharp/</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Full Hatsune Miku Discord bot C# Rewrite!</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,22 +26,23 @@
 
   <ItemGroup>
     <PackageReference Include="AlbumArtExtraction" Version="1.0.2" />
-    <PackageReference Include="AngleSharp" Version="0.14.0-alpha-784" />
+    <PackageReference Include="AngleSharp" Version="0.16.0" />
+    <PackageReference Include="DisCatSharp" Version="9.8.2" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="9.8.2" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.2" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.2" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.2" />
     <PackageReference Include="DiscordBotsList.Api" Version="1.4.0" />
-    <PackageReference Include="DSharpPlus" Version="4.0.0-nightly-00625" />
-    <PackageReference Include="DSharpPlus.CommandsNext" Version="4.0.0-nightly-00625" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.0.0-nightly-00625" />
-    <PackageReference Include="DSharpPlus.Lavalink" Version="4.0.0-nightly-00625" />
-    <PackageReference Include="FluentFTP" Version="27.1.4" />
-    <PackageReference Include="Google.Apis" Version="1.41.1" />
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.41.1.1699" />
+    <PackageReference Include="FluentFTP" Version="35.0.4" />
+    <PackageReference Include="Google.Apis" Version="1.55.0" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.55.0.2440" />
     <PackageReference Include="Kitsu" Version="1.4.2" />
-    <PackageReference Include="Mime" Version="3.0.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3-beta2" />
-    <PackageReference Include="Npgsql" Version="4.1.1" />
-    <PackageReference Include="NYoutubeDL" Version="0.10.8" />
+    <PackageReference Include="Mime" Version="3.2.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Npgsql" Version="5.0.7" />
+    <PackageReference Include="NYoutubeDL" Version="0.11.2" />
     <PackageReference Include="Weeb.net" Version="1.0.7" />
-    <PackageReference Include="YoutubeExplode" Version="4.7.10" />
+    <PackageReference Include="YoutubeExplode" Version="6.0.5" />
   </ItemGroup>
 
 </Project>

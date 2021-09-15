@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-namespace MikuSharp.Entities
+﻿namespace MikuSharp.Entities
 {
     public class Nekos_Life : Img_Data
     {

@@ -1,7 +1,6 @@
-﻿using DSharpPlus.Lavalink;
+﻿using DisCatSharp.Lavalink;
+
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace MikuSharp.Entities
 {

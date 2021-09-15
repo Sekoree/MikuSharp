@@ -1,23 +1,26 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.Entities;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Lavalink;
+﻿using DisCatSharp.CommandsNext;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+
 using FluentFTP;
+
 using MikuSharp.Entities;
 using MikuSharp.Enums;
+
 using Npgsql;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Utilities
 {
     public class PlaylistDB
     {
-        public static async Task<Dictionary<string,Playlist>> GetPlaylists(ulong u)
+        public static async Task<Dictionary<string,Playlist>> GetPlaylists(DiscordGuild guild, ulong u)
         {
             var connString = Bot.cfg.DbConnectString;
             var conn = new NpgsqlConnection(connString);
@@ -27,7 +30,7 @@ namespace MikuSharp.Utilities
             Dictionary<string, Playlist> lists = new Dictionary<string, Playlist>(); 
             while (await reader.ReadAsync())
             {
-                lists.Add(Convert.ToString(reader["playlistname"]), await GetPlaylist(u, Convert.ToString(reader["playlistname"])));
+                lists.Add(Convert.ToString(reader["playlistname"]), await GetPlaylist(guild, u, Convert.ToString(reader["playlistname"])));
             }
             reader.Close();
             cmd2.Dispose();
@@ -55,7 +58,7 @@ namespace MikuSharp.Utilities
             return lists;
         }
 
-        public static async Task<Playlist> GetPlaylist(ulong u, string p)
+        public static async Task<Playlist> GetPlaylist(DiscordGuild guild, ulong u, string p)
         {
             var connString = Bot.cfg.DbConnectString;
             var conn = new NpgsqlConnection(connString);
@@ -86,7 +89,7 @@ namespace MikuSharp.Utilities
                 {
                     try
                     {
-                        var ss = await Bot.LLEU.First().Value.GetTracksAsync(new Uri(Convert.ToString(reader2["url"])));
+                        var ss = await Bot.LLEU.First().Value.GetGuildConnection(guild).GetTracksAsync(new Uri(Convert.ToString(reader2["url"])));
                         am = ss.Tracks.Count();
                     }
                     catch { }
@@ -101,12 +104,12 @@ namespace MikuSharp.Utilities
             return pl;
         }
 
-        public static async Task ReorderList(string p, ulong u)
+        public static async Task ReorderList(DiscordGuild guild, string p, ulong u)
         {
             var connString = Bot.cfg.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
-            var listNow = await GetPlaylist(u, p);
+            var listNow = await GetPlaylist(guild, u, p);
             var ln = await listNow.GetEntries();
             var cmd = new NpgsqlCommand($"DELETE FROM playlistentries WHERE userid = {u} AND playlistname = @pl;", conn);
             cmd.Parameters.AddWithValue("pl", p);
@@ -254,17 +257,17 @@ namespace MikuSharp.Utilities
             conn.Dispose();
         }
 
-        public static async Task InsertEntry(string p, ulong u, string ts, int pos)
+        public static async Task InsertEntry(DiscordGuild guild, string p, ulong u, string ts, int pos)
         {
-            var qnow = await GetPlaylist(u, p);
+            var qnow = await GetPlaylist(guild, u, p);
             var q = await qnow.GetEntries();
             q.Insert(pos, new PlaylistEntry(LavalinkUtilities.DecodeTrack(ts), DateTimeOffset.UtcNow, DateTimeOffset.UtcNow));
             await RebuildList(u, p, q);
         }
 
-        public static async Task InsertEntry(string p, ulong u, List<LavalinkTrack> ts, int pos)
+        public static async Task InsertEntry(DiscordGuild guild, string p, ulong u, List<LavalinkTrack> ts, int pos)
         {
-            var qnow = await GetPlaylist(u, p);
+            var qnow = await GetPlaylist(guild, u, p);
             var q = await qnow.GetEntries();
             foreach (var tt in ts)
             {
@@ -286,9 +289,9 @@ namespace MikuSharp.Utilities
             conn.Dispose();
         }
 
-        public static async Task MoveListItems(string p, ulong u, int oldpos, int newpos)
+        public static async Task MoveListItems(DiscordGuild guild, string p, ulong u, int oldpos, int newpos)
         {
-            var qnow = await GetPlaylist(u,p);
+            var qnow = await GetPlaylist(guild, u,p);
             var q = await qnow.GetEntries();
             var temp = q[oldpos];
             q[oldpos] = q[newpos];
@@ -296,7 +299,7 @@ namespace MikuSharp.Utilities
             await RebuildList(u, p, q);
         }
 
-        public static async Task RemoveFromList(int position, string p, ulong u)
+        public static async Task RemoveFromList(DiscordGuild guild, int position, string p, ulong u)
         {
             var connString = Bot.cfg.DbConnectString;
             var conn = new NpgsqlConnection(connString);
@@ -306,7 +309,7 @@ namespace MikuSharp.Utilities
             cmd.Parameters.AddWithValue("mody", DateTimeOffset.UtcNow);
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
-            await ReorderList(p,u);
+            await ReorderList(guild, p,u);
             conn.Close();
             conn.Dispose();
         }
@@ -359,14 +362,14 @@ namespace MikuSharp.Utilities
                         return null;
                     }
                     await msg.ModifyAsync("Uploading");
-                    await client.UploadAsync(ex, $"{nndID}.mp3", FtpExists.Skip, true);
+                    await client.UploadAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
                 }
-                var Track = await nodeConnection.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
+                var Track = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
                 return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
             }
             if (n.StartsWith("http://") | n.StartsWith("https://"))
             {
-                var s = await nodeConnection.GetTracksAsync(new Uri(n));
+                var s = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(new Uri(n));
                 switch (s.LoadResultType)
                 {
                     case LavalinkLoadResultType.LoadFailed:
@@ -439,7 +442,7 @@ namespace MikuSharp.Utilities
             }
             else
             {
-                var s = await nodeConnection.GetTracksAsync(n);
+                var s = await nodeConnection.GetGuildConnection(ctx.Guild).GetTracksAsync(n);
                 switch (s.LoadResultType)
                 {
                     case LavalinkLoadResultType.LoadFailed:

@@ -1,29 +1,36 @@
-﻿using DSharpPlus;
-using DSharpPlus.Entities;
-using DSharpPlus.CommandsNext;
-using DSharpPlus.Interactivity;
-using DSharpPlus.Lavalink;
+﻿using DisCatSharp;
+using DisCatSharp.CommandsNext;
+using DisCatSharp.Entities;
+using DisCatSharp.Interactivity;
+using DisCatSharp.Interactivity.Enums;
+using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+using DisCatSharp.Net;
+
+using Microsoft.Extensions.Logging;
+
+using MikuSharp.Entities;
+using MikuSharp.Enums;
+using MikuSharp.Events;
+
+using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
-using MikuSharp.Entities;
+
 using Weeb.net;
-using Newtonsoft.Json;
-using DSharpPlus.Interactivity.Enums;
-using MikuSharp.Utilities;
-using MikuSharp.Events;
-using System.IO;
-using MikuSharp.Enums;
-using System.Diagnostics;
 
 namespace MikuSharp
 {
     class Bot : IDisposable
     {
         public static BotConfig cfg { get; set; } 
-        public static WeebClient _weeb = new WeebClient("Hatsune Miku Bot C# Rewrite", "0.0.1");
+        public static WeebClient _weeb = new WeebClient("Hatsune Miku Bot C# Rewrite", "0.0.2");
         public Task GameSetThread { get; set; }
         public Task StatusThread { get; set; }
         public static DiscordShardedClient bot { get; set; }
@@ -45,20 +52,21 @@ namespace MikuSharp
             bot = new DiscordShardedClient(new DiscordConfiguration
             {
                 Token = cfg.DiscordToken,
-                TokenType = DSharpPlus.TokenType.Bot,
-                LogLevel = LogLevel.Debug,
-                UseInternalLogHandler = true,
-                ReconnectIndefinitely = true
+                TokenType = DisCatSharp.TokenType.Bot,
+                MinimumLogLevel = LogLevel.Debug,
+                ReconnectIndefinitely = true,
+                AutoReconnect = true,
+                Intents = DiscordIntents.AllUnprivileged
             });
-            bot.GuildDownloadCompleted += e =>
+            bot.GuildDownloadCompleted += (sender, args) =>
             {
                 GameSetThread = Task.Run(setGame);
                 return Task.CompletedTask;
             };
-            bot.ClientErrored += e =>
+            bot.ClientErrored += (sender, args) =>
             {
-                Console.WriteLine(e.Exception.Message);
-                Console.WriteLine(e.Exception.StackTrace);
+                Console.WriteLine(args.Exception.Message);
+                Console.WriteLine(args.Exception.StackTrace);
                 return Task.CompletedTask;
             };
         }
@@ -120,14 +128,14 @@ namespace MikuSharp
                 cmdC[g.Key].RegisterCommands<Commands.Settings>();
                 bot.ShardClients[g.Key].VoiceStateUpdated += VoiceChat.LeftAlone;
                 Console.WriteLine("Caching Done " + g.Key);
-                cmdC[g.Key].CommandExecuted += e =>
+                cmdC[g.Key].CommandExecuted += (sender, args) =>
                 {
-                    Console.WriteLine($"Command: {e.Command.Name} by {e.Context.User.Username}#{e.Context.User.Discriminator}({e.Context.User.Id}) on {e.Context.Guild.Name}({e.Context.Guild.Id})");
+                    Console.WriteLine($"Command: {args.Command.Name} by {args.Context.User.Username}#{args.Context.User.Discriminator}({args.Context.User.Id}) on {args.Context.Guild.Name}({args.Context.Guild.Id})");
                     return Task.CompletedTask;
                 };
-                cmdC[g.Key].CommandErrored += e =>
+                cmdC[g.Key].CommandErrored += (sender, args) =>
                 {
-                    Console.WriteLine(e.Exception);
+                    Console.WriteLine(args.Exception);
                     return Task.CompletedTask;
                 };
             }
@@ -144,8 +152,8 @@ namespace MikuSharp
             {
                 var LCon = await shard.Value.ConnectAsync(new LavalinkConfiguration
                 {
-                    SocketEndpoint = new DSharpPlus.Net.ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
-                    RestEndpoint = new DSharpPlus.Net.ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
+                    SocketEndpoint = new ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
+                    RestEndpoint = new ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
                     Password = cfg.LavaConfig.Password
                 });
                 LLEU.Add(shard.Key, LCon);
@@ -164,7 +172,7 @@ namespace MikuSharp
             });
             foreach (var g in bot.ShardClients)
             {
-                g.Value.GuildDownloadCompleted += e =>
+                g.Value.GuildDownloadCompleted += (sender, args) =>
                 {
                     i++;
                     return Task.CompletedTask;
