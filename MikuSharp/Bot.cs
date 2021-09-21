@@ -26,6 +26,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Weeb.net;
+using DisCatSharp.ApplicationCommands;
 
 namespace MikuSharp
 {
@@ -40,7 +41,8 @@ namespace MikuSharp
         public static Dictionary<ulong, Guild> Guilds = new Dictionary<ulong, Guild>();
         public IReadOnlyDictionary<int, InteractivityExtension> interC { get; set; }
         public IReadOnlyDictionary<int, CommandsNextExtension> cmdC { get; set; }
-        public IReadOnlyDictionary<int, LavalinkExtension> lavaC { get; set; }
+        public IReadOnlyDictionary<int, ApplicationCommandsExtension> acC { get; set; }
+        public static IReadOnlyDictionary<int, LavalinkExtension> lavaC { get; set; }
         public static Dictionary<int, LavalinkNodeConnection> LLEU = new Dictionary<int, LavalinkNodeConnection>();
         public static Playstate ps = Playstate.Playing;
         public static Stopwatch psc = new Stopwatch();
@@ -49,7 +51,7 @@ namespace MikuSharp
         {
             cfg = JsonConvert.DeserializeObject<BotConfig>(File.ReadAllText(@"config.json"));
             cfg.DbConnectString = $"Host={cfg.DbConfig.Hostname};Username={cfg.DbConfig.User};Password={cfg.DbConfig.Password};Database=MikuSharpDB";
-            Console.WriteLine("first");
+            Console.WriteLine("Starting up!");
             _cts = new CancellationTokenSource();
             bot = new DiscordShardedClient(new DiscordConfiguration
             {
@@ -58,9 +60,8 @@ namespace MikuSharp
                 MinimumLogLevel = LogLevel.Trace,
                 AutoReconnect = true,
                 Intents = DiscordIntents.AllUnprivileged,
-                MessageCacheSize = 2048,
-                ShardCount = 1,
-                ShardId = 0
+                MessageCacheSize = 2048
+                
             });
             bot.GuildDownloadCompleted += (sender, args) =>
             {
@@ -142,6 +143,24 @@ namespace MikuSharp
                     Console.WriteLine(args.Exception);
                     return Task.CompletedTask;
                 };
+                g.Value.MessageCreated += async (sender, args) =>
+                {
+                    if(args.Guild.Id == 483279257431441410 && args.Message.Content.ToLower() == "#smolarmy")
+                    {
+                        var guild = args.Guild;
+                        var member = await guild.GetMemberAsync(args.Author.Id);
+                        if (member.Roles.Any(x => x.Id == 607989212696018945))
+                        {
+                            await member.RevokeRoleAsync(guild.GetRole(607989212696018945));
+                            await args.Message.RespondAsync(":(");
+                            return;
+                        }
+                        await member.GrantRoleAsync(guild.GetRole(607989212696018945));
+                        await args.Message.RespondAsync("Welcome to smolcar");
+                    }
+                    await Task.FromResult(true);
+                };
+                acC[g.Key].RegisterCommands<Commands.Slash>(483279257431441410);
             }
         }
 
@@ -170,6 +189,10 @@ namespace MikuSharp
                 ResponseMessage = "Something went wrong.",
                 ResponseBehavior = InteractionResponseBehavior.Respond
             });
+            acC = await bot.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration
+            {
+                Services = null
+            });
             cmdC = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
             {
                 EnableDefaultHelp = false,
@@ -194,6 +217,7 @@ namespace MikuSharp
             }
             foreach (var g in bot.ShardClients)
             {
+                g.Value.GetApplicationCommands();
                 g.Value.GuildDownloadCompleted += (sender, args) =>
                 {
                     i++;

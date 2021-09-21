@@ -6,6 +6,8 @@ using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
+using DisCatSharp.Lavalink;
+using DisCatSharp.Net;
 
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
@@ -23,6 +25,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
@@ -74,6 +78,36 @@ namespace MikuSharp.Commands
                 g.musicInstance = null;
                 await ctx.RespondAsync("cya! 💙");
             }
+        }
+
+        [Command("lstats"), Description("Displays Lavalink statistics."), RequireOwner]
+        public async Task StatsAsync(CommandContext ctx)
+        {
+            var stats = Bot.LLEU[ctx.Client.ShardId].Statistics;
+            var sb = new StringBuilder();
+            sb.Append("Lavalink resources usage statistics: ```")
+                .Append("Uptime:                    ").Append(stats.Uptime).AppendLine()
+                .Append("Players:                   ").AppendFormat("{0} active / {1} total", stats.ActivePlayers, stats.TotalPlayers).AppendLine()
+                .Append("CPU Cores:                 ").Append(stats.CpuCoreCount).AppendLine()
+                .Append("CPU Usage:                 ").AppendFormat("{0:#,##0.0%} lavalink / {1:#,##0.0%} system", stats.CpuLavalinkLoad, stats.CpuSystemLoad).AppendLine()
+                .Append("RAM Usage:                 ").AppendFormat("{0} allocated / {1} used / {2} free / {3} reservable", SizeToString(stats.RamAllocated), SizeToString(stats.RamUsed), SizeToString(stats.RamFree), SizeToString(stats.RamReservable)).AppendLine()
+                .Append("Audio frames (per minute): ").AppendFormat("{0:#,##0} sent / {1:#,##0} nulled / {2:#,##0} deficit", stats.AverageSentFramesPerMinute, stats.AverageNulledFramesPerMinute, stats.AverageDeficitFramesPerMinute).AppendLine()
+                .Append("```");
+            await ctx.RespondAsync(sb.ToString()).ConfigureAwait(false);
+        }
+
+        private static readonly string[] Units = new[] { "", "ki", "Mi", "Gi" };
+        private static string SizeToString(long l)
+        {
+            double d = l;
+            var u = 0;
+            while (d >= 900 && u < Units.Length - 2)
+            {
+                u++;
+                d /= 1024;
+            }
+
+            return $"{d:#,##0.00} {Units[u]}B";
         }
 
         [Command("play"), Aliases("p")]
