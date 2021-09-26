@@ -10,7 +10,7 @@ namespace MikuSharp
             {
                 b.RunBot().Wait();
             }
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Shutdown!");
         }
     }
 }
