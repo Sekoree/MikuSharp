@@ -57,7 +57,7 @@ namespace MikuSharp
             {
                 Token = cfg.DiscordToken,
                 TokenType = DisCatSharp.TokenType.Bot,
-                MinimumLogLevel = LogLevel.Trace,
+                MinimumLogLevel = LogLevel.Warning,
                 AutoReconnect = true,
                 Intents = DiscordIntents.AllUnprivileged,
                 MessageCacheSize = 2048
