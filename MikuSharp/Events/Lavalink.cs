@@ -2,6 +2,8 @@
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.EventArgs;
 
+using Microsoft.Extensions.Logging;
+
 using MikuSharp.Enums;
 using MikuSharp.Utilities;
 
@@ -77,7 +79,8 @@ namespace MikuSharp.Events
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Bot.bot.Logger.LogError(ex.Message);
+                Bot.bot.Logger.LogError(ex.StackTrace); 
             }
         }
 

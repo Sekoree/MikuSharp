@@ -2,6 +2,8 @@
 using DisCatSharp.Entities;
 using DisCatSharp.EventArgs;
 
+using Microsoft.Extensions.Logging;
+
 using MikuSharp.Enums;
 
 using System;
@@ -61,7 +63,8 @@ namespace MikuSharp.Events
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                client.Logger.LogError(ex.Message);
+                client.Logger.LogError(ex.StackTrace);
             }
         }
     }
