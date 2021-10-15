@@ -1,7 +1,8 @@
 ﻿using DisCatSharp;
-using DisCatSharp.Enums;
+using DisCatSharp.ApplicationCommands;
 using DisCatSharp.CommandsNext;
 using DisCatSharp.Entities;
+using DisCatSharp.Enums;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.EventHandling;
@@ -17,6 +18,9 @@ using MikuSharp.Events;
 
 using Newtonsoft.Json;
 
+using Serilog;
+using Serilog.Events;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,14 +30,13 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Weeb.net;
-using DisCatSharp.ApplicationCommands;
 
 namespace MikuSharp
 {
     class Bot : IDisposable
     {
         public static BotConfig cfg { get; set; } 
-        public static WeebClient _weeb = new WeebClient("Hatsune Miku Bot C# Rewrite", "0.0.2");
+        public static WeebClient _weeb = new WeebClient("Hatsune Miku Bot C# Rewrite", "2.0.0");
         public Task GameSetThread { get; set; }
         public Task StatusThread { get; set; }
         public static DiscordShardedClient bot { get; set; }
@@ -51,17 +54,23 @@ namespace MikuSharp
         {
             cfg = JsonConvert.DeserializeObject<BotConfig>(File.ReadAllText(@"config.json"));
             cfg.DbConnectString = $"Host={cfg.DbConfig.Hostname};Username={cfg.DbConfig.User};Password={cfg.DbConfig.Password};Database=MikuSharpDB";
-            Console.WriteLine("Starting up!");
             _cts = new CancellationTokenSource();
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.File("miku_log.txt", fileSizeLimitBytes: null, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2, shared: true)
+                .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+                .CreateLogger();
+            Log.Logger.Information("Starting up!");
             bot = new DiscordShardedClient(new DiscordConfiguration
             {
                 Token = cfg.DiscordToken,
                 TokenType = DisCatSharp.TokenType.Bot,
-                MinimumLogLevel = LogLevel.Warning,
+                MinimumLogLevel = LogLevel.Debug,
                 AutoReconnect = true,
-                Intents = DiscordIntents.AllUnprivileged,
-                MessageCacheSize = 2048
-                
+                Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
+                MessageCacheSize = 2048,
+                LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
+
             });
             bot.GuildDownloadCompleted += (sender, args) =>
             {
@@ -70,8 +79,8 @@ namespace MikuSharp
             };
             bot.ClientErrored += (sender, args) =>
             {
-                Console.WriteLine(args.Exception.Message);
-                Console.WriteLine(args.Exception.StackTrace);
+                sender.Logger.LogError(args.Exception.Message);
+                sender.Logger.LogError(args.Exception.StackTrace);
                 return Task.CompletedTask;
             };
         }
@@ -110,7 +119,7 @@ namespace MikuSharp
             while (true)
             {
                 var al = Guilds.Where(x => x.Value.musicInstance != null);
-                Console.WriteLine("Voice Connections: " + al.Where(x => x.Value.musicInstance.guildConnection?.IsConnected == true).Count());
+                bot.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.musicInstance.guildConnection?.IsConnected == true).Count());
                 await Task.Delay(15000);
             }
         }
@@ -131,16 +140,17 @@ namespace MikuSharp
                 cmdC[g.Key].RegisterCommands<Commands.MikuGuild>();
                 cmdC[g.Key].RegisterCommands<Commands.Playlist>();
                 cmdC[g.Key].RegisterCommands<Commands.Settings>();
-                bot.ShardClients[g.Key].VoiceStateUpdated += VoiceChat.LeftAlone;
-                Console.WriteLine("Caching Done " + g.Key);
+                g.Value.VoiceStateUpdated += VoiceChat.LeftAlone;
                 cmdC[g.Key].CommandExecuted += (sender, args) =>
                 {
-                    Console.WriteLine($"Command: {args.Command.Name} by {args.Context.User.Username}#{args.Context.User.Discriminator}({args.Context.User.Id}) on {args.Context.Guild.Name}({args.Context.Guild.Id})");
+                    // TODO: Check if guild is null
+                    sender.Client.Logger.LogInformation($"Command: {args.Command.Name} by {args.Context.User.Username}#{args.Context.User.Discriminator}({args.Context.User.Id}) on {args.Context.Guild.Name}({args.Context.Guild.Id})");
                     return Task.CompletedTask;
                 };
                 cmdC[g.Key].CommandErrored += (sender, args) =>
                 {
-                    Console.WriteLine(args.Exception);
+                    sender.Client.Logger.LogError(args.Exception.Message);
+                    sender.Client.Logger.LogError(args.Exception.StackTrace);
                     return Task.CompletedTask;
                 };
                 g.Value.MessageCreated += async (sender, args) =>
@@ -160,7 +170,23 @@ namespace MikuSharp
                     }
                     await Task.FromResult(true);
                 };
+                /*g.Value.GuildMemberAdded += async (sender, args) =>
+                {
+                    if (args.Guild.Id == 483279257431441410)
+                        await Task.Run(async () => await MikuGuild.OnJoinAsync(sender, args));
+                    else
+                        await Task.FromResult(true);
+                };*/
                 acC[g.Key].RegisterCommands<Commands.Slash>(483279257431441410);
+                acC[g.Key].RegisterCommands<Commands.Developer>(483279257431441410, perms => {
+                    perms.AddUser(756968464090136636, true);
+                    perms.AddRole(602923142586957853, true);
+                });
+                acC[g.Key].RegisterCommands<Commands.Developer>(858089281214087179, perms => {
+                    perms.AddUser(756968464090136636, true);
+                    perms.AddRole(887877553929469952, true);
+                });
+                g.Value.Logger.LogInformation("Caching Done for shard " + g.Key);
             }
         }
 
@@ -218,6 +244,18 @@ namespace MikuSharp
             foreach (var g in bot.ShardClients)
             {
                 g.Value.GetApplicationCommands();
+                g.Value.GuildMemberUpdated += async (sender, args) =>
+                {
+                    if (args.Guild.Id == 483279257431441410)
+                    {
+                        g.Value.Logger.LogDebug("Guild member update in MikuGuild");
+                        await MikuGuild.OnUpdateAsync(sender, args);
+                    }
+                    else
+                    {
+                        await Task.FromResult(true);
+                    }
+                };
                 g.Value.GuildDownloadCompleted += (sender, args) =>
                 {
                     i++;
@@ -304,6 +342,11 @@ namespace MikuSharp
 
         public void Dispose()
         {
+            cmdC = null;
+            acC = null;
+            interC = null;
+            lavaC = null;
+            cfg = null;
             bot = null;
         }
     }

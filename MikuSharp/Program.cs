@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using Serilog;
 
 namespace MikuSharp
 {
@@ -10,7 +11,7 @@ namespace MikuSharp
             {
                 b.RunBot().Wait();
             }
-            Console.WriteLine("Shutdown!");
+            Log.Logger.Information("Shutdown!");
         }
     }
 }
