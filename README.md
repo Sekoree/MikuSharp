@@ -1,10 +1,10 @@
 # This is basically EoL and hardly working 
 If you wanna do stuff with it go ahead, though if you're just here for some small parts of it, I have rewritten some things as their own library
-if you want something to talk to NND, look at
+* If you want something to talk to NND, look at
 [NicoNicoNii](https://github.com/Sekoree/NicoNicoNii)
-For MeekMoe api stuff use
+* For MeekMoe api stuff use
 [MeekMoe.Images](https://github.com/Meek-Moe/MeekMoe.Images)
-For anything else feel free to add me on Discord and ask stuff (Sekoree#3939)
+* For anything else feel free to add me on Discord and ask stuff (Sekoree#3939)
 
 The new version will be in this
 https://github.com/Miku-Bot/mN
