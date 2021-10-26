@@ -92,7 +92,7 @@ namespace MikuSharp
             {
                 DiscordActivity test = new DiscordActivity
                 {
-                    Name = "m%help for commands!",
+                    Name = "m_help for commands!",
                     ActivityType = ActivityType.Playing
                 };
                 await bot.UpdateStatusAsync(activity: test, userStatus: UserStatus.Online);
@@ -222,7 +222,7 @@ namespace MikuSharp
             cmdC = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
             {
                 EnableDefaultHelp = false,
-                StringPrefixes = new[] {"m%"},
+                StringPrefixes = new[] {"m_"},
                 CaseSensitive = true,
                 EnableDms = true,
                 DmHelp = true,
