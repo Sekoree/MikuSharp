@@ -23,11 +23,11 @@
   <ItemGroup>
     <PackageReference Include="AlbumArtExtraction" Version="1.0.2" />
     <PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
-    <PackageReference Include="DisCatSharp" Version="9.8.4-nightly-00198" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="9.8.4-nightly-00198" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.4-nightly-00198" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.4-nightly-00198" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.4-nightly-00198" />
+    <PackageReference Include="DisCatSharp" Version="9.8.4-nightly-00201" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="9.8.4-nightly-00201" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.4-nightly-00201" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.4-nightly-00201" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="9.8.4-nightly-00201" />
     <PackageReference Include="DiscordBotsList.Api" Version="1.4.0" />
     <PackageReference Include="FluentFTP" Version="35.0.5" />
     <PackageReference Include="Google.Apis" Version="1.55.0" />
