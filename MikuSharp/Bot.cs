@@ -215,10 +215,7 @@ namespace MikuSharp
                 ResponseMessage = "Something went wrong.",
                 ResponseBehavior = InteractionResponseBehavior.Respond
             });
-            acC = await bot.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration
-            {
-                Services = null
-            });
+            acC = await bot.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration(null));
             cmdC = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
             {
                 EnableDefaultHelp = false,
