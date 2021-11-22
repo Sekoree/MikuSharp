@@ -23,7 +23,7 @@
   <ItemGroup>
     <PackageReference Include="AlbumArtExtraction" Version="1.0.2" />
     <PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
-    <PackageReference Include="DisCatSharp" Version="9.8.4-nightly-00201" />
+    <PackageReference Include="DisCatSharp" Version="9.8.4" />
     <PackageReference Include="DisCatSharp.ApplicationCommands" Version="9.8.4" />
     <PackageReference Include="DisCatSharp.CommandsNext" Version="9.8.4" />
     <PackageReference Include="DisCatSharp.Interactivity" Version="9.8.4" />
