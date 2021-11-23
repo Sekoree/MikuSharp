@@ -34,7 +34,7 @@ namespace MikuSharp.Commands
     class Music : BaseCommandModule
     {
         [Command("join")]
-        [Description("Joins the voice cahnnel you're in")]
+        [Description("Joins the voice channel you're in")]
         [RequireUserVoicechatConnection]
         public async Task Join(CommandContext ctx)
         {

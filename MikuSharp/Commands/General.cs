@@ -17,8 +17,8 @@ namespace MikuSharp.Commands
 {
     class General : BaseCommandModule
     {
-        private readonly string botdev = "davidjcralph#9721";
-        private readonly string curbotdev = "Speyd3r (Hiatus)#3939 [Contact via Sekoree#3939]";
+        private readonly string botdev = "David#9179";
+        private readonly string curbotdev = "Sekoree#3939";
     
         [Command("donate")]
         [Description("Financial support information")]
@@ -139,7 +139,7 @@ namespace MikuSharp.Commands
                     .AddField("General Info", "" +
                             $"Developer of the original bot: {botdev}\n" +
                             $"Current Developer: {curbotdev}\n" +
-                            "Avatar by: Chillow ❤ [Twitter](https://twitter.com/SaikoSamurai)\n" +
+                            "Avatar by: Chillow [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
                             "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)")));
