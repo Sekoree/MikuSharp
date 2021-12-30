@@ -58,7 +58,7 @@ namespace MikuSharp
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.File("miku_log.txt", fileSizeLimitBytes: null, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2, shared: true)
-                .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+                .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
             Log.Logger.Information("Starting up!");
             bot = new DiscordShardedClient(new DiscordConfiguration
@@ -155,7 +155,7 @@ namespace MikuSharp
                 };
                 g.Value.MessageCreated += async (sender, args) =>
                 {
-                    if(args.Guild.Id == 483279257431441410 && args.Message.Content.ToLower() == "#smolarmy")
+                    if(args.Guild.Id == 483279257431441410 && (args.Channel.Type != ChannelType.NewsThread && args.Channel.Type != ChannelType.PrivateThread && args.Channel.Type != ChannelType.PublicThread) && args.Message.Content.ToLower() == "#smolarmy")
                     {
                         var guild = args.Guild;
                         var member = await guild.GetMemberAsync(args.Author.Id);
