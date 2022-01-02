@@ -72,6 +72,39 @@ namespace MikuSharp
                 LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
 
             });
+            interC = bot.UseInteractivityAsync(new InteractivityConfiguration
+            {
+                Timeout = TimeSpan.FromMinutes(2),
+                PaginationBehaviour = PaginationBehaviour.WrapAround,
+                PaginationDeletion = PaginationDeletion.DeleteEmojis,
+                PollBehaviour = PollBehaviour.DeleteEmojis,
+                AckPaginationButtons = true,
+                ButtonBehavior = ButtonPaginationBehavior.Disable,
+                PaginationButtons = new PaginationButtons()
+                {
+                    SkipLeft = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-left", "First", false, new DiscordComponentEmoji("⏮️")),
+                    Left = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-left", "Previous", false, new DiscordComponentEmoji("◀️")),
+                    Stop = new DiscordButtonComponent(ButtonStyle.Danger, "pgb-stop", "Cancel", false, new DiscordComponentEmoji("⏹️")),
+                    Right = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-right", "Next", false, new DiscordComponentEmoji("▶️")),
+                    SkipRight = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-right", "Last", false, new DiscordComponentEmoji("⏭️"))
+                },
+                ResponseMessage = "Something went wrong.",
+                ResponseBehavior = InteractionResponseBehavior.Respond
+            }).Result;
+            acC = bot.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration()
+            {
+                EnableDefaultHelp = true
+            }).Result;
+            cmdC = bot.UseCommandsNextAsync(new CommandsNextConfiguration
+            {
+                EnableDefaultHelp = false,
+                StringPrefixes = new[] { "m_" },
+                CaseSensitive = true,
+                EnableDms = true,
+                DmHelp = true,
+                EnableMentionPrefix = true
+                //PrefixResolver = GetPrefix
+            }).Result;
             bot.GuildDownloadCompleted += (sender, args) =>
             {
                 GameSetThread = Task.Run(setGame);
@@ -92,7 +125,7 @@ namespace MikuSharp
             {
                 DiscordActivity test = new DiscordActivity
                 {
-                    Name = "m%help for commands!",
+                    Name = "m_help for commands!",
                     ActivityType = ActivityType.Playing
                 };
                 await bot.UpdateStatusAsync(activity: test, userStatus: UserStatus.Online);
@@ -196,36 +229,7 @@ namespace MikuSharp
             await _weeb.Authenticate(cfg.WeebShToken, Weeb.net.TokenType.Wolke);
             var LL = await bot.UseLavalinkAsync();
             lavaC = LL;
-            interC = await bot.UseInteractivityAsync(new InteractivityConfiguration
-            {
-                Timeout = TimeSpan.FromMinutes(2),
-                PaginationBehaviour = PaginationBehaviour.WrapAround,
-                PaginationDeletion = PaginationDeletion.DeleteEmojis,
-                PollBehaviour = PollBehaviour.DeleteEmojis,
-                AckPaginationButtons = true,
-                ButtonBehavior = ButtonPaginationBehavior.Disable,
-                PaginationButtons = new PaginationButtons()
-                {
-                    SkipLeft = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-left", "First", false, new DiscordComponentEmoji("⏮️")),
-                    Left = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-left", "Previous", false, new DiscordComponentEmoji("◀️")),
-                    Stop = new DiscordButtonComponent(ButtonStyle.Danger, "pgb-stop", "Cancel", false, new DiscordComponentEmoji("⏹️")),
-                    Right = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-right", "Next", false, new DiscordComponentEmoji("▶️")),
-                    SkipRight = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-right", "Last", false, new DiscordComponentEmoji("⏭️"))
-                },
-                ResponseMessage = "Something went wrong.",
-                ResponseBehavior = InteractionResponseBehavior.Respond
-            });
-            acC = await bot.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration(null));
-            cmdC = await bot.UseCommandsNextAsync(new CommandsNextConfiguration
-            {
-                EnableDefaultHelp = false,
-                StringPrefixes = new[] {"m%"},
-                CaseSensitive = true,
-                EnableDms = true,
-                DmHelp = true,
-                EnableMentionPrefix = true
-                //PrefixResolver = GetPrefix
-            });
+            
             await CacheRegister();
             await bot.StartAsync();
             foreach (var shard in lavaC)
