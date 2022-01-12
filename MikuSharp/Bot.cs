@@ -91,10 +91,11 @@ namespace MikuSharp
                 ResponseMessage = "Something went wrong.",
                 ResponseBehavior = InteractionResponseBehavior.Respond
             }).Result;
-            acC = bot.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration()
+            /*acC = bot.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration()
             {
-                EnableDefaultHelp = true
-            }).Result;
+                EnableDefaultHelp = false,
+                DebugStartup = false
+            }).Result;*/
             cmdC = bot.UseCommandsNextAsync(new CommandsNextConfiguration
             {
                 EnableDefaultHelp = false,
@@ -105,11 +106,6 @@ namespace MikuSharp
                 EnableMentionPrefix = true
                 //PrefixResolver = GetPrefix
             }).Result;
-            bot.GuildDownloadCompleted += (sender, args) =>
-            {
-                GameSetThread = Task.Run(setGame);
-                return Task.CompletedTask;
-            };
             bot.ClientErrored += (sender, args) =>
             {
                 sender.Logger.LogError(args.Exception.Message);
@@ -157,22 +153,34 @@ namespace MikuSharp
             }
         }
 
-        public async Task CacheRegister()
+        public async Task RegisterCommands(DiscordShardedClient client, IReadOnlyDictionary<int, CommandsNextExtension> cnext, IReadOnlyDictionary<int, ApplicationCommandsExtension> ac)
+        {
+            cnext.RegisterCommands<Commands.Action>();
+            cnext.RegisterCommands<Commands.Fun>();
+            cnext.RegisterCommands<Commands.General>();
+            cnext.RegisterCommands<Commands.Moderation>();
+            cnext.RegisterCommands<Commands.Music>();
+            cnext.RegisterCommands<Commands.NSFW>();
+            cnext.RegisterCommands<Commands.Utility>();
+            cnext.RegisterCommands<Commands.Weeb>();
+            cnext.RegisterCommands<Commands.MikuGuild>();
+            cnext.RegisterCommands<Commands.Playlist>();
+            cnext.RegisterCommands<Commands.Settings>();
+            /* client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Slash>(483279257431441410);
+             client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Developer>(483279257431441410, perms => {
+                 //perms.AddRole(602923142586957853, true);
+             });
+             client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Developer>(858089281214087179, perms => {
+                 //perms.AddRole(887877553929469952, true);
+             });*/
+            await Task.Delay(1);
+        }
+
+        public async Task RegisterEvents()
         {
             await Task.Delay(1);
             foreach(var g in bot.ShardClients)
             {
-                cmdC[g.Key].RegisterCommands<Commands.Action>();
-                cmdC[g.Key].RegisterCommands<Commands.Fun>();
-                cmdC[g.Key].RegisterCommands<Commands.General>();
-                cmdC[g.Key].RegisterCommands<Commands.Moderation>();
-                cmdC[g.Key].RegisterCommands<Commands.Music>();
-                cmdC[g.Key].RegisterCommands<Commands.NSFW>();
-                cmdC[g.Key].RegisterCommands<Commands.Utility>();
-                cmdC[g.Key].RegisterCommands<Commands.Weeb>();
-                cmdC[g.Key].RegisterCommands<Commands.MikuGuild>();
-                cmdC[g.Key].RegisterCommands<Commands.Playlist>();
-                cmdC[g.Key].RegisterCommands<Commands.Settings>();
                 g.Value.VoiceStateUpdated += VoiceChat.LeftAlone;
                 cmdC[g.Key].CommandExecuted += (sender, args) =>
                 {
@@ -188,7 +196,7 @@ namespace MikuSharp
                 };
                 g.Value.MessageCreated += async (sender, args) =>
                 {
-                    if(args.Guild.Id == 483279257431441410 && (args.Channel.Type != ChannelType.NewsThread && args.Channel.Type != ChannelType.PrivateThread && args.Channel.Type != ChannelType.PublicThread) && args.Message.Content.ToLower() == "#smolarmy")
+                    if(args.Guild != null && args.Guild.Id == 483279257431441410 && (args.Channel.Type != ChannelType.NewsThread && args.Channel.Type != ChannelType.PrivateThread && args.Channel.Type != ChannelType.PublicThread) && args.Message.Content.ToLower() == "#smolarmy")
                     {
                         var guild = args.Guild;
                         var member = await guild.GetMemberAsync(args.Author.Id);
@@ -210,15 +218,6 @@ namespace MikuSharp
                     else
                         await Task.FromResult(true);
                 };*/
-                acC[g.Key].RegisterGuildCommands<Commands.Slash>(483279257431441410);
-                acC[g.Key].RegisterGuildCommands<Commands.Developer>(483279257431441410, perms => {
-                    perms.AddUser(756968464090136636, true);
-                    perms.AddRole(602923142586957853, true);
-                });
-                acC[g.Key].RegisterGuildCommands<Commands.Developer>(858089281214087179, perms => {
-                    perms.AddUser(756968464090136636, true);
-                    perms.AddRole(887877553929469952, true);
-                });
                 g.Value.Logger.LogInformation("Caching Done for shard " + g.Key);
             }
         }
@@ -229,22 +228,10 @@ namespace MikuSharp
             await _weeb.Authenticate(cfg.WeebShToken, Weeb.net.TokenType.Wolke);
             var LL = await bot.UseLavalinkAsync();
             lavaC = LL;
-            
-            await CacheRegister();
-            await bot.StartAsync();
-            foreach (var shard in lavaC)
-            {
-                var LCon = await shard.Value.ConnectAsync(new LavalinkConfiguration
-                {
-                    SocketEndpoint = new ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
-                    RestEndpoint = new ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
-                    Password = cfg.LavaConfig.Password
-                });
-                LLEU.Add(shard.Key, LCon);
-            }
+            await RegisterEvents();
             foreach (var g in bot.ShardClients)
             {
-                g.Value.GetApplicationCommands();
+               // g.Value.GetApplicationCommands();
                 g.Value.GuildMemberUpdated += async (sender, args) =>
                 {
                     if (args.Guild.Id == 483279257431441410)
@@ -263,7 +250,20 @@ namespace MikuSharp
                     return Task.CompletedTask;
                 };
             }
-            while(i != bot.ShardClients.Count - 1 && cmdC == null && interC == null)
+            await bot.StartAsync();
+            await RegisterCommands(bot, cmdC, acC);
+            foreach (var shard in lavaC)
+            {
+                var LCon = await shard.Value.ConnectAsync(new LavalinkConfiguration
+                {
+                    SocketEndpoint = new ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
+                    RestEndpoint = new ConnectionEndpoint { Hostname = cfg.LavaConfig.Hostname, Port = cfg.LavaConfig.Port },
+                    Password = cfg.LavaConfig.Password
+                });
+                LLEU.Add(shard.Key, LCon);
+            }
+
+            while (i != bot.ShardClients.Count - 1 && cmdC == null && interC == null)
             {
                 await Task.Delay(1000);
             }

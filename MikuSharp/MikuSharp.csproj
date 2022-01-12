@@ -19,8 +19,14 @@
     <EmbeddedResource Remove="MusicCommands\**" />
     <None Remove="MusicCommands\**" />
   </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>1701;1702;DV2001</NoWarn>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<NoWarn>1701;1702;DV2001</NoWarn>
+	</PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <PackageReference Include="AlbumArtExtraction" Version="1.0.2" />
     <PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
     <PackageReference Include="DisCatSharp" Version="9.8.5" />
