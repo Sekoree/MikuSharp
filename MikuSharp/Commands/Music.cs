@@ -159,7 +159,7 @@ namespace MikuSharp.Commands
             if (song == null)
             {
                 await Task.Delay(2500);
-                song = ctx.Message.Attachments.First().ProxyUrl;
+                song = ctx.Message.Attachments[0].ProxyUrl;
             }
             var oldState = g.musicInstance.playstate;
             var q = await g.musicInstance.QueueSong(song, ctx);
@@ -207,7 +207,7 @@ namespace MikuSharp.Commands
             if (song == null)
             {
                 await Task.Delay(2500);
-                song = ctx.Message.Attachments.First().ProxyUrl;
+                song = ctx.Message.Attachments[0].ProxyUrl;
             }
             var oldState = g.musicInstance.playstate;
             var q = await g.musicInstance.QueueSong(song, ctx, pos);
@@ -504,7 +504,7 @@ namespace MikuSharp.Commands
                 int totalP = queue.Count / 5;
                 if ((queue.Count % 5) != 0) totalP++;
                 var emb = new DiscordEmbedBuilder();
-                List<Page> Pages = new List<Page>();
+                List<Page> Pages = new();
                 if (g.musicInstance.repeatMode == RepeatMode.All)
                 {
                     songAmount = g.musicInstance.repeatAllPos;
@@ -648,7 +648,7 @@ namespace MikuSharp.Commands
                     await ctx.RespondAsync(embed: Pages.First().Embed);
                     return;
                 }
-                foreach (var eP in Pages.Where(x => x.Embed.Fields.Where(y => y.Name != "Playback Options").Count() == 0).ToList())
+                foreach (var eP in Pages.Where(x => !x.Embed.Fields.Any(y => y.Name != "Playback Options")).ToList())
                 {
                     Pages.Remove(eP);
                 }
@@ -700,7 +700,7 @@ namespace MikuSharp.Commands
                     var searchListResponse = await searchListRequest.ExecuteAsync();
                     eb.AddField($"{g.musicInstance.currentSong.track.Title} ({time1}/{time2})", $"[Video Link]({g.musicInstance.currentSong.track.Uri})\n" +
                         $"[{g.musicInstance.currentSong.track.Author}](https://www.youtube.com/channel/" + searchListResponse.Items[0].Snippet.ChannelId + ")");
-                    if (searchListResponse.Items[0].Snippet.Description.Length > 500) eb.AddField("Description", searchListResponse.Items[0].Snippet.Description.Substring(0, 500) + "...");
+                    if (searchListResponse.Items[0].Snippet.Description.Length > 500) eb.AddField("Description", string.Concat(searchListResponse.Items[0].Snippet.Description.AsSpan(0, 500), "..."));
                     else eb.AddField("Description", searchListResponse.Items[0].Snippet.Description);
                     eb.WithImageUrl(searchListResponse.Items[0].Snippet.Thumbnails.High.Url);
                     var opts = "";
@@ -733,22 +733,22 @@ namespace MikuSharp.Commands
                 try
                 {
                     var c = new HttpClient();
-                    MemoryStream d = new MemoryStream(await c.GetByteArrayAsync(g.musicInstance.currentSong.track.Uri))
+                    MemoryStream d = new(await c.GetByteArrayAsync(g.musicInstance.currentSong.track.Uri))
                     {
                         Position = 0
                     };
-                    e = File.Create($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[g.musicInstance.currentSong.track.Uri.ToString().Split('/').Count() - 2]}.{g.musicInstance.currentSong.track.Uri.ToString().Split('/').Last()}");
+                    e = File.Create($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[^2]}.{g.musicInstance.currentSong.track.Uri.ToString().Split('/').Last()}");
                     await d.CopyToAsync(e);
                     e.Close();
                     var selector = new Selector();
-                    var extractor = selector.SelectAlbumArtExtractor($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[g.musicInstance.currentSong.track.Uri.ToString().Split('/').Count() - 2]}.{ g.musicInstance.currentSong.track.Uri.ToString().Split('/').Last()}");
-                    img = extractor.Extract($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[g.musicInstance.currentSong.track.Uri.ToString().Split('/').Count() - 2]}.{ g.musicInstance.currentSong.track.Uri.ToString().Split('/').Last()}");
+                    var extractor = selector.SelectAlbumArtExtractor($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[^2]}.{ g.musicInstance.currentSong.track.Uri.ToString().Split('/').Last()}");
+                    img = extractor.Extract($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[^2]}.{ g.musicInstance.currentSong.track.Uri.ToString().Split('/').Last()}");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex);
                     img = null;
-                    File.Delete($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[g.musicInstance.currentSong.track.Uri.ToString().Split('/').Count() - 2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
+                    File.Delete($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[^2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
                 }
                 string time1, time2;
                 if (g.musicInstance.currentSong.track.Length.Hours < 1)
@@ -772,7 +772,7 @@ namespace MikuSharp.Commands
                 }
                 if (img != null)
                 {
-                    eb.WithImageUrl($"attachment://{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[g.musicInstance.currentSong.track.Uri.ToString().Split('/').Count() - 2]}.{MimeGuesser.GuessExtension(img)}");
+                    eb.WithImageUrl($"attachment://{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[^2]}.{MimeGuesser.GuessExtension(img)}");
                 }
             }
             else
@@ -806,11 +806,11 @@ namespace MikuSharp.Commands
             {
 
 
-                DiscordMessageBuilder builder = new DiscordMessageBuilder();
-                builder.WithFile($"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[g.musicInstance.currentSong.track.Uri.ToString().Split('/').Count() - 2]}.{MimeGuesser.GuessExtension(img)}", img);
+                DiscordMessageBuilder builder = new();
+                builder.WithFile($"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[^2]}.{MimeGuesser.GuessExtension(img)}", img);
                 builder.WithEmbed(eb.Build());
                 await ctx.RespondAsync(builder);
-                File.Delete($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[g.musicInstance.currentSong.track.Uri.ToString().Split('/').Count() - 2]}.{g.musicInstance.currentSong.track.Uri.ToString().Split('/').Last()}");
+                File.Delete($@"{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[^2]}.{g.musicInstance.currentSong.track.Uri.ToString().Split('/').Last()}");
             }
         }
 
@@ -851,7 +851,7 @@ namespace MikuSharp.Commands
                     var searchListResponse = await searchListRequest.ExecuteAsync();
                     eb.AddField($"{lastPlayedSongs[0].track.Title} ({time2})", $"[Video Link]({lastPlayedSongs[0].track.Uri})\n" +
                         $"[{lastPlayedSongs[0].track.Author}](https://www.youtube.com/channel/" + searchListResponse.Items[0].Snippet.ChannelId + ")");
-                    if (searchListResponse.Items[0].Snippet.Description.Length > 500) eb.AddField("Description", searchListResponse.Items[0].Snippet.Description.Substring(0, 500) + "...");
+                    if (searchListResponse.Items[0].Snippet.Description.Length > 500) eb.AddField("Description", string.Concat(searchListResponse.Items[0].Snippet.Description.AsSpan(0, 500), "..."));
                     else eb.AddField("Description", searchListResponse.Items[0].Snippet.Description);
                     eb.WithImageUrl(searchListResponse.Items[0].Snippet.Thumbnails.High.Url);
                     var opts = "";
@@ -884,22 +884,22 @@ namespace MikuSharp.Commands
                 try
                 {
                     var c = new HttpClient();
-                    MemoryStream d = new MemoryStream(await c.GetByteArrayAsync(lastPlayedSongs[0].track.Uri))
+                    MemoryStream d = new(await c.GetByteArrayAsync(lastPlayedSongs[0].track.Uri))
                     {
                         Position = 0
                     };
-                    e = File.Create($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
+                    e = File.Create($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[^2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
                     await d.CopyToAsync(e);
                     e.Close();
                     var selector = new Selector();
-                    var extractor = selector.SelectAlbumArtExtractor($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
-                    img = extractor.Extract($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
+                    var extractor = selector.SelectAlbumArtExtractor($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[^2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
+                    img = extractor.Extract($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[^2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex);
                     img = null;
-                    File.Delete($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
+                    File.Delete($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[^2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
                 }
                 string time2;
                 if (lastPlayedSongs[0].track.Length.Hours < 1)
@@ -921,7 +921,7 @@ namespace MikuSharp.Commands
                 }
                 if (img != null)
                 {
-                    eb.WithImageUrl($"attachment://{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{MimeGuesser.GuessExtension(img)}");
+                    eb.WithImageUrl($"attachment://{lastPlayedSongs[0].track.Uri.ToString().Split('/')[^2]}.{MimeGuesser.GuessExtension(img)}");
                 }
             }
             else
@@ -951,11 +951,11 @@ namespace MikuSharp.Commands
             }
             else
             {
-                DiscordMessageBuilder builder = new DiscordMessageBuilder();
-                builder.WithFile($"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{MimeGuesser.GuessExtension(img)}", img);
+                DiscordMessageBuilder builder = new();
+                builder.WithFile($"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[^2]}.{MimeGuesser.GuessExtension(img)}", img);
                 builder.WithEmbed(eb.Build());
                 await ctx.RespondAsync(builder);
-                File.Delete($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[lastPlayedSongs[0].track.Uri.ToString().Split('/').Count() - 2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
+                File.Delete($@"{lastPlayedSongs[0].track.Uri.ToString().Split('/')[^2]}.{lastPlayedSongs[0].track.Uri.ToString().Split('/').Last()}");
             }
         }
 
@@ -979,7 +979,7 @@ namespace MikuSharp.Commands
                 int totalP = lastPlayedSongs.Count / 10;
                 if ((lastPlayedSongs.Count % 10) != 0) totalP++;
                 var emb = new DiscordEmbedBuilder();
-                List<Page> Pages = new List<Page>();
+                List<Page> Pages = new();
                 foreach (var Track in lastPlayedSongs)
                 {
 

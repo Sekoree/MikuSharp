@@ -19,7 +19,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=4k");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -31,7 +31,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=anal");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -43,7 +43,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=ass");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -83,7 +83,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=gonewild");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -95,7 +95,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetKsoftSiRanImg("hentai_gif", true);
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -135,7 +135,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=lewdkitsune");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -147,7 +147,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=lewdneko");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -159,7 +159,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetDerpy("https://miku.derpyenterprises.org/nekoparajson");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -171,7 +171,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetDerpy("https://miku.derpyenterprises.org/nekoparagifjson");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -183,7 +183,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=pgif");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -195,7 +195,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/image?type=pussy");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
@@ -237,7 +237,7 @@ namespace MikuSharp.Commands
         {
             var d = await Web.GetNekobot("https://nekobot.xyz/api/v2/image/thighs");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);

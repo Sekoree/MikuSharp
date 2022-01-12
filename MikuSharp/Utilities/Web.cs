@@ -22,7 +22,7 @@ namespace MikuSharp.Utilities
         {
             var hc = new HttpClient();
             var dl = JsonConvert.DeserializeObject<Nekos_Life>(await hc.GetStringAsync(url));
-            MemoryStream str = new MemoryStream(await hc.GetByteArrayAsync(Other.resizeLink(dl.Url)))
+            MemoryStream str = new(await hc.GetByteArrayAsync(Other.resizeLink(dl.Url)))
             {
                 Position = 0
             };
@@ -40,7 +40,7 @@ namespace MikuSharp.Utilities
             var c = new HttpClient();
             c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Bot.cfg.KsoftSiToken);
             var v = JsonConvert.DeserializeObject<KsoftSiRanImg>(await c.GetStringAsync("https://api.ksoft.si/images/random-image?tag=hentai_gif&nsfw=true"));
-            MemoryStream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(v.url)));
+            MemoryStream img = new(await c.GetByteArrayAsync(Other.resizeLink(v.url)));
             v.Data = img;
             v.Filetype = MimeGuesser.GuessExtension(img);
             var em = new DiscordEmbedBuilder();
@@ -54,7 +54,7 @@ namespace MikuSharp.Utilities
         {
             var hc = new HttpClient();
             var dl = JsonConvert.DeserializeObject<NekoBot>(await hc.GetStringAsync(url));
-            MemoryStream str = new MemoryStream(await hc.GetByteArrayAsync(Other.resizeLink(dl.message)))
+            MemoryStream str = new(await hc.GetByteArrayAsync(Other.resizeLink(dl.message)))
             {
                 Position = 0
             };
@@ -71,7 +71,7 @@ namespace MikuSharp.Utilities
         {
             var hc = new HttpClient();
             var dl = JsonConvert.DeserializeObject<Derpy>(await hc.GetStringAsync(url));
-            MemoryStream str = new MemoryStream(await hc.GetByteArrayAsync(Other.resizeLink(dl.url)))
+            MemoryStream str = new(await hc.GetByteArrayAsync(Other.resizeLink(dl.url)))
             {
                 Position = 0
             };
@@ -88,7 +88,7 @@ namespace MikuSharp.Utilities
         {
             var weeurl = await Bot._weeb.GetRandomAsync(query, tags, nsfw: nsfw);
             var hc = new HttpClient();
-            MemoryStream img = new MemoryStream(await hc.GetByteArrayAsync(weeurl.Url))
+            MemoryStream img = new(await hc.GetByteArrayAsync(weeurl.Url))
             {
                 Position = 0
             };

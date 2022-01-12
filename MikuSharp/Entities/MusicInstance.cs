@@ -72,7 +72,7 @@ namespace MikuSharp.Entities
                 var msg = await ctx.RespondAsync("Processing NND Video...");
                 var split = n.Split("/".ToCharArray());
                 var nndID = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
-                FtpClient client = new FtpClient(Bot.cfg.NndConfig.FtpConfig.Hostname, new NetworkCredential(Bot.cfg.NndConfig.FtpConfig.User, Bot.cfg.NndConfig.FtpConfig.Password));
+                FtpClient client = new(Bot.cfg.NndConfig.FtpConfig.Hostname, new NetworkCredential(Bot.cfg.NndConfig.FtpConfig.User, Bot.cfg.NndConfig.FtpConfig.Password));
                 await client.ConnectAsync();
                 if (!await client.FileExistsAsync($"{nndID}.mp3"))
                 {
@@ -98,7 +98,7 @@ namespace MikuSharp.Entities
                 var msg = await ctx.RespondAsync("Processing Bilibili Video...");
                 var split = n.Split("/".ToCharArray());
                 var nndID = split.First(x => x.StartsWith("anime") || x.StartsWith("av")).Split("?")[0];
-                FtpClient client = new FtpClient(Bot.cfg.NndConfig.FtpConfig.Hostname, new NetworkCredential(Bot.cfg.NndConfig.FtpConfig.User, Bot.cfg.NndConfig.FtpConfig.Password));
+                FtpClient client = new(Bot.cfg.NndConfig.FtpConfig.Hostname, new NetworkCredential(Bot.cfg.NndConfig.FtpConfig.User, Bot.cfg.NndConfig.FtpConfig.Password));
                 await client.ConnectAsync();
                 if (!await client.FileExistsAsync($"{nndID}.mp3"))
                 {

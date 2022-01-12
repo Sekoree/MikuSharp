@@ -17,7 +17,7 @@ namespace MikuSharp.Utilities
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM prefixes WHERE userid = {u};", conn);
             var reader = await cmd2.ExecuteReaderAsync();
-            Dictionary<ulong,List<string>> lists = new Dictionary<ulong, List<string>>();
+            Dictionary<ulong,List<string>> lists = new();
             while (await reader.ReadAsync())
             {
                 if (!lists.Any(x => x.Key == Convert.ToUInt64(reader["guild"])))
@@ -40,7 +40,7 @@ namespace MikuSharp.Utilities
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM guildprefixes WHERE guildid = {g};", conn);
             var reader = await cmd2.ExecuteReaderAsync();
-            List<string> lists = new List<string>();
+            List<string> lists = new();
             while (await reader.ReadAsync())
             {
                 lists.Add(Convert.ToString(reader["prefix"]));

@@ -43,7 +43,7 @@ namespace MikuSharp.Commands
                     File.Delete($"temp-{target_file}");
                     File.Copy(target_file, $"temp-{target_file}");
                 }
-                FileStream log = new FileStream(path: $"temp-{target_file}", FileMode.Open, FileAccess.Read);
+                FileStream log = new(path: $"temp-{target_file}", FileMode.Open, FileAccess.Read);
                 await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddFile(target_file, log, true).WithContent($"Log {Formatter.Bold(target_file)}").AsEphemeral(false));
                 log.Close();
                 log.Dispose();

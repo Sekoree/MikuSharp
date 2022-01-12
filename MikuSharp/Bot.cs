@@ -36,19 +36,19 @@ namespace MikuSharp
     class Bot : IDisposable
     {
         public static BotConfig cfg { get; set; } 
-        public static WeebClient _weeb = new WeebClient("Hatsune Miku Bot C# Rewrite", "2.0.0");
+        public static WeebClient _weeb = new("Hatsune Miku Bot C# Rewrite", "3.0.0");
         public Task GameSetThread { get; set; }
         public Task StatusThread { get; set; }
         public static DiscordShardedClient bot { get; set; }
         static CancellationTokenSource _cts { get; set; }
-        public static Dictionary<ulong, Guild> Guilds = new Dictionary<ulong, Guild>();
+        public static Dictionary<ulong, Guild> Guilds = new();
         public IReadOnlyDictionary<int, InteractivityExtension> interC { get; set; }
         public IReadOnlyDictionary<int, CommandsNextExtension> cmdC { get; set; }
         public IReadOnlyDictionary<int, ApplicationCommandsExtension> acC { get; set; }
         public static IReadOnlyDictionary<int, LavalinkExtension> lavaC { get; set; }
-        public static Dictionary<int, LavalinkNodeConnection> LLEU = new Dictionary<int, LavalinkNodeConnection>();
+        public static Dictionary<int, LavalinkNodeConnection> LLEU = new();
         public static Playstate ps = Playstate.Playing;
-        public static Stopwatch psc = new Stopwatch();
+        public static Stopwatch psc = new();
 
         public Bot()
         {
@@ -123,21 +123,21 @@ namespace MikuSharp
             await Task.CompletedTask;
             while (true)
             {
-                DiscordActivity test = new DiscordActivity
+                DiscordActivity test = new()
                 {
                     Name = "m_help for commands!",
                     ActivityType = ActivityType.Playing
                 };
                 await bot.UpdateStatusAsync(activity: test, userStatus: UserStatus.Online);
                 await Task.Delay(TimeSpan.FromMinutes(5));
-                DiscordActivity test2 = new DiscordActivity
+                DiscordActivity test2 = new()
                 {
                     Name = "Check the new playlist commands!",
                     ActivityType = ActivityType.Playing
                 };
                 await bot.UpdateStatusAsync(activity: test2, userStatus: UserStatus.Online);
                 await Task.Delay(TimeSpan.FromMinutes(5));
-                DiscordActivity test3 = new DiscordActivity
+                DiscordActivity test3 = new()
                 {
                     Name = "Full NND support!",
                     ActivityType = ActivityType.Playing
@@ -210,12 +210,12 @@ namespace MikuSharp
                     else
                         await Task.FromResult(true);
                 };*/
-                acC[g.Key].RegisterCommands<Commands.Slash>(483279257431441410);
-                acC[g.Key].RegisterCommands<Commands.Developer>(483279257431441410, perms => {
+                acC[g.Key].RegisterGuildCommands<Commands.Slash>(483279257431441410);
+                acC[g.Key].RegisterGuildCommands<Commands.Developer>(483279257431441410, perms => {
                     perms.AddUser(756968464090136636, true);
                     perms.AddRole(602923142586957853, true);
                 });
-                acC[g.Key].RegisterCommands<Commands.Developer>(858089281214087179, perms => {
+                acC[g.Key].RegisterGuildCommands<Commands.Developer>(858089281214087179, perms => {
                     perms.AddUser(756968464090136636, true);
                     perms.AddRole(887877553929469952, true);
                 });

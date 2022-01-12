@@ -35,7 +35,7 @@ namespace MikuSharp.Commands
         {
             var ImgURL = await Web.GetNekos_Life("https://nekos.life/api/v2/img/meow");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{ImgURL.Filetype}", ImgURL.Data);
             builder.WithEmbed(ImgURL.Embed);
             await ctx.RespondAsync(builder);
@@ -64,7 +64,7 @@ namespace MikuSharp.Commands
             var e = JsonConvert.DeserializeObject<NekoBot>(await c.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}"));
             Stream img = new MemoryStream(await c.GetByteArrayAsync(e.message));
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"clyde.png", img);
             await ctx.RespondAsync(builder);
         }
@@ -81,7 +81,7 @@ namespace MikuSharp.Commands
         [Description("Random dadjoke")]
         public async Task DadJoke(CommandContext ctx)
         {
-            var wr = (HttpWebRequest)WebRequest.Create("https://icanhazdadjoke.com/");
+            var wr = WebRequest.Create("https://icanhazdadjoke.com/") as HttpWebRequest;
             wr.Accept = "application/json";
             wr.UserAgent = "Hatsune Miku Discord Bot (speyd3r@meek.moe)";
             await ctx.RespondAsync(JsonConvert.DeserializeObject<Dadjoke>(new StreamReader(wr.GetResponse().GetResponseStream()).ReadToEnd()).joke);
@@ -99,7 +99,7 @@ namespace MikuSharp.Commands
             em.WithFooter("by dog.ceo", "https://dog.ceo/img/favicon.png");
             em.WithDescription($"[Full Image]({dc.message})");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             builder.WithEmbed(em.Build());
             await ctx.RespondAsync(builder);
@@ -158,7 +158,7 @@ namespace MikuSharp.Commands
             var get = await Web.GetNekos_Life("https://nekos.life/api/lizard");
             Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(get.Url)));
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             await ctx.RespondAsync(builder);
         }

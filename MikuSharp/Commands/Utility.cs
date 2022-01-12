@@ -26,8 +26,8 @@ namespace MikuSharp.Commands
                 var ine = ctx.Client.GetInteractivity();
                 var a = await Anime.GetAnimeAsync(search);
                 var emb = new DiscordEmbedBuilder();
-                List<DiscordEmbedBuilder> res = new List<DiscordEmbedBuilder>();
-                List<Page> ress = new List<Page>();
+                List<DiscordEmbedBuilder> res = new();
+                List<Page> ress = new();
                 foreach (var aa in a.Data)
                 {
                     emb.WithColor(new DiscordColor(0212255));
@@ -130,8 +130,8 @@ namespace MikuSharp.Commands
                 var ine = ctx.Client.GetInteractivity();
                 var a = await Manga.GetMangaAsync(search);
                 var emb = new DiscordEmbedBuilder();
-                List<DiscordEmbedBuilder> res = new List<DiscordEmbedBuilder>();
-                List<Page> ress = new List<Page>();
+                List<DiscordEmbedBuilder> res = new();
+                List<Page> ress = new();
                 foreach (var aa in a.Data)
                 {
                     emb.WithColor(new DiscordColor(0212255));
