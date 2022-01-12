@@ -95,7 +95,7 @@ namespace MikuSharp.Utilities
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM queues WHERE guildId = {g.Id} ORDER BY position ASC;", conn);
             var reader = await cmd2.ExecuteReaderAsync();
-            List<QueueEntry> queue = new List<QueueEntry>();
+            List<QueueEntry> queue = new();
             while (await reader.ReadAsync())
             {
                 queue.Add(new QueueEntry(LavalinkUtilities.DecodeTrack(Convert.ToString(reader["trackstring"])), Convert.ToUInt64(reader["userid"]), DateTimeOffset.Parse(reader["addtime"].ToString()), Convert.ToInt32(reader["position"])));
@@ -254,7 +254,7 @@ namespace MikuSharp.Utilities
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM lastplayedsongs WHERE guildId = {g.Id} ORDER BY lastplayedsongs.trackposition DESC LIMIT 1000", conn);
             var reader = await cmd2.ExecuteReaderAsync();
-            List<Entry> queue = new List<Entry>();
+            List<Entry> queue = new();
             while (await reader.ReadAsync())
             {
                 //queue.Add(new Entry(LavalinkUtilities.DecodeTrack((string)reader["trackstring"]), DateTimeOffset.Parse(NpgsqlDateTime.Parse((string)reader["addtime"]).ToString())));

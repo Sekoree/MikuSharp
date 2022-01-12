@@ -27,7 +27,7 @@ namespace MikuSharp.Utilities
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM playlists WHERE userid = {u} ORDER BY playlistname ASC;", conn);
             var reader = await cmd2.ExecuteReaderAsync();
-            Dictionary<string, Playlist> lists = new Dictionary<string, Playlist>(); 
+            Dictionary<string, Playlist> lists = new(); 
             while (await reader.ReadAsync())
             {
                 lists.Add(Convert.ToString(reader["playlistname"]), await GetPlaylist(guild, u, Convert.ToString(reader["playlistname"])));
@@ -46,7 +46,7 @@ namespace MikuSharp.Utilities
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM playlists WHERE userid = {u} ORDER BY playlistname ASC;", conn);
             var reader = await cmd2.ExecuteReaderAsync();
-            List<string> lists = new List<string>();
+            List<string> lists = new();
             while (await reader.ReadAsync())
             {
                 lists.Add(Convert.ToString(reader["playlistname"]));
@@ -293,9 +293,7 @@ namespace MikuSharp.Utilities
         {
             var qnow = await GetPlaylist(guild, u,p);
             var q = await qnow.GetEntries();
-            var temp = q[oldpos];
-            q[oldpos] = q[newpos];
-            q[newpos] = temp;
+            (q[newpos], q[oldpos]) = (q[oldpos], q[newpos]);
             await RebuildList(u, p, q);
         }
 
@@ -350,7 +348,7 @@ namespace MikuSharp.Utilities
                 var msg = await ctx.RespondAsync("Processing NND Video...");
                 var split = n.Split("/".ToCharArray());
                 var nndID = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
-                FtpClient client = new FtpClient(Bot.cfg.NndConfig.FtpConfig.Hostname, new NetworkCredential(Bot.cfg.NndConfig.FtpConfig.User, Bot.cfg.NndConfig.FtpConfig.Password));
+                FtpClient client = new(Bot.cfg.NndConfig.FtpConfig.Hostname, new NetworkCredential(Bot.cfg.NndConfig.FtpConfig.User, Bot.cfg.NndConfig.FtpConfig.Password));
                 await client.ConnectAsync();
                 if (!await client.FileExistsAsync($"{nndID}.mp3"))
                 {

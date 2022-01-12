@@ -71,7 +71,7 @@ namespace MikuSharp.Commands
             try
             {
                 var inter = ctx.Client.GetInteractivity();
-                Dictionary<string, List<DiscordEmbedBuilder>> Helps = new Dictionary<string, List<DiscordEmbedBuilder>>();
+                Dictionary<string, List<DiscordEmbedBuilder>> Helps = new();
                 foreach (var Command in ctx.CommandsNext.RegisteredCommands.Where(x => x.Value.Module.ModuleType.Name != "MikuGuild"))
                 {
                     if (ctx.CommandsNext.RegisteredCommands.Any(x => x.Value.Aliases.Any(y => y == Command.Key))) continue;
@@ -111,7 +111,7 @@ namespace MikuSharp.Commands
                         else Helps[mod].Last().AddField($"{ctx.Prefix}{Command.Key}", $"{Command.Value.Description}.", true);
                     }
                 }
-                List<Page> All = new List<Page>();
+                List<Page> All = new();
                 string cats = "**";
                 foreach (var cat in Helps)
                 {
@@ -217,7 +217,7 @@ namespace MikuSharp.Commands
                     else if (ctx.CommandsNext.RegisteredCommands.FirstOrDefault(x => x.Key == command[0]).Value is Command cmd)
                     {
                         string usg = "";
-                        Usage Usage = new Usage("not available currently");
+                        Usage Usage = new("not available currently");
                         try { Usage = cmd.CustomAttributes.OfType<Usage>().First(); } catch { }
                         var emb = new DiscordEmbedBuilder();
                         emb.WithTitle(cmd.Module.ModuleType.Name);
@@ -243,7 +243,7 @@ namespace MikuSharp.Commands
                         if (cmd2.Children.FirstOrDefault(x => x.Name == command[1] || x.Aliases.Any(y => y == command[1])) is Command cmd)
                         {
                             string usg = "";
-                            Usage Usage = new Usage("not available currently");
+                            Usage Usage = new("not available currently");
                             try { Usage = cmd.CustomAttributes.OfType<Usage>().First(); } catch { }
                             var emb = new DiscordEmbedBuilder();
                             emb.WithTitle(cmd.Module.ModuleType.Name);
@@ -275,7 +275,7 @@ namespace MikuSharp.Commands
         public async Task Invite(CommandContext ctx)
         {
             var invite = ctx.Client.GetInAppOAuth(DisCatSharp.Permissions.Administrator).AbsoluteUri;
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithContent($"Thanks for your interest in the {ctx.Client.CurrentUser.Username} Bot!");
             builder.AddComponents(new DiscordLinkButtonComponent(invite, $"Add {ctx.Client.CurrentUser.Username}", false, new DiscordComponentEmoji(704730096220635296)));
             await ctx.RespondAsync(builder);

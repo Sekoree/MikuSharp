@@ -21,7 +21,7 @@ namespace MikuSharp.Commands
             var WSH = await Web.GetWeebSh(ctx, "hug", new[] { "" });
             WSH.Embed.WithDescription($"{ctx.Member.Mention} hugs {m.Mention} uwu");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{WSH.Extension}", WSH.ImgData);
             builder.WithEmbed(WSH.Embed.Build());
             await ctx.RespondAsync(builder);
@@ -34,7 +34,7 @@ namespace MikuSharp.Commands
             var WSH = await Web.GetWeebSh(ctx, "kiss", new[] { "" });
             WSH.Embed.WithDescription($"{ctx.Member.Mention} kisses {m.Mention} >~<");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{WSH.Extension}", WSH.ImgData);
             builder.WithEmbed(WSH.Embed.Build());
             await ctx.RespondAsync(builder);
@@ -47,7 +47,7 @@ namespace MikuSharp.Commands
             var WSH = await Web.GetWeebSh(ctx, "lick", new[] { "" });
             WSH.Embed.WithDescription($"{ctx.Member.Mention} licks {m.Mention} owo");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{WSH.Extension}", WSH.ImgData);
             builder.WithEmbed(WSH.Embed.Build());
             await ctx.RespondAsync(builder);
@@ -65,7 +65,7 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by nekos.life");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             builder.WithEmbed(em.Build());
             await ctx.RespondAsync(builder);
@@ -83,7 +83,7 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by nekos.life");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             builder.WithEmbed(em.Build());
             await ctx.RespondAsync(builder);
@@ -101,7 +101,7 @@ namespace MikuSharp.Commands
             em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
             em.WithFooter("by nekos.life");
 
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
+            DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
             builder.WithEmbed(em.Build());
             await ctx.RespondAsync(builder);

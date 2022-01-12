@@ -131,7 +131,7 @@ namespace MikuSharp.Commands
             int totalP = pls.Count / 5;
             if ((pls.Count % 5) != 0) totalP++;
             var emb = new DiscordEmbedBuilder();
-            List<Page> Pages = new List<Page>();
+            List<Page> Pages = new();
             Console.WriteLine(pls == null);
             foreach (var Track in pls)
             {
@@ -182,7 +182,7 @@ namespace MikuSharp.Commands
                 await ctx.RespondAsync(embed: Pages.First().Embed);
                 return;
             }
-            foreach (var eP in Pages.Where(x => x.Embed.Fields.Count() == 0).ToList())
+            foreach (var eP in Pages.Where(x => x.Embed.Fields.Count == 0).ToList())
             {
                 Pages.Remove(eP);
             }
@@ -221,7 +221,7 @@ namespace MikuSharp.Commands
             int totalP = queue.Count / 5;
             if ((queue.Count % 5) != 0) totalP++;
             var emb = new DiscordEmbedBuilder();
-            List<Page> Pages = new List<Page>();
+            List<Page> Pages = new();
             foreach (var Track in queue)
             {
                 string time = "";
@@ -258,7 +258,7 @@ namespace MikuSharp.Commands
                 await ctx.RespondAsync(embed: Pages.First().Embed);
                 return;
             }
-            foreach (var eP in Pages.Where(x => x.Embed.Fields.Count() == 0).ToList())
+            foreach (var eP in Pages.Where(x => x.Embed.Fields.Count == 0).ToList())
             {
                 Pages.Remove(eP);
             }

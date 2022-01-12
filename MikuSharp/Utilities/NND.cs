@@ -56,7 +56,7 @@ namespace MikuSharp.Utilities
                     flashPart = parsedDoc.GetElementById("watchAPIDataContainer");
                     jsonData = flashPart.TextContent;
                 }
-                MemoryStream videoData = new MemoryStream();
+                MemoryStream videoData = new();
                 await msg.ModifyAsync("Downloading video (this may take up to 5 min)");
                 if (flashPart == null)
                 {
@@ -80,7 +80,7 @@ namespace MikuSharp.Utilities
                 videoData.Position = 0;
                 videoFile.Close();
                 await msg.ModifyAsync("Converting");
-                Process process = new Process();
+                Process process = new();
                 process.StartInfo.FileName = "ffmpeg";
                 process.StartInfo.Arguments = $"-i {$@"{s}"} -metadata title=\"{songTitle}\" -metadata artist=\"{songArtist}\" {$@"{s}"}.mp3";
                 process.OutputDataReceived += (d, f) =>
@@ -90,7 +90,7 @@ namespace MikuSharp.Utilities
                 process.Start();
                 process.WaitForExit();
                 File.Delete($@"{s}");
-                MemoryStream ms = new MemoryStream(await File.ReadAllBytesAsync($@"{s}.mp3"));
+                MemoryStream ms = new(await File.ReadAllBytesAsync($@"{s}.mp3"));
                 File.Delete($@"{s}.mp3");
                 ms.Position = 0;
                 return ms;
