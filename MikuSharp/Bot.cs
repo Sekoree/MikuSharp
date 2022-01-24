@@ -67,7 +67,7 @@ namespace MikuSharp
                 TokenType = DisCatSharp.TokenType.Bot,
                 MinimumLogLevel = LogLevel.Debug,
                 AutoReconnect = true,
-                Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
+                Intents = DiscordIntents.AllUnprivileged, // | DiscordIntents.GuildMembers,
                 MessageCacheSize = 2048,
                 LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
 
@@ -232,7 +232,7 @@ namespace MikuSharp
             foreach (var g in bot.ShardClients)
             {
                // g.Value.GetApplicationCommands();
-                g.Value.GuildMemberUpdated += async (sender, args) =>
+                /*g.Value.GuildMemberUpdated += async (sender, args) =>
                 {
                     if (args.Guild.Id == 483279257431441410)
                     {
@@ -243,7 +243,7 @@ namespace MikuSharp
                     {
                         await Task.FromResult(true);
                     }
-                };
+                };*/
                 g.Value.GuildDownloadCompleted += (sender, args) =>
                 {
                     i++;
