@@ -91,11 +91,11 @@ namespace MikuSharp
                 ResponseMessage = "Something went wrong.",
                 ResponseBehavior = InteractionResponseBehavior.Respond
             }).Result;
-            /*acC = bot.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration()
+            acC = bot.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration()
             {
                 EnableDefaultHelp = false,
                 DebugStartup = false
-            }).Result;*/
+            }).Result;
             cmdC = bot.UseCommandsNextAsync(new CommandsNextConfiguration
             {
                 EnableDefaultHelp = false,
@@ -166,13 +166,9 @@ namespace MikuSharp
             cnext.RegisterCommands<Commands.MikuGuild>();
             cnext.RegisterCommands<Commands.Playlist>();
             cnext.RegisterCommands<Commands.Settings>();
-            /* client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Slash>(483279257431441410);
-             client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Developer>(483279257431441410, perms => {
-                 //perms.AddRole(602923142586957853, true);
-             });
-             client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Developer>(858089281214087179, perms => {
-                 //perms.AddRole(887877553929469952, true);
-             });*/
+            client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Slash>(483279257431441410);
+            client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Developer>(483279257431441410);
+            client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Developer>(858089281214087179);
             await Task.Delay(1);
         }
 
