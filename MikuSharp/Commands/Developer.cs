@@ -17,7 +17,7 @@ namespace MikuSharp.Commands
         /// Gets the debug log.
         /// </summary>
         /// <param name="ctx">The interaction context.</param>
-        [SlashCommand("dbg", "Get the logs of today", false)]
+        [SlashCommand("dbg", "Get the logs of today")]
         public static async Task GetDebugLogAsync(InteractionContext ctx)
         {
             await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Trying to get log").AsEphemeral(false));

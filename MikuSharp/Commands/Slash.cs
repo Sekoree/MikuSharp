@@ -9,7 +9,7 @@ namespace MikuSharp.Commands
 {
     public class Slash : ApplicationCommandsModule
     {
-        [SlashCommand("smolcar", "#SmolArmy", true)]
+        [SlashCommand("smolcar", "#SmolArmy")]
         public static async Task SmolCarAsync(InteractionContext ctx)
         {
 
