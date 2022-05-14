@@ -67,6 +67,7 @@ namespace MikuSharp
                 TokenType = DisCatSharp.TokenType.Bot,
                 MinimumLogLevel = LogLevel.Debug,
                 AutoReconnect = true,
+                ApiVersion = "9",
                 Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
                 MessageCacheSize = 2048,
                 LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
