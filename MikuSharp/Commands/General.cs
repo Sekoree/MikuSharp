@@ -33,8 +33,8 @@ namespace MikuSharp.Commands
                 WithColor(new DiscordColor("#348573")).
                 WithDescription("Thank you for your interest in supporting the Bot's development!\n" +
                 "Here are some links that may interest you").
-                AddField("Patreon", "[Link](https://patreon.com/speyd3r)", true).
-                AddField("PayPal", "[Link](https://paypal.me/speyd3r)", true);
+                AddField(new DiscordEmbedField("Patreon", "[Link](https://patreon.com/speyd3r)", true)).
+                AddField(new DiscordEmbedField("PayPal", "[Link](https://paypal.me/speyd3r)", true));
             await ctx.RespondAsync(embed: emb.Build());
         }
 
@@ -54,8 +54,8 @@ namespace MikuSharp.Commands
                 WithTitle(title: "Feedback").
                 WithDescription(description: text).
                 WithFooter(text: $"Sent from {ctx.Guild.Name}");
-            emb.AddField(name: "User", value: $"{ctx.Member.Mention}", inline: true);
-            emb.AddField(name: "ID", value: $"{ctx.Guild.Id}", inline: true);
+            emb.AddField(new DiscordEmbedField(name: "User", value: $"{ctx.Member.Mention}", inline: true));
+            emb.AddField(new DiscordEmbedField(name: "ID", value: $"{ctx.Guild.Id}", inline: true));
             var embed = await guild.GetChannel(484698873411928075).SendMessageAsync(embed: emb.Build());
             await embed.CreateReactionAsync(DiscordEmoji.FromName(client: ctx.Client, name: ":thumbsup:"));
             await embed.CreateReactionAsync(DiscordEmoji.FromName(client: ctx.Client, name: ":thumbsdown:"));
@@ -91,8 +91,8 @@ namespace MikuSharp.Commands
                                 Helps[mod].Add(new DiscordEmbedBuilder());
                                 Helps[mod].Last().WithTitle(mod);
                             }
-                            if (ctx.Prefix.Contains(ctx.Client.CurrentUser.Id.ToString())) Helps[mod].Last().AddField($"m%{Command.Key} {cmd2.Name}", $"{cmd2.Description}", true);
-                            else Helps[mod].Last().AddField($"{ctx.Prefix}{Command.Key} {cmd2.Name}", $"{cmd2.Description}.", true);
+                            if (ctx.Prefix.Contains(ctx.Client.CurrentUser.Id.ToString())) Helps[mod].Last().AddField(new DiscordEmbedField($"m%{Command.Key} {cmd2.Name}", $"{cmd2.Description}", true));
+                            else Helps[mod].Last().AddField(new DiscordEmbedField($"{ctx.Prefix}{Command.Key} {cmd2.Name}", $"{cmd2.Description}.", true));
                         }
                     }
                     else
@@ -107,8 +107,8 @@ namespace MikuSharp.Commands
                             Helps[mod].Add(new DiscordEmbedBuilder());
                             Helps[mod].Last().WithTitle(mod);
                         }
-                        if (ctx.Prefix.Contains(ctx.Client.CurrentUser.Id.ToString())) Helps[mod].Last().AddField($"m%{Command.Key}", $"{Command.Value.Description}", true);
-                        else Helps[mod].Last().AddField($"{ctx.Prefix}{Command.Key}", $"{Command.Value.Description}.", true);
+                        if (ctx.Prefix.Contains(ctx.Client.CurrentUser.Id.ToString())) Helps[mod].Last().AddField(new DiscordEmbedField($"m%{Command.Key}", $"{Command.Value.Description}", true));
+                        else Helps[mod].Last().AddField(new DiscordEmbedField($"{ctx.Prefix}{Command.Key}", $"{Command.Value.Description}.", true));
                     }
                 }
                 List<Page> All = new();
@@ -136,13 +136,13 @@ namespace MikuSharp.Commands
                     "are still missing but will be re-added over the next couple of days/weeks\n\n" +
                     $"Current Category List consists of {cats}, all commands are displayed on the following pages (use the reactions to switch pages)\n" +
                     $"For a more indepth view if certain commands you can use ``{ctx.Prefix}help (commandname)`` to see A more detailed description and usage\n")
-                    .AddField("General Info", "" +
+                    .AddField(new DiscordEmbedField("General Info", "" +
                             $"Developer of the original bot: {botdev}\n" +
                             $"Current Developer: {curbotdev}\n" +
                             "Avatar by: Chillow [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
-                            "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)")));
+                            "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)"))));
                 //await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, All, null, PaginationBehaviour.WrapAround, PaginationDeletion.DeleteEmojis, TimeSpan.FromMinutes(5));
                 await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, All, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
@@ -179,13 +179,13 @@ namespace MikuSharp.Commands
                                 else list += $"\n**{ctx.Prefix}{Command.Key}** *|-|* {Command.Value.Description}";
                             }
                             disemb.WithDescription(list);
-                            disemb.AddField("General Info", "" +
+                            disemb.AddField(new DiscordEmbedField("General Info", "" +
                                 $"Developer of the original bot: {botdev}\n" +
                                 $"Current Developer: {curbotdev}\n" +
                                 "Avatar by: Chillow [Twitter](https://twitter.com/SaikoSamurai)\n" +
                                 "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                                 "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
-                                "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)");
+                                "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)"));
                             await ctx.RespondAsync(embed: disemb.Build());
                             return;
                         }
@@ -201,16 +201,16 @@ namespace MikuSharp.Commands
                         }
                         if (cmd2.Aliases.Any())
                         {
-                            disemb.AddField("Group aliases", $"``{string.Join("``, ``", cmd2.Aliases)}``");
+                            disemb.AddField(new DiscordEmbedField("Group aliases", $"``{string.Join("``, ``", cmd2.Aliases)}``"));
                         }
                         disemb.WithDescription(list);
-                        disemb.AddField("General Info", "" +
+                        disemb.AddField(new DiscordEmbedField("General Info", "" +
                             $"Developer of the original bot: {botdev}\n" +
                             $"Current Developer: {curbotdev}\n" +
                             "Avatar by: Chillow [Twitter](https://twitter.com/SaikoSamurai)\n" +
                             "Support server: [Invite](https://discord.gg/YPPA2Pu)\n" +
                             "Bot invite: [Invite Link](https://meek.moe/miku)\n" +
-                            "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)");
+                            "Support: [PayPal](https://paypal.me/speyd3r)|[Patreon](https://patreon.com/speyd3r)"));
                         await ctx.RespondAsync(embed: disemb.Build());
                         return;
                     }
@@ -223,14 +223,14 @@ namespace MikuSharp.Commands
                         emb.WithTitle(cmd.Module.ModuleType.Name);
                         if (cmd.Aliases.Count != 0)
                         {
-                            emb.AddField("Aliases", $"``{string.Join("``, ``", cmd.Aliases)}``");
+                            emb.AddField(new DiscordEmbedField("Aliases", $"``{string.Join("``, ``", cmd.Aliases)}``"));
                         }
-                        emb.AddField("Description", cmd.Description + ".");
+                        emb.AddField(new DiscordEmbedField("Description", cmd.Description + "."));
                         foreach (var usages in Usage.value)
                         {
                             usg += $"m%{command[0]} {usages}\n";
                         }
-                        emb.AddField("Usage", usg);
+                        emb.AddField(new DiscordEmbedField("Usage", usg));
                         await ctx.RespondAsync(embed: emb.Build());
                         return;
                     }
@@ -249,14 +249,14 @@ namespace MikuSharp.Commands
                             emb.WithTitle(cmd.Module.ModuleType.Name);
                             if (cmd.Aliases.Count != 0)
                             {
-                                emb.AddField("Aliases", $"``{string.Join("``, ``", cmd.Aliases)}``");
+                                emb.AddField(new DiscordEmbedField("Aliases", $"``{string.Join("``, ``", cmd.Aliases)}``"));
                             }
-                            emb.AddField("Description", cmd.Description + ".");
+                            emb.AddField(new DiscordEmbedField("Description", cmd.Description + "."));
                             foreach (var usages in Usage.value)
                             {
                                 usg += $"m%{command[0]} {command[1]} {usages}\n";
                             }
-                            emb.AddField("Usage", usg);
+                            emb.AddField(new DiscordEmbedField("Usage", usg));
                             await ctx.RespondAsync(embed: emb.Build());
                             return;
                         }
@@ -310,12 +310,12 @@ namespace MikuSharp.Commands
             var emb = new DiscordEmbedBuilder().
                 WithTitle("Stats").
                 WithDescription("Some stats of the Bot!").
-                AddField("Guilds", GuildCount.ToString(), true).
-                AddField("Users(Without Bots)", $"{UserCount}({NoBotCount})", true).
-                AddField("Channels", ChannelCount.ToString(), true).
-                AddField("Top-Level Commands", CommandCount.ToString(), true).
-                AddField("Ping", ctx.Client.Ping.ToString(), true).
-                AddField("Lib (Version)", ctx.Client.BotLibrary + " " + ctx.Client.VersionString, true).
+                AddField(new DiscordEmbedField("Guilds", GuildCount.ToString(), true)).
+                AddField(new DiscordEmbedField("Users (Humans)", $"{UserCount} ({NoBotCount})", true)).
+                AddField(new DiscordEmbedField("Channels", ChannelCount.ToString(), true)).
+                AddField(new DiscordEmbedField("Top-Level Commands", CommandCount.ToString(), true)).
+                AddField(new DiscordEmbedField("Ping", ctx.Client.Ping.ToString(), true)).
+                AddField(new DiscordEmbedField("Lib (Version)", ctx.Client.BotLibrary + " " + ctx.Client.VersionString, true)).
                 WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);
             await ctx.RespondAsync(embed: emb.Build());
         }

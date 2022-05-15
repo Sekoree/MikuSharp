@@ -88,11 +88,14 @@ namespace MikuSharp.Commands
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
         }
-
+        /*
         [Command("hentai")]
         [Description("lewd")]
         public async Task Hentai(CommandContext ctx)
         {
+
+            await ctx.RespondAsync("The API we're using sadly ended their service.");
+			
             var d = await Web.GetKsoftSiRanImg("hentai_gif", true);
 
             DiscordMessageBuilder builder = new();
@@ -100,7 +103,7 @@ namespace MikuSharp.Commands
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
         }
-
+             - discontinued
         /*[Command("konachan")]
         [Description("lewd")]
         public async Task Konachan(CommandContext ctx, params string[] tag)
@@ -129,7 +132,7 @@ namespace MikuSharp.Commands
             await ctx.RespondAsync(builder);
         }*/
 
-        [Command("lewdkitsune")]
+			[Command("lewdkitsune")]
         [Description("lewd")]
         public async Task LewdKitsune(CommandContext ctx)
         {
@@ -152,11 +155,13 @@ namespace MikuSharp.Commands
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
         }
-
+        /*
         [Command("nekopara")]
-        [Description("lewd")]
+        [Description("lewd - discontinued")]
         public async Task Nekopara(CommandContext ctx)
         {
+            await ctx.RespondAsync("The API we're using sadly ended their service.");
+            
             var d = await Web.GetDerpy("https://miku.derpyenterprises.org/nekoparajson");
 
             DiscordMessageBuilder builder = new();
@@ -164,19 +169,22 @@ namespace MikuSharp.Commands
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
         }
-
+    
         [Command("nekoparagif")]
-        [Description("lewd")]
+        [Description("lewd - discontinued")]
         public async Task NekoparaGif(CommandContext ctx)
         {
+            await ctx.RespondAsync("The API we're using sadly ended their service.");
+            
             var d = await Web.GetDerpy("https://miku.derpyenterprises.org/nekoparagifjson");
 
             DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
+            
         }
-
+        */
         [Command("porngif")]
         [Description("lewd")]
         public async Task PornGif(CommandContext ctx)
@@ -230,7 +238,7 @@ namespace MikuSharp.Commands
             await ctx.RespondAsync(builder);
         }*/
 
-        [Command("thighs")]
+            [Command("thighs")]
         [Aliases("thigh")]
         [Description("lewd")]
         public async Task Thighs(CommandContext ctx)

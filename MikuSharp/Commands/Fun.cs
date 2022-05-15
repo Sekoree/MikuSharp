@@ -82,7 +82,7 @@ namespace MikuSharp.Commands
         public async Task DadJoke(CommandContext ctx)
         {
             var c = new HttpClient();
-            c.DefaultRequestHeaders.Add("User-Agent", "Hatsune Miku Discord Bot(speyd3r@meek.moe)");
+            c.DefaultRequestHeaders.Add("User-Agent", "Hatsune-Miku-DiscordBot (speyd3r@meek.moe)");
             await ctx.RespondAsync(JsonConvert.DeserializeObject<Dadjoke>(await c.GetStringAsync("https://icanhazdadjoke.com/")).joke);
         }
 

@@ -1,4 +1,5 @@
-﻿using DisCatSharp.CommandsNext;
+﻿using DisCatSharp;
+using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
@@ -32,15 +33,23 @@ namespace MikuSharp.Commands
                 {
                     emb.WithColor(new DiscordColor(0212255));
                     emb.WithTitle(aa.Attributes.Titles.EnJp);
-                    if (aa.Attributes.Synopsis.Length != 0) emb.WithDescription(aa.Attributes.Synopsis);
-                    if (aa.Attributes.Subtype.Length != 0) emb.AddField("Type", $"{aa.Attributes.Subtype}", true);
-                    if (aa.Attributes.EpisodeCount != null)emb.AddField("Episodes", $"{aa.Attributes.EpisodeCount}", true);
-                    if (aa.Attributes.EpisodeLength != null)emb.AddField("Length", $"{aa.Attributes.EpisodeLength}", true);
-                    if (aa.Attributes.StartDate != null) emb.AddField("Start Date", $"{aa.Attributes.StartDate}", true);
-                    if (aa.Attributes.EndDate != null) emb.AddField("End Date", $"{aa.Attributes.EndDate}", true);
-                    if (aa.Attributes.AgeRating != null) emb.AddField("Age Rating", $"{aa.Attributes.AgeRating}", true);
-                    if (aa.Attributes.AverageRating != null) emb.AddField("Score", $"{aa.Attributes.AverageRating}", true);
-                    emb.AddField("NSFW", $"{aa.Attributes.Nsfw}", true);
+                    if (aa.Attributes.Synopsis.Length != 0) 
+                        emb.WithDescription(aa.Attributes.Synopsis);
+                    if (aa.Attributes.Subtype.Length != 0) 
+                        emb.AddField(new DiscordEmbedField("Type", $"{aa.Attributes.Subtype}", true));
+                    if (aa.Attributes.EpisodeCount != null)
+                        emb.AddField(new DiscordEmbedField("Episodes", $"{aa.Attributes.EpisodeCount}", true));
+                    if (aa.Attributes.EpisodeLength != null)
+                        emb.AddField(new DiscordEmbedField("Length", $"{aa.Attributes.EpisodeLength}", true));
+                    if (aa.Attributes.StartDate != null) 
+                        emb.AddField(new DiscordEmbedField("Start Date", $"{aa.Attributes.StartDate}", true));
+                    if (aa.Attributes.EndDate != null)
+                        emb.AddField(new DiscordEmbedField("End Date", $"{aa.Attributes.EndDate}", true));
+                    if (aa.Attributes.AgeRating != null) 
+                        emb.AddField(new DiscordEmbedField("Age Rating", $"{aa.Attributes.AgeRating}", true));
+                    if (aa.Attributes.AverageRating != null) 
+                        emb.AddField(new DiscordEmbedField("Score", $"{aa.Attributes.AverageRating}", true));
+                    emb.AddField(new DiscordEmbedField("NSFW", $"{aa.Attributes.Nsfw}", true));
                     if (aa.Attributes.CoverImage?.Small != null) emb.WithThumbnail(aa.Attributes.CoverImage.Small);
                     res.Add(emb);
                     emb = new DiscordEmbedBuilder();
@@ -112,12 +121,12 @@ namespace MikuSharp.Commands
             emb.WithTitle(ctx.Guild.Name);
             emb.WithColor(new DiscordColor(0212255));
             emb.WithThumbnail(ctx.Guild.IconUrl);
-            emb.AddField("Owner",ctx.Guild.Owner.Mention, true);
-            emb.AddField("Region",ctx.Guild.VoiceRegion.Name, true);
-            emb.AddField("ID",ctx.Guild.Id.ToString(), true);
-            emb.AddField("Created At",ctx.Guild.CreationTimestamp.ToString(), true);
-            emb.AddField("Emojis",ctx.Guild.Emojis.Count.ToString(), true);
-            emb.AddField("Members(without Bots)",$"{ctx.Guild.MemberCount}({ctx.Guild.Members.Where(x => !x.Value.IsBot).Count()})", true);
+            emb.AddField(new DiscordEmbedField("Owner",ctx.Guild.Owner.Mention, true));
+            emb.AddField(new DiscordEmbedField("Region",ctx.Guild.VoiceRegion.Name, true));
+            emb.AddField(new DiscordEmbedField("ID",ctx.Guild.Id.ToString(), true));
+            emb.AddField(new DiscordEmbedField("Created At",ctx.Guild.CreationTimestamp.ToString(), true));
+            emb.AddField(new DiscordEmbedField("Emojis",ctx.Guild.Emojis.Count.ToString(), true));
+            emb.AddField(new DiscordEmbedField("Members (Humans)",$"{ctx.Guild.MemberCount}({ctx.Guild.Members.Where(x => !x.Value.IsBot).Count()})", true));
             await ctx.RespondAsync(embed: emb.Build());
         }
 
@@ -136,13 +145,20 @@ namespace MikuSharp.Commands
                 {
                     emb.WithColor(new DiscordColor(0212255));
                     emb.WithTitle(aa.Attributes.Titles.EnJp);
-                    if (aa.Attributes.Synopsis != null)emb.WithDescription(aa.Attributes.Synopsis);
-                    if (aa.Attributes.Subtype != null) emb.AddField("Type", $"{aa.Attributes.Subtype}", true);
-                    if (aa.Attributes.StartDate != null) emb.AddField("Start Date", $"{aa.Attributes.StartDate}", true);
-                    if (aa.Attributes.EndDate != null) emb.AddField("End Date", $"{aa.Attributes.EndDate}", true);
-                    if (aa.Attributes.AgeRating != null) emb.AddField("Age Rating", $"{aa.Attributes.AgeRating}", true);
-                    if (aa.Attributes.AverageRating != null) emb.AddField("Score", $"{aa.Attributes.AverageRating}", true);
-                    if (aa.Attributes.CoverImage?.Small != null) emb.WithThumbnail(aa.Attributes.CoverImage.Small);
+                    if (aa.Attributes.Synopsis != null)
+                        emb.WithDescription(aa.Attributes.Synopsis);
+                    if (aa.Attributes.Subtype != null) 
+                        emb.AddField(new DiscordEmbedField("Type", $"{aa.Attributes.Subtype}", true));
+                    if (aa.Attributes.StartDate != null) 
+                        emb.AddField(new DiscordEmbedField("Start Date", $"{aa.Attributes.StartDate}", true));
+                    if (aa.Attributes.EndDate != null) 
+                        emb.AddField(new DiscordEmbedField("End Date", $"{aa.Attributes.EndDate}", true));
+                    if (aa.Attributes.AgeRating != null) 
+                        emb.AddField(new DiscordEmbedField("Age Rating", $"{aa.Attributes.AgeRating}", true));
+                    if (aa.Attributes.AverageRating != null) 
+                        emb.AddField(new DiscordEmbedField("Score", $"{aa.Attributes.AverageRating}", true));
+                    if (aa.Attributes.CoverImage?.Small != null) 
+                        emb.WithThumbnail(aa.Attributes.CoverImage.Small);
                     emb.WithFooter("via Kitsu.io", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
                     res.Add(emb);
                     emb = new DiscordEmbedBuilder();
@@ -172,11 +188,13 @@ namespace MikuSharp.Commands
             var emb = new DiscordEmbedBuilder();
             emb.WithColor(new DiscordColor(0212255));
             emb.WithTitle("User Info");
-            emb.AddField("Username", $"{m.Username}#{m.Discriminator}", true);
-            if (m.DisplayName != m.Username)emb.AddField("Nickname", $"{m.DisplayName}", true);
-            emb.AddField("ID", $"{m.Id}", true);
-            emb.AddField("Status", $"{m.Presence.Status}", true);
-            emb.AddField("Account Creation", $"{m.CreationTimestamp}", true);
+            emb.AddField(new DiscordEmbedField("Username", $"{m.Username}#{m.Discriminator}", true));
+            if (m.DisplayName != m.Username)
+                emb.AddField(new DiscordEmbedField("Nickname", $"{m.DisplayName}", true));
+            emb.AddField(new DiscordEmbedField("ID", $"{m.Id}", true));
+            emb.AddField(new DiscordEmbedField("Status", $"{m.Presence.Status}", true));
+            emb.AddField(new DiscordEmbedField("Account Creation", $"{Formatter.Timestamp(m.CreationTimestamp)}", true));
+            emb.AddField(new DiscordEmbedField("Join Date", $"{Formatter.Timestamp(m.JoinedAt)}", true));
             emb.WithThumbnail(m.AvatarUrl);
             await ctx.RespondAsync(embed: emb.Build());
         }
@@ -194,11 +212,12 @@ namespace MikuSharp.Commands
             var emb = new DiscordEmbedBuilder();
             emb.WithColor(new DiscordColor(0212255));
             emb.WithTitle("User Info");
-            emb.AddField("Username", $"{m.Username}#{m.Discriminator}", true);
-            if (m.DisplayName != m.Username) emb.AddField("Nickname", $"{m.DisplayName}", true);
-            emb.AddField("ID", $"{m.Id}", true);
+            emb.AddField(new DiscordEmbedField("Username", $"{m.Username}#{m.Discriminator}", true));
+            if (m.DisplayName != m.Username)
+                emb.AddField(new DiscordEmbedField("Nickname", $"{m.DisplayName}", true));
+            emb.AddField(new DiscordEmbedField("ID", $"{m.Id}", true));
             //emb.AddField("Status", $"{m.Presence.Status}", true); // Requires presence intent
-            emb.AddField("Account Creation", $"{m.CreationTimestamp}", true);
+            emb.AddField(new DiscordEmbedField("Account Creation", $"{Formatter.Timestamp(m.CreationTimestamp)}", true));
             emb.WithThumbnail(m.AvatarUrl);
             await ctx.RespondAsync(embed: emb.Build());
         }

@@ -108,7 +108,7 @@ namespace MikuSharp.Commands
             };
             if (res.creator.Length != 0)
             {
-                emim.AddField("Creator", res.creator);
+                emim.AddField(new DiscordEmbedField("Creator", res.creator));
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
@@ -136,7 +136,7 @@ namespace MikuSharp.Commands
             };
             if (res.creator.Length != 0)
             {
-                emim.AddField("Creator", res.creator);
+                emim.AddField(new DiscordEmbedField("Creator", res.creator));
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
@@ -206,7 +206,7 @@ namespace MikuSharp.Commands
             };
             if (res.creator.Length != 0)
             {
-                emim.AddField("Creator", res.creator);
+                emim.AddField(new DiscordEmbedField("Creator", res.creator));
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
@@ -255,7 +255,7 @@ namespace MikuSharp.Commands
             };
             if (res.creator.Length != 0)
             {
-                emim.AddField("Creator", res.creator);
+                emim.AddField(new DiscordEmbedField("Creator", res.creator));
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
@@ -283,7 +283,7 @@ namespace MikuSharp.Commands
             };
             if (res.creator.Length != 0)
             {
-                emim.AddField("Creator", res.creator);
+                emim.AddField(new DiscordEmbedField("Creator", res.creator));
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
@@ -311,7 +311,7 @@ namespace MikuSharp.Commands
             };
             if (res.creator.Length != 0)
             {
-                emim.AddField("Creator", res.creator);
+                emim.AddField(new DiscordEmbedField("Creator", res.creator));
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
@@ -356,7 +356,7 @@ namespace MikuSharp.Commands
             };
             if (res.creator.Length != 0)
             {
-                emim.AddField("Creator", res.creator);
+                emim.AddField(new DiscordEmbedField("Creator", res.creator));
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);
@@ -405,7 +405,7 @@ namespace MikuSharp.Commands
             };
             if (res.creator.Length != 0)
             {
-                emim.AddField("Creator", res.creator);
+                emim.AddField(new DiscordEmbedField("Creator", res.creator));
             }
             emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
             emim.WithFooter("Requested by " + ctx.Message.Author.Username, ctx.Message.Author.AvatarUrl);

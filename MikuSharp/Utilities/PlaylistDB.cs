@@ -20,14 +20,14 @@ namespace MikuSharp.Utilities
 {
     public class PlaylistDB
     {
-        public static async Task<Dictionary<string,Playlist>> GetPlaylists(DiscordGuild guild, ulong u)
+        public static async Task<Dictionary<string, Playlist>> GetPlaylists(DiscordGuild guild, ulong u)
         {
             var connString = Bot.cfg.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM playlists WHERE userid = {u} ORDER BY playlistname ASC;", conn);
             var reader = await cmd2.ExecuteReaderAsync();
-            Dictionary<string, Playlist> lists = new(); 
+            Dictionary<string, Playlist> lists = new();
             while (await reader.ReadAsync())
             {
                 lists.Add(Convert.ToString(reader["playlistname"]), await GetPlaylist(guild, u, Convert.ToString(reader["playlistname"])));
@@ -80,7 +80,10 @@ namespace MikuSharp.Utilities
                 $"FROM playlists " +
                 $"WHERE userid = {u} " +
                 $"AND playlistname = @pl;", conn);
-            cmd2.Parameters.AddWithValue("pl", p);
+            var para = cmd2.CreateParameter();
+            para.ParameterName = "pl";
+            para.Value = p;
+            cmd2.Parameters.Add(para);
             var reader2 = await cmd2.ExecuteReaderAsync();
             Playlist pl = null;
             while (await reader2.ReadAsync())
@@ -112,7 +115,10 @@ namespace MikuSharp.Utilities
             var listNow = await GetPlaylist(guild, u, p);
             var ln = await listNow.GetEntries();
             var cmd = new NpgsqlCommand($"DELETE FROM playlistentries WHERE userid = {u} AND playlistname = @pl;", conn);
-            cmd.Parameters.AddWithValue("pl", p);
+            var para = cmd.CreateParameter();
+            para.ParameterName = "pl";
+            para.Value = p;
+            cmd.Parameters.Add(para);
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
             int i = 0;
@@ -125,8 +131,14 @@ namespace MikuSharp.Utilities
                 i++;
             }
             var cmd2 = new NpgsqlCommand(longcmd, conn);
-            cmd2.Parameters.AddWithValue("p", p);
-            cmd2.Parameters.AddWithValue("u", Convert.ToInt64(u));
+            var para1 = cmd2.CreateParameter();
+            para1.ParameterName = "p";
+            para1.Value = p;
+            cmd2.Parameters.Add(para1);
+            var para2 = cmd2.CreateParameter();
+            para2.ParameterName = "u";
+            para2.Value = Convert.ToInt64(u);
+            cmd2.Parameters.Add(para2);
             await cmd2.ExecuteNonQueryAsync();
             cmd2.Dispose();
             conn.Close();
@@ -140,7 +152,10 @@ namespace MikuSharp.Utilities
             await conn.OpenAsync();
             var queueNow = q;
             var cmd = new NpgsqlCommand($"DELETE FROM playlistentries WHERE userid = {u} AND playlistname = @pl;", conn);
-            cmd.Parameters.AddWithValue("pl", p);
+            var para = cmd.CreateParameter();
+            para.ParameterName = "pl";
+            para.Value = p;
+            cmd.Parameters.Add(para);
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
             int i = 0;
@@ -153,8 +168,14 @@ namespace MikuSharp.Utilities
                 i++;
             }
             var cmd2 = new NpgsqlCommand(longcmd, conn);
-            cmd2.Parameters.AddWithValue("p", p);
-            cmd2.Parameters.AddWithValue("u", Convert.ToInt64(u));
+            var para1 = cmd2.CreateParameter();
+            para1.ParameterName = "p";
+            para1.Value = p;
+            cmd2.Parameters.Add(para1);
+            var para2 = cmd2.CreateParameter();
+            para2.ParameterName = "u";
+            para2.Value = Convert.ToInt64(u);
+            cmd2.Parameters.Add(para2);
             await cmd2.ExecuteNonQueryAsync();
             cmd2.Dispose();
             conn.Close();
@@ -167,12 +188,30 @@ namespace MikuSharp.Utilities
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd = new NpgsqlCommand("INSERT INTO playlists VALUES (@u,@p,@url,@ext,@cre,@mody)", conn);
-            cmd.Parameters.AddWithValue("u", Convert.ToInt64(u));
-            cmd.Parameters.AddWithValue("p", p);
-            cmd.Parameters.AddWithValue("url", url);
-            cmd.Parameters.AddWithValue("ext", e.ToString());
-            cmd.Parameters.AddWithValue("cre", DateTimeOffset.UtcNow);
-            cmd.Parameters.AddWithValue("mody", DateTimeOffset.UtcNow);
+            var para = cmd.CreateParameter();
+            para.ParameterName = "u";
+            para.Value = Convert.ToInt64(u);
+            cmd.Parameters.Add(para);
+            var para2 = cmd.CreateParameter();
+            para2.ParameterName = "p";
+            para2.Value = p;
+            cmd.Parameters.Add(para2);
+            var para3 = cmd.CreateParameter();
+            para3.ParameterName = "url";
+            para3.Value = url;
+            cmd.Parameters.Add(para3);
+            var para4 = cmd.CreateParameter();
+            para4.ParameterName = "ext";
+            para4.Value = e.ToString();
+            cmd.Parameters.Add(para4);
+            var para5 = cmd.CreateParameter();
+            para5.ParameterName = "cre";
+            para5.Value = DateTime.UtcNow;
+            cmd.Parameters.Add(para5);
+            var para6 = cmd.CreateParameter();
+            para6.ParameterName = "mody";
+            para6.Value = DateTime.UtcNow;
+            cmd.Parameters.Add(para6);
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
             conn.Close();
@@ -186,7 +225,10 @@ namespace MikuSharp.Utilities
             await conn.OpenAsync();
             Console.WriteLine("delete init");
             var cmd = new NpgsqlCommand($"DELETE FROM playlists WHERE playlistname = @pl AND userid = {u};", conn);
-            cmd.Parameters.AddWithValue("pl", p);
+            var para = cmd.CreateParameter();
+            para.ParameterName = "pl";
+            para.Value = p;
+            cmd.Parameters.Add(para);
             await cmd.ExecuteNonQueryAsync();
             await ClearList(p, u);
             Console.WriteLine("delete yes?");
@@ -212,12 +254,30 @@ namespace MikuSharp.Utilities
             reader.Close();
             cmd2.Dispose();
             var cmd = new NpgsqlCommand("INSERT INTO playlistentries VALUES (@pos,@p,@u,@ts,@add,@mody);UPDATE playlists SET changed=@mody WHERE userid=@u AND playlistname=@p;", conn);
-            cmd.Parameters.AddWithValue("pos", position);
-            cmd.Parameters.AddWithValue("p", p);
-            cmd.Parameters.AddWithValue("u", Convert.ToInt64(u));
-            cmd.Parameters.AddWithValue("ts", ts);
-            cmd.Parameters.AddWithValue("add", DateTimeOffset.UtcNow);
-            cmd.Parameters.AddWithValue("mody", DateTimeOffset.UtcNow);
+            var para = cmd.CreateParameter();
+            para.ParameterName = "pos";
+            para.Value = position;
+            cmd.Parameters.Add(para);
+            var para2 = cmd.CreateParameter();
+            para2.ParameterName = "p";
+            para2.Value = p;
+            cmd.Parameters.Add(para2);
+            var para3 = cmd.CreateParameter();
+            para3.ParameterName = "u";
+            para3.Value = Convert.ToInt64(u);
+            cmd.Parameters.Add(para3);
+            var para4 = cmd.CreateParameter();
+            para4.ParameterName = "ts";
+            para4.Value = ts;
+            cmd.Parameters.Add(para4);
+            var para5 = cmd.CreateParameter();
+            para5.ParameterName = "add";
+            para5.Value = DateTime.UtcNow;
+            cmd.Parameters.Add(para5);
+            var para6 = cmd.CreateParameter();
+            para6.ParameterName = "mody";
+            para6.Value = DateTime.UtcNow;
+            cmd.Parameters.Add(para6);
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
             conn.Close();
@@ -231,7 +291,10 @@ namespace MikuSharp.Utilities
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM playlistentries WHERE userid = {u} AND playlistname = @pl;", conn);
-            cmd2.Parameters.AddWithValue("pl", p);
+            var para = cmd2.CreateParameter();
+            para.ParameterName = "pl";
+            para.Value = p;
+            cmd2.Parameters.Add(para);
             var reader = await cmd2.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
@@ -247,10 +310,22 @@ namespace MikuSharp.Utilities
                 position++;
             }
             var cmd = new NpgsqlCommand(longcmd, conn);
-            cmd.Parameters.AddWithValue("p", p);
-            cmd.Parameters.AddWithValue("u", Convert.ToInt64(u));
-            cmd.Parameters.AddWithValue("add", DateTimeOffset.UtcNow);
-            cmd.Parameters.AddWithValue("mody", DateTimeOffset.UtcNow);
+            var para2 = cmd.CreateParameter();
+            para2.ParameterName = "p";
+            para2.Value = p;
+            cmd.Parameters.Add(para2);
+            var para3 = cmd.CreateParameter();
+            para3.ParameterName = "u";
+            para3.Value = Convert.ToInt64(u);
+            cmd.Parameters.Add(para3);
+            var para4 = cmd.CreateParameter();
+            para4.ParameterName = "add";
+            para4.Value = DateTime.UtcNow;
+            cmd.Parameters.Add(para4);
+            var para5 = cmd.CreateParameter();
+            para5.ParameterName = "mody";
+            para5.Value = DateTime.UtcNow;
+            cmd.Parameters.Add(para5);
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
             conn.Close();
@@ -282,7 +357,10 @@ namespace MikuSharp.Utilities
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd = new NpgsqlCommand($"DELETE FROM playlistentries WHERE userid = {u} AND playlistname = @pl;", conn);
-            cmd.Parameters.AddWithValue("pl", p);
+            var para = cmd.CreateParameter();
+            para.ParameterName = "pl";
+            para.Value = p;
+            cmd.Parameters.Add(para);
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
             conn.Close();
@@ -291,7 +369,7 @@ namespace MikuSharp.Utilities
 
         public static async Task MoveListItems(DiscordGuild guild, string p, ulong u, int oldpos, int newpos)
         {
-            var qnow = await GetPlaylist(guild, u,p);
+            var qnow = await GetPlaylist(guild, u, p);
             var q = await qnow.GetEntries();
             (q[newpos], q[oldpos]) = (q[oldpos], q[newpos]);
             await RebuildList(u, p, q);
@@ -303,30 +381,51 @@ namespace MikuSharp.Utilities
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd = new NpgsqlCommand($"DELETE FROM playlistentries WHERE pos = {position} AND userid = {u} AND playlistname = @pl;UPDATE playlists SET changed=@mody WHERE userid= {u} AND playlistname=@pl;", conn);
-            cmd.Parameters.AddWithValue("pl", p);
-            cmd.Parameters.AddWithValue("mody", DateTimeOffset.UtcNow);
+            var para = cmd.CreateParameter();
+            para.ParameterName = "pl";
+            para.Value = p;
+            cmd.Parameters.Add(para);
+            var para2 = cmd.CreateParameter();
+            para2.ParameterName = "mody";
+            para2.Value = DateTime.UtcNow;
+            cmd.Parameters.Add(para2);
             await cmd.ExecuteNonQueryAsync();
             cmd.Dispose();
-            await ReorderList(guild, p,u);
+            await ReorderList(guild, p, u);
             conn.Close();
             conn.Dispose();
         }
 
-        public static async Task RenameList(string p,ulong u, string newname)
+        public static async Task RenameList(string p, ulong u, string newname)
         {
             var connString = Bot.cfg.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd = new NpgsqlCommand($"UPDATE playlists SET playlistname = @newn WHERE userid = {u} AND playlistname = @pl;", conn);
-            cmd.Parameters.AddWithValue("pl", p);
-            cmd.Parameters.AddWithValue("newn", newname);
+            var para = cmd.CreateParameter();
+            para.ParameterName = "pl";
+            para.Value = p;
+            cmd.Parameters.Add(para);
+            var para2 = cmd.CreateParameter();
+            para2.ParameterName = "newn";
+            para2.Value = newname;
+            cmd.Parameters.Add(para2);
             await cmd.ExecuteNonQueryAsync();
             Console.WriteLine("main");
             cmd.Dispose();
             var cmd2 = new NpgsqlCommand($"UPDATE playlistentries SET playlistname = @newn WHERE userid = {u} AND playlistname = @pl;UPDATE playlists SET changed = @mody WHERE userid= {u} AND playlistname = @newn;", conn);
-            cmd2.Parameters.AddWithValue("pl", p);
-            cmd2.Parameters.AddWithValue("newn", newname);
-            cmd2.Parameters.AddWithValue("mody", DateTimeOffset.UtcNow);
+            var para3 = cmd2.CreateParameter();
+            para3.ParameterName = "pl";
+            para3.Value = p;
+            cmd2.Parameters.Add(para3);
+            var para4 = cmd2.CreateParameter();
+            para4.ParameterName = "newn";
+            para4.Value = newname;
+            cmd2.Parameters.Add(para4);
+            var para5 = cmd2.CreateParameter();
+            para5.ParameterName = "mody";
+            para5.Value = DateTime.UtcNow;
+            cmd2.Parameters.Add(para5);
             await cmd2.ExecuteNonQueryAsync();
             Console.WriteLine("alls");
             cmd2.Dispose();
@@ -464,7 +563,7 @@ namespace MikuSharp.Utilities
                             if (leng > 5) leng = 5;
                             for (int i = 0; i < leng; i++)
                             {
-                                em.AddField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})");
+                                em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));
                             }
                             var msg = await ctx.RespondAsync(embed: em.Build());
                             var resp = await inter.WaitForMessageAsync(x => x.Author.Id == ctx.User.Id, TimeSpan.FromSeconds(25));

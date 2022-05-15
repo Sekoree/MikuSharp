@@ -29,12 +29,21 @@
 	<ItemGroup>
     <PackageReference Include="AlbumArtExtraction" Version="1.0.2" />
     <PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
-    <PackageReference Include="DisCatSharp" Version="10.0.0-nightly-00349" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.0.0-nightly-00349" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.0-nightly-00349" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.0.0-nightly-00349" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.0.0-nightly-00349" />
-    <PackageReference Include="DiscordBotsList.Api" Version="1.5.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.2.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.2.0" />
+<!--
+    <PackageReference Include="DisCatSharp" Version="10.0.0-nightly-00352" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.0.0-nightly-00352" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.0-nightly-00352" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="10.0.0-nightly-00352" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="10.0.0-nightly-00352" />
+-->
+	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
+	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
+	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
+	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj" />
+	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
+	<PackageReference Include="DiscordBotsList.Api" Version="1.5.0" />
     <PackageReference Include="FluentFTP" Version="37.0.2" />
     <PackageReference Include="Google.Apis" Version="1.57.0" />
     <PackageReference Include="Google.Apis.YouTube.v3" Version="1.57.0.2665" />
