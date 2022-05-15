@@ -93,12 +93,16 @@ namespace MikuSharp.Commands
         [Description("lewd")]
         public async Task Hentai(CommandContext ctx)
         {
+
+            await ctx.RespondAsync("The API we're using sadly ended their service.");
+            /*
             var d = await Web.GetKsoftSiRanImg("hentai_gif", true);
 
             DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
+            */
         }
 
         /*[Command("konachan")]
@@ -129,7 +133,7 @@ namespace MikuSharp.Commands
             await ctx.RespondAsync(builder);
         }*/
 
-        [Command("lewdkitsune")]
+            [Command("lewdkitsune")]
         [Description("lewd")]
         public async Task LewdKitsune(CommandContext ctx)
         {
@@ -157,24 +161,29 @@ namespace MikuSharp.Commands
         [Description("lewd")]
         public async Task Nekopara(CommandContext ctx)
         {
+            await ctx.RespondAsync("The API we're using sadly ended their service.");
+            /*
             var d = await Web.GetDerpy("https://miku.derpyenterprises.org/nekoparajson");
 
             DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
-            await ctx.RespondAsync(builder);
+            await ctx.RespondAsync(builder);*/
         }
 
         [Command("nekoparagif")]
         [Description("lewd")]
         public async Task NekoparaGif(CommandContext ctx)
         {
+            await ctx.RespondAsync("The API we're using sadly ended their service.");
+            /*
             var d = await Web.GetDerpy("https://miku.derpyenterprises.org/nekoparagifjson");
 
             DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
+            */
         }
 
         [Command("porngif")]
@@ -230,7 +239,7 @@ namespace MikuSharp.Commands
             await ctx.RespondAsync(builder);
         }*/
 
-        [Command("thighs")]
+            [Command("thighs")]
         [Aliases("thigh")]
         [Description("lewd")]
         public async Task Thighs(CommandContext ctx)

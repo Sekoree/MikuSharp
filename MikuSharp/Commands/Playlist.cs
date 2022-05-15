@@ -151,8 +151,7 @@ namespace MikuSharp.Commands
                     sub = $"Created on: {Track.Value.Creation}\n" +
                         $"{Track.Value.ExternalService} [Link]({Track.Value.Url})";
                 }
-                emb.AddField($"**{songAmount + 1}.{Track.Key}** ({songam} Songs)",
-                    sub);
+                emb.AddField(new DiscordEmbedField($"**{songAmount + 1}.{Track.Key}** ({songam} Songs)", sub));
                 songsPerPage++;
                 songAmount++;
                 emb.WithTitle($"List Playlists");
@@ -227,8 +226,8 @@ namespace MikuSharp.Commands
                 string time = "";
                 if (Track.track.Length.Hours < 1) time = Track.track.Length.ToString(@"mm\:ss");
                 else time = Track.track.Length.ToString(@"hh\:mm\:ss");
-                emb.AddField($"**{songAmount+1}.{Track.track.Title.Replace("*", "").Replace("|", "")}** by {Track.track.Author.Replace("*", "").Replace("|", "")} [{time}]",
-                    $"Added on {Track.additionDate} [Link]({Track.track.Uri.AbsoluteUri})");
+                emb.AddField(new DiscordEmbedField($"**{songAmount+1}.{Track.track.Title.Replace("*", "").Replace("|", "")}** by {Track.track.Author.Replace("*", "").Replace("|", "")} [{time}]",
+                    $"Added on {Track.additionDate} [Link]({Track.track.Uri.AbsoluteUri})"));
                 songsPerPage++;
                 songAmount++;
                 emb.WithTitle($"Songs in {name}");

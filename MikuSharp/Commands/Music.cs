@@ -39,15 +39,12 @@ namespace MikuSharp.Commands
         public async Task Join(CommandContext ctx)
         {
             if (!Bot.Guilds.Any(x => x.Key == ctx.Guild.Id))
-            {
-                Bot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
-            }
+            Bot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
             var g = Bot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null)
-            {
                 g.musicInstance = new MusicInstance(Bot.LLEU[ctx.Client.ShardId], ctx.Client.ShardId);
-            }
-            if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false) await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
+            if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false) 
+                await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
             g.musicInstance.usedChannel = ctx.Channel;
             await ctx.RespondAsync($"Heya {ctx.Member.Mention}!");
         }
@@ -60,7 +57,8 @@ namespace MikuSharp.Commands
         public async Task Leave(CommandContext ctx, string Options = null)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
-            if (g.musicInstance == null) return;
+            if (g.musicInstance == null) 
+                return;
             if (Options?.ToLower() == "k" || Options?.ToLower() == "keep")
             {
                 g.musicInstance.playstate = Playstate.NotPlaying;
@@ -119,14 +117,10 @@ namespace MikuSharp.Commands
         public async Task Play(CommandContext ctx, [RemainingText]string song = null)
         {
             if (!Bot.Guilds.Any(x => x.Key == ctx.Guild.Id))
-            {
                 Bot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
-            }
             var g = Bot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null)
-            {
                 g.musicInstance = new MusicInstance(Bot.LLEU[ctx.Client.ShardId], ctx.Client.ShardId);
-            }
             var curq = await Database.GetQueue(ctx.Guild);
             if (curq.Count != 0 && g.musicInstance.playstate == Playstate.NotPlaying)
             {
@@ -136,7 +130,8 @@ namespace MikuSharp.Commands
                     "> ``1``, ``y``, ``yes`` | To Restore and play the old queue or\n" +
                     "> ``0``, ``n``, ``no`` | To clear the old queue and start anew").Build());
                 var hmm = await inter.WaitForMessageAsync(x => x.Author == ctx.Member, TimeSpan.FromSeconds(15));
-                if (hmm.TimedOut) return;
+                if (hmm.TimedOut) 
+                    return;
                 else if (hmm.Result.Content == "1" || hmm.Result.Content == "y" || hmm.Result.Content == "yes")
                 {
                     await msg.DeleteAsync();
@@ -151,10 +146,13 @@ namespace MikuSharp.Commands
                     await msg.DeleteAsync();
                     await hmm.Result.DeleteAsync();
                 }
-                else return;
+                else 
+                    return;
             }
-            if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false) await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
-            if (ctx.Message.Attachments.Count == 0 && song == null) return;
+            if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false) 
+                await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
+            if (ctx.Message.Attachments.Count == 0 && song == null) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             if (song == null)
             {
@@ -163,26 +161,25 @@ namespace MikuSharp.Commands
             }
             var oldState = g.musicInstance.playstate;
             var q = await g.musicInstance.QueueSong(song, ctx);
-            if (q == null) return;
+            if (q == null) 
+                return;
             var emb = new DiscordEmbedBuilder();
             if (oldState == Playstate.Playing)
             {
-                emb.AddField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\n" +
-                    $"Requested by {ctx.Member.Mention}");
+                emb.AddField(new DiscordEmbedField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\n" +
+                    $"Requested by {ctx.Member.Mention}"));
                 if (q.Tracks.Count != 1)
-                {
-                    emb.AddField("Playlist added:", $"added {q.Tracks.Count - 1} more");
-                }
+                emb.AddField(new DiscordEmbedField("Playlist added:", $"added {q.Tracks.Count - 1} more"));
                 await ctx.RespondAsync(embed: emb.WithTitle("Added").Build());
             }
             else
             {
-                if (q.PlaylistInfo.SelectedTrack == -1 || q.PlaylistInfo.Name == null) emb.AddField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\nRequested by {ctx.Member.Mention}");
-                else emb.AddField(q.Tracks[q.PlaylistInfo.SelectedTrack].Title + "[" + (q.Tracks[q.PlaylistInfo.SelectedTrack].Length.Hours != 0 ? q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"hh\:mm\:ss") : q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks[q.PlaylistInfo.SelectedTrack].Author}\nRequested by {ctx.Member.Mention}");
+                if (q.PlaylistInfo.SelectedTrack == -1 || q.PlaylistInfo.Name == null)
+                    emb.AddField(new DiscordEmbedField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\nRequested by {ctx.Member.Mention}"));
+                else 
+                    emb.AddField(new DiscordEmbedField(q.Tracks[q.PlaylistInfo.SelectedTrack].Title + "[" + (q.Tracks[q.PlaylistInfo.SelectedTrack].Length.Hours != 0 ? q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"hh\:mm\:ss") : q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks[q.PlaylistInfo.SelectedTrack].Author}\nRequested by {ctx.Member.Mention}"));
                 if (q.Tracks.Count != 1)
-                {
-                    emb.AddField("Playlist added:", $"added {q.Tracks.Count - 1} more");
-                }
+                    emb.AddField(new DiscordEmbedField("Playlist added:", $"added {q.Tracks.Count - 1} more"));
                 await ctx.RespondAsync(embed: emb.WithTitle("Playing").Build());
             }
         }
@@ -196,13 +193,14 @@ namespace MikuSharp.Commands
         public async Task InsertPlay(CommandContext ctx, int pos, [RemainingText]string song = null)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
-            if (pos < 1) return;
+            if (pos < 1) 
+                return;
             if (g.musicInstance == null)
-            {
                 g.musicInstance = new MusicInstance(Bot.LLEU[ctx.Client.ShardId], ctx.Client.ShardId);
-            }
-            if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false) await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
-            if (ctx.Message.Attachments.Count == 0 && song == null) return;
+            if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false)
+                await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
+            if (ctx.Message.Attachments.Count == 0 && song == null) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             if (song == null)
             {
@@ -211,26 +209,25 @@ namespace MikuSharp.Commands
             }
             var oldState = g.musicInstance.playstate;
             var q = await g.musicInstance.QueueSong(song, ctx, pos);
-            if (q == null) return;
+            if (q == null) 
+                return;
             var emb = new DiscordEmbedBuilder();
             if (oldState == Playstate.Playing)
             {
-                emb.AddField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\n" +
-                    $"Requested by {ctx.Member.Mention}\nAt position: {pos}");
+                emb.AddField(new DiscordEmbedField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\n" +
+                    $"Requested by {ctx.Member.Mention}\nAt position: {pos}"));
                 if (q.Tracks.Count != 1)
-                {
-                    emb.AddField("Playlist added:", $"added {q.Tracks.Count - 1} more");
-                }
+                emb.AddField(new DiscordEmbedField("Playlist added:", $"added {q.Tracks.Count - 1} more"));
                 await ctx.RespondAsync(embed: emb.WithTitle("Playing").Build());
             }
             else
             {
-                if (q.PlaylistInfo.SelectedTrack == -1 || q.PlaylistInfo.Name == null) emb.AddField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\nRequested by {ctx.Member.Mention}");
-                else emb.AddField(q.Tracks[q.PlaylistInfo.SelectedTrack].Title + "[" + (q.Tracks[q.PlaylistInfo.SelectedTrack].Length.Hours != 0 ? q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"hh\:mm\:ss") : q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks[q.PlaylistInfo.SelectedTrack].Author}\nRequested by {ctx.Member.Mention}At position: {pos}");
+                if (q.PlaylistInfo.SelectedTrack == -1 || q.PlaylistInfo.Name == null) 
+                    emb.AddField(new DiscordEmbedField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\nRequested by {ctx.Member.Mention}"));
+                else 
+                    emb.AddField(new DiscordEmbedField(q.Tracks[q.PlaylistInfo.SelectedTrack].Title + "[" + (q.Tracks[q.PlaylistInfo.SelectedTrack].Length.Hours != 0 ? q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"hh\:mm\:ss") : q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks[q.PlaylistInfo.SelectedTrack].Author}\nRequested by {ctx.Member.Mention}At position: {pos}"));
                 if (q.Tracks.Count != 1)
-                {
-                    emb.AddField("Playlist added:", $"added {q.Tracks.Count - 1} more");
-                }
+                emb.AddField(new DiscordEmbedField("Playlist added:", $"added {q.Tracks.Count - 1} more"));
                 await ctx.RespondAsync(embed: emb.WithTitle("Added").Build());
             }
         }
@@ -243,25 +240,21 @@ namespace MikuSharp.Commands
             var g = Bot.Guilds[ctx.Guild.Id];
             var lastPlayedSongs = await Database.GetLPL(ctx.Guild);
             var queue = await Database.GetQueue(ctx.Guild);
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             g.musicInstance.guildConnection.PlaybackFinished -= Lavalink.LavalinkTrackFinish;
             if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All)
-            {
-                await Database.RemoveFromQueue(g.musicInstance.currentSong.position, ctx.Guild);
-            }
+            await Database.RemoveFromQueue(g.musicInstance.currentSong.position, ctx.Guild);
             if (lastPlayedSongs.Count == 0)
-            {
-                await Database.AddToLPL(ctx.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-            }
+            await Database.AddToLPL(ctx.Guild.Id, g.musicInstance.currentSong.track.TrackString);
             else if (lastPlayedSongs[0]?.track.Uri != g.musicInstance.currentSong.track.Uri)
-            {
-                await Database.AddToLPL(ctx.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-            }
+            await Database.AddToLPL(ctx.Guild.Id, g.musicInstance.currentSong.track.TrackString);
             queue = await Database.GetQueue(ctx.Guild);
             g.musicInstance.lastSong = g.musicInstance.currentSong;
             g.musicInstance.currentSong = null;
-            if (queue.Count != 0) await g.musicInstance.PlaySong();
+            if (queue.Count != 0) 
+                await g.musicInstance.PlaySong();
             else
             {
                 g.musicInstance.playstate = Playstate.NotPlaying;
@@ -276,7 +269,8 @@ namespace MikuSharp.Commands
         public async Task Stop(CommandContext ctx)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             await Task.Run(async () => await g .musicInstance.guildConnection.StopAsync());
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription("**Stopped**\n(use m%resume to start playback again)").Build());
@@ -290,7 +284,8 @@ namespace MikuSharp.Commands
         public async Task Volume(CommandContext ctx, int vol = 100)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             if (vol > 150) vol = 150;
             await g.musicInstance.guildConnection.SetVolumeAsync(vol);
@@ -303,7 +298,8 @@ namespace MikuSharp.Commands
         public async Task Pause(CommandContext ctx)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false)
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             if (g.musicInstance.playstate == Playstate.Stopped)
             {
@@ -330,7 +326,8 @@ namespace MikuSharp.Commands
         public async Task Resume(CommandContext ctx)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             if (g.musicInstance.playstate == Playstate.Stopped)
             {
@@ -351,7 +348,8 @@ namespace MikuSharp.Commands
         public async Task QueueClear(CommandContext ctx)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             await Database.ClearQueue(ctx.Guild);
             await Database.AddToQueue(ctx.Guild, g.musicInstance.currentSong.addedBy, g.musicInstance.currentSong.track.TrackString);
@@ -366,9 +364,11 @@ namespace MikuSharp.Commands
         {
             var g = Bot.Guilds[ctx.Guild.Id];
             var queue = await Database.GetQueue(ctx.Guild);
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
-            if (old < 1 || newpos < 1 || old == newpos || newpos >= queue.Count) return;
+            if (old < 1 || newpos < 1 || old == newpos || newpos >= queue.Count) 
+                return;
             var oldSong = queue[old];
             await Database.MoveQueueItems(ctx.Guild, old, newpos);
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"**Moved**:\n" +
@@ -384,7 +384,8 @@ namespace MikuSharp.Commands
         {
             var g = Bot.Guilds[ctx.Guild.Id];
             var queue = await Database.GetQueue(ctx.Guild);
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             var old = queue[r];
             await Database.RemoveFromQueue(r, ctx.Guild);
@@ -401,12 +402,17 @@ namespace MikuSharp.Commands
         {
             var g = Bot.Guilds[ctx.Guild.Id];
             var queue = await Database.GetQueue(ctx.Guild);
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             switch (e)
             {
-                case 0: g.musicInstance.repeatMode = RepeatMode.Off; break;
-                case 1: g.musicInstance.repeatMode = RepeatMode.On; break;
+                case 0: 
+                    g.musicInstance.repeatMode = RepeatMode.Off; 
+                    break;
+                case 1: 
+                    g.musicInstance.repeatMode = RepeatMode.On;
+                    break;
                 case 2:
                     {
                         g.musicInstance.repeatMode = RepeatMode.All;
@@ -416,7 +422,9 @@ namespace MikuSharp.Commands
                             g.musicInstance.repeatAllPos = 0;
                         break;
                     }
-                default: g.musicInstance.repeatMode = RepeatMode.Off; break;
+                default: 
+                    g.musicInstance.repeatMode = RepeatMode.Off;
+                    break;
             }
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set repeat mode to:\n**{g.musicInstance.repeatMode}**").Build());
         }
@@ -426,12 +434,17 @@ namespace MikuSharp.Commands
         {
             var g = Bot.Guilds[ctx.Guild.Id];
             var queue = await Database.GetQueue(ctx.Guild);
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
             switch (e)
             {
-                case "off": g.musicInstance.repeatMode = RepeatMode.Off; g.musicInstance.repeatAllPos = 0;  break;
-                case "on": g.musicInstance.repeatMode = RepeatMode.On; g.musicInstance.repeatAllPos = 0; break;
+                case "off":
+                    g.musicInstance.repeatMode = RepeatMode.Off; g.musicInstance.repeatAllPos = 0;  
+                    break;
+                case "on": 
+                    g.musicInstance.repeatMode = RepeatMode.On; g.musicInstance.repeatAllPos = 0; 
+                    break;
                 case "all":
                     {
                         g.musicInstance.repeatMode = RepeatMode.All;
@@ -441,7 +454,9 @@ namespace MikuSharp.Commands
                             g.musicInstance.repeatAllPos = 0;
                         break;
                     }
-                default: g.musicInstance.repeatMode = RepeatMode.Off; break;
+                default: 
+                    g.musicInstance.repeatMode = RepeatMode.Off; 
+                    break;
             }
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set repeat mode to:\n**{g.musicInstance.repeatMode}**").Build());
         }
@@ -450,10 +465,13 @@ namespace MikuSharp.Commands
         public async Task Repeat(CommandContext ctx)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
-            if (g.musicInstance.repeatMode != RepeatMode.On) g.musicInstance.repeatMode = RepeatMode.On;
-            else g.musicInstance.repeatMode = RepeatMode.Off;
+            if (g.musicInstance.repeatMode != RepeatMode.On) 
+                g.musicInstance.repeatMode = RepeatMode.On;
+            else 
+                g.musicInstance.repeatMode = RepeatMode.Off;
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set repeatmode to:\n**{g.musicInstance.repeatMode}**").Build());
         }
 
@@ -464,10 +482,13 @@ namespace MikuSharp.Commands
         public async Task RepeatAll(CommandContext ctx)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
-            if (g.musicInstance.repeatMode != RepeatMode.All) g.musicInstance.repeatMode = RepeatMode.All;
-            else g.musicInstance.repeatMode = RepeatMode.Off;
+            if (g.musicInstance.repeatMode != RepeatMode.All)
+                g.musicInstance.repeatMode = RepeatMode.All;
+            else 
+                g.musicInstance.repeatMode = RepeatMode.Off;
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set repeat mode to:\n**{g.musicInstance.repeatMode}**").Build());
         }
 
@@ -477,10 +498,13 @@ namespace MikuSharp.Commands
         public async Task Shuffle(CommandContext ctx)
         {
             var g = Bot.Guilds[ctx.Guild.Id];
-            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) return;
+            if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
+                return;
             g.musicInstance.usedChannel = ctx.Channel;
-            if (g.musicInstance.shuffleMode == ShuffleMode.Off) g.musicInstance.shuffleMode = ShuffleMode.On;
-            else g.musicInstance.shuffleMode = ShuffleMode.Off;
+            if (g.musicInstance.shuffleMode == ShuffleMode.Off) 
+                g.musicInstance.shuffleMode = ShuffleMode.On;
+            else 
+                g.musicInstance.shuffleMode = ShuffleMode.Off;
             await ctx.RespondAsync(embed: new DiscordEmbedBuilder().WithDescription($"Set shuffle mode to:\n**{g.musicInstance.shuffleMode}**").Build());
         }
 
@@ -502,7 +526,8 @@ namespace MikuSharp.Commands
                 int currentPage = 1;
                 int songAmount = 0;
                 int totalP = queue.Count / 5;
-                if ((queue.Count % 5) != 0) totalP++;
+                if ((queue.Count % 5) != 0) 
+                    totalP++;
                 var emb = new DiscordEmbedBuilder();
                 List<Page> Pages = new();
                 if (g.musicInstance.repeatMode == RepeatMode.All)
@@ -514,39 +539,44 @@ namespace MikuSharp.Commands
                         {
                             emb.WithTitle("Current Song");
                             string time = "";
-                            if (g.musicInstance.currentSong.track.Length.Hours < 1) time = g.musicInstance.currentSong.track.Length.ToString(@"mm\:ss");
-                            else time = g.musicInstance.currentSong.track.Length.ToString(@"hh\:mm\:ss");
+                            if (g.musicInstance.currentSong.track.Length.Hours < 1)
+                                time = g.musicInstance.currentSong.track.Length.ToString(@"mm\:ss");
+                            else 
+                                time = g.musicInstance.currentSong.track.Length.ToString(@"hh\:mm\:ss");
                             string time2 = "";
-                            if (g.musicInstance.guildConnection.CurrentState.PlaybackPosition.Hours < 1) time2 = g.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"mm\:ss");
-                            else time2 = g.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"hh\:mm\:ss");
-                            emb.AddField($"**{songAmount}.{g.musicInstance.currentSong.track.Title.Replace("*", "").Replace("|", "")}** by {g.musicInstance.currentSong.track.Author.Replace("*", "").Replace("|", "")} [{time2}/{time}]",
-                                $"Requested by <@{g.musicInstance.currentSong.addedBy}> [Link]({g.musicInstance.currentSong.track.Uri.AbsoluteUri})\nˉˉˉˉˉ");
+                            if (g.musicInstance.guildConnection.CurrentState.PlaybackPosition.Hours < 1) 
+                                time2 = g.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"mm\:ss");
+                            else 
+                                time2 = g.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"hh\:mm\:ss");
+                            emb.AddField(new DiscordEmbedField($"**{songAmount}.{g.musicInstance.currentSong.track.Title.Replace("*", "").Replace("|", "")}** by {g.musicInstance.currentSong.track.Author.Replace("*", "").Replace("|", "")} [{time2}/{time}]",
+                                $"Requested by <@{g.musicInstance.currentSong.addedBy}> [Link]({g.musicInstance.currentSong.track.Uri.AbsoluteUri})\nˉˉˉˉˉ"));
                         }
                         else
                         {
                             string time = "";
-                            if (queue.ElementAt(songAmount).track.Length.Hours < 1) time = queue.ElementAt(songAmount).track.Length.ToString(@"mm\:ss");
-                            else time = queue.ElementAt(songAmount).track.Length.ToString(@"hh\:mm\:ss");
-                            emb.AddField($"**{songAmount}.{queue.ElementAt(songAmount).track.Title.Replace("*", "").Replace("|", "")}** by {queue.ElementAt(songAmount).track.Author.Replace("*", "").Replace("|", "")} [{time}]",
-                                $"Requested by <@{queue.ElementAt(songAmount).addedBy}> [Link]({queue.ElementAt(songAmount).track.Uri.AbsoluteUri})");
+                            if (queue.ElementAt(songAmount).track.Length.Hours < 1)
+                                time = queue.ElementAt(songAmount).track.Length.ToString(@"mm\:ss");
+                            else
+                                time = queue.ElementAt(songAmount).track.Length.ToString(@"hh\:mm\:ss");
+                            emb.AddField(new DiscordEmbedField($"**{songAmount}.{queue.ElementAt(songAmount).track.Title.Replace("*", "").Replace("|", "")}** by {queue.ElementAt(songAmount).track.Author.Replace("*", "").Replace("|", "")} [{time}]",
+                                $"Requested by <@{queue.ElementAt(songAmount).addedBy}> [Link]({queue.ElementAt(songAmount).track.Uri.AbsoluteUri})"));
                         }
                         songsPerPage++;
                         songAmount++;
                         if (songAmount == queue.Count)
-                        {
                             songAmount = 0;
-                        }
                         if (songsPerPage == 5)
                         {
                             songsPerPage = 0;
                             var opts = "";
-                            if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                            if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                            if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                            if (g.musicInstance.repeatMode == RepeatMode.On)
+                                opts += DiscordEmoji.FromUnicode("🔂");
+                            if (g.musicInstance.repeatMode == RepeatMode.All)
+                                opts += DiscordEmoji.FromUnicode("🔁");
+                            if (g.musicInstance.shuffleMode == ShuffleMode.On)
+                                opts += DiscordEmoji.FromUnicode("🔀");
                             if (opts != "")
-                            {
-                                emb.AddField("Playback Options", opts);
-                            }
+                                emb.AddField(new DiscordEmbedField("Playback Options", opts));
                             emb.WithFooter($"Page {currentPage}/{totalP}");
                             Pages.Add(new Page(embed: emb));
                             emb.ClearFields();
@@ -556,13 +586,14 @@ namespace MikuSharp.Commands
                         if (songAmount == g.musicInstance.repeatAllPos)
                         {
                             var opts = "";
-                            if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                            if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                            if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                            if (g.musicInstance.repeatMode == RepeatMode.On) 
+                                opts += DiscordEmoji.FromUnicode("🔂");
+                            if (g.musicInstance.repeatMode == RepeatMode.All) 
+                                opts += DiscordEmoji.FromUnicode("🔁");
+                            if (g.musicInstance.shuffleMode == ShuffleMode.On) 
+                                opts += DiscordEmoji.FromUnicode("🔀");
                             if (opts != "")
-                            {
-                                emb.AddField("Playback Options", opts);
-                            }
+                                emb.AddField(new DiscordEmbedField("Playback Options", opts));
                             emb.WithFooter($"Page {currentPage}/{totalP}");
                             Pages.Add(new Page(embed: emb));
                             emb.ClearFields();
@@ -577,21 +608,25 @@ namespace MikuSharp.Commands
                         {
                             emb.WithTitle("Current Song");
                             string time = "";
-                            if (g.musicInstance.currentSong.track.Length.Hours < 1) time = g.musicInstance.currentSong.track.Length.ToString(@"mm\:ss");
-                            else time = g.musicInstance.currentSong.track.Length.ToString(@"hh\:mm\:ss");
+                            if (g.musicInstance.currentSong.track.Length.Hours < 1)
+                                time = g.musicInstance.currentSong.track.Length.ToString(@"mm\:ss");
+                            else 
+                                time = g.musicInstance.currentSong.track.Length.ToString(@"hh\:mm\:ss");
                             string time2 = "";
-                            if (g.musicInstance.guildConnection.CurrentState.PlaybackPosition.Hours < 1) time2 = g.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"mm\:ss");
-                            else time2 = g.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"hh\:mm\:ss");
-                            emb.AddField($"**{g.musicInstance.currentSong.track.Title.Replace("*", "").Replace("|", "")}** by {g.musicInstance.currentSong.track.Author.Replace("*", "").Replace("|", "")} [{time2}/{time}]",
-                                $"Requested by <@{g.musicInstance.currentSong.addedBy}> [Link]({g.musicInstance.currentSong.track.Uri.AbsoluteUri})\nˉˉˉˉˉ");
+                            if (g.musicInstance.guildConnection.CurrentState.PlaybackPosition.Hours < 1) 
+                                time2 = g.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"mm\:ss");
+                            else 
+                                time2 = g.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"hh\:mm\:ss");
+                            emb.AddField(new DiscordEmbedField($"**{g.musicInstance.currentSong.track.Title.Replace("*", "").Replace("|", "")}** by {g.musicInstance.currentSong.track.Author.Replace("*", "").Replace("|", "")} [{time2}/{time}]",
+                                $"Requested by <@{g.musicInstance.currentSong.addedBy}> [Link]({g.musicInstance.currentSong.track.Uri.AbsoluteUri})\nˉˉˉˉˉ"));
                         }
                         else
                         {
                             string time = "";
                             if (Track.track.Length.Hours < 1) time = Track.track.Length.ToString(@"mm\:ss");
                             else time = Track.track.Length.ToString(@"hh\:mm\:ss");
-                            emb.AddField($"**{songAmount}.{Track.track.Title.Replace("*", "").Replace("|", "")}** by {Track.track.Author.Replace("*", "").Replace("|", "")} [{time}]",
-                                $"Requested by <@{Track.addedBy}> [Link]({Track.track.Uri.AbsoluteUri})");
+                            emb.AddField(new DiscordEmbedField($"**{songAmount}.{Track.track.Title.Replace("*", "").Replace("|", "")}** by {Track.track.Author.Replace("*", "").Replace("|", "")} [{time}]",
+                                $"Requested by <@{Track.addedBy}> [Link]({Track.track.Uri.AbsoluteUri})"));
                         }
                         songsPerPage++;
                         songAmount++;
@@ -600,13 +635,14 @@ namespace MikuSharp.Commands
                             songsPerPage = 0;
                             emb.WithFooter($"Page {currentPage}/{totalP}");
                             var opts = "";
-                            if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                            if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                            if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                            if (g.musicInstance.repeatMode == RepeatMode.On) 
+                                opts += DiscordEmoji.FromUnicode("🔂");
+                            if (g.musicInstance.repeatMode == RepeatMode.All) 
+                                opts += DiscordEmoji.FromUnicode("🔁");
+                            if (g.musicInstance.shuffleMode == ShuffleMode.On) 
+                                opts += DiscordEmoji.FromUnicode("🔀");
                             if (opts != "")
-                            {
-                                emb.AddField("Playback Options", opts);
-                            }
+                                emb.AddField(new DiscordEmbedField("Playback Options", opts));
                             Pages.Add(new Page(embed: emb));
                             emb.ClearFields();
                             emb.WithTitle("more™");
@@ -616,13 +652,14 @@ namespace MikuSharp.Commands
                         {
                             emb.WithFooter($"Page {currentPage}/{totalP}");
                             var opts = "";
-                            if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                            if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                            if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                            if (g.musicInstance.repeatMode == RepeatMode.On) 
+                                opts += DiscordEmoji.FromUnicode("🔂");
+                            if (g.musicInstance.repeatMode == RepeatMode.All) 
+                                opts += DiscordEmoji.FromUnicode("🔁");
+                            if (g.musicInstance.shuffleMode == ShuffleMode.On) 
+                                opts += DiscordEmoji.FromUnicode("🔀");
                             if (opts != "")
-                            {
-                                emb.AddField("Playback Options", opts);
-                            }
+                                emb.AddField(new DiscordEmbedField("Playback Options", opts));
                             Pages.Add(new Page(embed: emb));
                             //Console.WriteLine(emb.Fields.Count);
                             emb.ClearFields();
@@ -632,13 +669,14 @@ namespace MikuSharp.Commands
                 if (currentPage == 1)
                 {
                     var opts = "";
-                    if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                    if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                    if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                    if (g.musicInstance.repeatMode == RepeatMode.On) 
+                        opts += DiscordEmoji.FromUnicode("🔂");
+                    if (g.musicInstance.repeatMode == RepeatMode.All) 
+                        opts += DiscordEmoji.FromUnicode("🔁");
+                    if (g.musicInstance.shuffleMode == ShuffleMode.On)
+                        opts += DiscordEmoji.FromUnicode("🔀");
                     if (opts != "")
-                    {
-                        emb.AddField("Playback Options", opts);
-                    }
+                        emb.AddField(new DiscordEmbedField("Playback Options", opts));
                     //Console.WriteLine(emb.Fields.Count);
                     await ctx.RespondAsync(embed: Pages.First().Embed);
                     return;
@@ -649,9 +687,7 @@ namespace MikuSharp.Commands
                     return;
                 }
                 foreach (var eP in Pages.Where(x => !x.Embed.Fields.Any(y => y.Name != "Playback Options")).ToList())
-                {
                     Pages.Remove(eP);
-                }
                 await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch (Exception ex)
@@ -698,33 +734,37 @@ namespace MikuSharp.Commands
                         time2 = g.musicInstance.currentSong.track.Length.ToString(@"hh\:mm\:ss");
                     }
                     var searchListResponse = await searchListRequest.ExecuteAsync();
-                    eb.AddField($"{g.musicInstance.currentSong.track.Title} ({time1}/{time2})", $"[Video Link]({g.musicInstance.currentSong.track.Uri})\n" +
-                        $"[{g.musicInstance.currentSong.track.Author}](https://www.youtube.com/channel/" + searchListResponse.Items[0].Snippet.ChannelId + ")");
-                    if (searchListResponse.Items[0].Snippet.Description.Length > 500) eb.AddField("Description", string.Concat(searchListResponse.Items[0].Snippet.Description.AsSpan(0, 500), "..."));
-                    else eb.AddField("Description", searchListResponse.Items[0].Snippet.Description);
+                    eb.AddField(new DiscordEmbedField($"{g.musicInstance.currentSong.track.Title} ({time1}/{time2})", $"[Video Link]({g.musicInstance.currentSong.track.Uri})\n" +
+                        $"[{g.musicInstance.currentSong.track.Author}](https://www.youtube.com/channel/" + searchListResponse.Items[0].Snippet.ChannelId + ")"));
+                    if (searchListResponse.Items[0].Snippet.Description.Length > 500)
+                        eb.AddField(new DiscordEmbedField("Description", string.Concat(searchListResponse.Items[0].Snippet.Description.AsSpan(0, 500), "...")));
+                    else 
+                        eb.AddField(new DiscordEmbedField("Description", searchListResponse.Items[0].Snippet.Description));
                     eb.WithImageUrl(searchListResponse.Items[0].Snippet.Thumbnails.High.Url);
                     var opts = "";
-                    if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                    if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                    if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                    if (g.musicInstance.repeatMode == RepeatMode.On) 
+                        opts += DiscordEmoji.FromUnicode("🔂");
+                    if (g.musicInstance.repeatMode == RepeatMode.All) 
+                        opts += DiscordEmoji.FromUnicode("🔁");
+                    if (g.musicInstance.shuffleMode == ShuffleMode.On)
+                        opts += DiscordEmoji.FromUnicode("🔀");
                     if (opts != "")
-                    {
-                        eb.AddField("Playback Options", opts);
-                    }
+                        eb.AddField(new DiscordEmbedField("Playback Options", opts));
                 }
                 catch
                 {
                     if (eb.Fields.Count != 1)
                     {
-                        eb.AddField($"{g.musicInstance.currentSong.track.Title} ({g.musicInstance.currentSong.track.Length})", $"By {g.musicInstance.currentSong.track.Author}\n[Link]({g.musicInstance.currentSong.track.Uri})\nRequested by <@{g.musicInstance.currentSong.addedBy}>");
+                        eb.AddField(new DiscordEmbedField($"{g.musicInstance.currentSong.track.Title} ({g.musicInstance.currentSong.track.Length})", $"By {g.musicInstance.currentSong.track.Author}\n[Link]({g.musicInstance.currentSong.track.Uri})\nRequested by <@{g.musicInstance.currentSong.addedBy}>"));
                         var opts = "";
-                        if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                        if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                        if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                        if (g.musicInstance.repeatMode == RepeatMode.On) 
+                            opts += DiscordEmoji.FromUnicode("🔂");
+                        if (g.musicInstance.repeatMode == RepeatMode.All)
+                            opts += DiscordEmoji.FromUnicode("🔁");
+                        if (g.musicInstance.shuffleMode == ShuffleMode.On) 
+                            opts += DiscordEmoji.FromUnicode("🔀");
                         if (opts != "")
-                        {
-                            eb.AddField("Playback Options", opts);
-                        }
+                            eb.AddField(new DiscordEmbedField("Playback Options", opts));
                     }
                 }
             }
@@ -761,19 +801,18 @@ namespace MikuSharp.Commands
                     time1 = g.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"hh\:mm\:ss");
                     time2 = g.musicInstance.currentSong.track.Length.ToString(@"hh\:mm\:ss");
                 }
-                eb.AddField($"{g.musicInstance.currentSong.track.Title} ({time1}/{time2})", $"By {g.musicInstance.currentSong.track.Author}\n[Link]({g.musicInstance.currentSong.track.Uri})\nRequested by <@{g.musicInstance.currentSong.addedBy}>");
+                eb.AddField(new DiscordEmbedField($"{g.musicInstance.currentSong.track.Title} ({time1}/{time2})", $"By {g.musicInstance.currentSong.track.Author}\n[Link]({g.musicInstance.currentSong.track.Uri})\nRequested by <@{g.musicInstance.currentSong.addedBy}>"));
                 var opts = "";
-                if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                if (g.musicInstance.repeatMode == RepeatMode.On) 
+                    opts += DiscordEmoji.FromUnicode("🔂");
+                if (g.musicInstance.repeatMode == RepeatMode.All)
+                    opts += DiscordEmoji.FromUnicode("🔁");
+                if (g.musicInstance.shuffleMode == ShuffleMode.On) 
+                    opts += DiscordEmoji.FromUnicode("🔀");
                 if (opts != "")
-                {
-                    eb.AddField("Playback Options", opts);
-                }
+                    eb.AddField(new DiscordEmbedField("Playback Options", opts));
                 if (img != null)
-                {
                     eb.WithImageUrl($"attachment://{g.musicInstance.currentSong.track.Uri.ToString().Split('/')[^2]}.{MimeGuesser.GuessExtension(img)}");
-                }
             }
             else
             {
@@ -788,20 +827,19 @@ namespace MikuSharp.Commands
                     time1 = g.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"hh\:mm\:ss");
                     time2 = g.musicInstance.currentSong.track.Length.ToString(@"hh\:mm\:ss");
                 }
-                eb.AddField($"{g.musicInstance.currentSong.track.Title} ({time1}/{time2})", $"By {g.musicInstance.currentSong.track.Author}\n[Link]({g.musicInstance.currentSong.track.Uri})\nRequested by <@{g.musicInstance.currentSong.addedBy}>");
+                eb.AddField(new DiscordEmbedField($"{g.musicInstance.currentSong.track.Title} ({time1}/{time2})", $"By {g.musicInstance.currentSong.track.Author}\n[Link]({g.musicInstance.currentSong.track.Uri})\nRequested by <@{g.musicInstance.currentSong.addedBy}>"));
                 var opts = "";
-                if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                if (g.musicInstance.repeatMode == RepeatMode
+                    .On) opts += DiscordEmoji.FromUnicode("🔂");
+                if (g.musicInstance.repeatMode == RepeatMode
+                    .All) opts += DiscordEmoji.FromUnicode("🔁");
+                if (g.musicInstance.shuffleMode == ShuffleMode.On)
+                    opts += DiscordEmoji.FromUnicode("🔀");
                 if (opts != "")
-                {
-                    eb.AddField("Playback Options", opts);
-                }
+                    eb.AddField(new DiscordEmbedField("Playback Options", opts));
             }
             if (e == null)
-            {
-                await ctx.RespondAsync(embed: eb.Build());
-            }
+            await ctx.RespondAsync(embed: eb.Build());
             else
             {
 
@@ -841,41 +879,41 @@ namespace MikuSharp.Commands
                     searchListRequest.Type = "video";
                     string time2 = "";
                     if (lastPlayedSongs[0].track.Length.Hours < 1)
-                    {
                         time2 = lastPlayedSongs[0].track.Length.ToString(@"mm\:ss");
-                    }
                     else
-                    {
                         time2 = lastPlayedSongs[0].track.Length.ToString(@"hh\:mm\:ss");
-                    }
                     var searchListResponse = await searchListRequest.ExecuteAsync();
-                    eb.AddField($"{lastPlayedSongs[0].track.Title} ({time2})", $"[Video Link]({lastPlayedSongs[0].track.Uri})\n" +
-                        $"[{lastPlayedSongs[0].track.Author}](https://www.youtube.com/channel/" + searchListResponse.Items[0].Snippet.ChannelId + ")");
-                    if (searchListResponse.Items[0].Snippet.Description.Length > 500) eb.AddField("Description", string.Concat(searchListResponse.Items[0].Snippet.Description.AsSpan(0, 500), "..."));
-                    else eb.AddField("Description", searchListResponse.Items[0].Snippet.Description);
+                    eb.AddField(new DiscordEmbedField($"{lastPlayedSongs[0].track.Title} ({time2})", $"[Video Link]({lastPlayedSongs[0].track.Uri})\n" +
+                        $"[{lastPlayedSongs[0].track.Author}](https://www.youtube.com/channel/" + searchListResponse.Items[0].Snippet.ChannelId + ")"));
+                    if (searchListResponse.Items[0].Snippet.Description.Length > 500) 
+                        eb.AddField(new DiscordEmbedField("Description", string.Concat(searchListResponse.Items[0].Snippet.Description.AsSpan(0, 500), "...")));
+                    else 
+                        eb.AddField(new DiscordEmbedField("Description", searchListResponse.Items[0].Snippet.Description));
                     eb.WithImageUrl(searchListResponse.Items[0].Snippet.Thumbnails.High.Url);
                     var opts = "";
-                    if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                    if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                    if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                    if (g.musicInstance.repeatMode == RepeatMode.On) 
+                        opts += DiscordEmoji.FromUnicode("🔂");
+                    if (g.musicInstance.repeatMode == RepeatMode.All) 
+                        opts += DiscordEmoji.FromUnicode("🔁");
+                    if (g.musicInstance.shuffleMode == ShuffleMode.On)
+                        opts += DiscordEmoji.FromUnicode("🔀");
                     if (opts != "")
-                    {
-                        eb.AddField("Playback Options", opts);
-                    }
+                        eb.AddField(new DiscordEmbedField("Playback Options", opts));
                 }
                 catch
                 {
                     if (eb.Fields.Count != 1)
                     {
-                        eb.AddField($"{lastPlayedSongs[0].track.Title} ({lastPlayedSongs[0].track.Length})", $"By {lastPlayedSongs[0].track.Author}\n[Link]({lastPlayedSongs[0].track.Uri})");
+                        eb.AddField(new DiscordEmbedField($"{lastPlayedSongs[0].track.Title} ({lastPlayedSongs[0].track.Length})", $"By {lastPlayedSongs[0].track.Author}\n[Link]({lastPlayedSongs[0].track.Uri})"));
                         var opts = "";
-                        if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                        if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                        if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                        if (g.musicInstance.repeatMode == RepeatMode.On)
+                            opts += DiscordEmoji.FromUnicode("🔂");
+                        if (g.musicInstance.repeatMode == RepeatMode.All) 
+                            opts += DiscordEmoji.FromUnicode("🔁");
+                        if (g.musicInstance.shuffleMode == ShuffleMode.On) 
+                            opts += DiscordEmoji.FromUnicode("🔀");
                         if (opts != "")
-                        {
-                            eb.AddField("Playback Options", opts);
-                        }
+                            eb.AddField(new DiscordEmbedField("Playback Options", opts));
                     }
                 }
             }
@@ -903,52 +941,43 @@ namespace MikuSharp.Commands
                 }
                 string time2;
                 if (lastPlayedSongs[0].track.Length.Hours < 1)
-                {
                     time2 = lastPlayedSongs[0].track.Length.ToString(@"mm\:ss");
-                }
-                else
-                {
+                else 
                     time2 = lastPlayedSongs[0].track.Length.ToString(@"hh\:mm\:ss");
-                }
-                eb.AddField($"{lastPlayedSongs[0].track.Title} ({time2})", $"By {lastPlayedSongs[0].track.Author}\n[Link]({lastPlayedSongs[0].track.Uri})");
+
+                eb.AddField(new DiscordEmbedField($"{lastPlayedSongs[0].track.Title} ({time2})", $"By {lastPlayedSongs[0].track.Author}\n[Link]({lastPlayedSongs[0].track.Uri})"));
                 var opts = "";
-                if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                if (g.musicInstance.repeatMode == RepeatMode.On) 
+                    opts += DiscordEmoji.FromUnicode("🔂");
+                if (g.musicInstance.repeatMode == RepeatMode.All) 
+                    opts += DiscordEmoji.FromUnicode("🔁");
+                if (g.musicInstance.shuffleMode == ShuffleMode.On) 
+                    opts += DiscordEmoji.FromUnicode("🔀");
                 if (opts != "")
-                {
-                    eb.AddField("Playback Options", opts);
-                }
+                    eb.AddField(new DiscordEmbedField("Playback Options", opts));
                 if (img != null)
-                {
                     eb.WithImageUrl($"attachment://{lastPlayedSongs[0].track.Uri.ToString().Split('/')[^2]}.{MimeGuesser.GuessExtension(img)}");
-                }
             }
             else
             {
                 string time2;
                 if (lastPlayedSongs[0].track.Length.Hours < 1)
-                {
                     time2 = lastPlayedSongs[0].track.Length.ToString(@"mm\:ss");
-                }
                 else
-                {
                     time2 = lastPlayedSongs[0].track.Length.ToString(@"hh\:mm\:ss");
-                }
-                eb.AddField($"{lastPlayedSongs[0].track.Title} ({time2})", $"By {lastPlayedSongs[0].track.Author}\n[Link]({lastPlayedSongs[0].track.Uri})");
+                eb.AddField(new DiscordEmbedField($"{lastPlayedSongs[0].track.Title} ({time2})", $"By {lastPlayedSongs[0].track.Author}\n[Link]({lastPlayedSongs[0].track.Uri})"));
                 var opts = "";
-                if (g.musicInstance.repeatMode == RepeatMode.On) opts += DiscordEmoji.FromUnicode("🔂");
-                if (g.musicInstance.repeatMode == RepeatMode.All) opts += DiscordEmoji.FromUnicode("🔁");
-                if (g.musicInstance.shuffleMode == ShuffleMode.On) opts += DiscordEmoji.FromUnicode("🔀");
+                if (g.musicInstance.repeatMode == RepeatMode.On) 
+                    opts += DiscordEmoji.FromUnicode("🔂");
+                if (g.musicInstance.repeatMode == RepeatMode.All) 
+                    opts += DiscordEmoji.FromUnicode("🔁");
+                if (g.musicInstance.shuffleMode == ShuffleMode.On) 
+                    opts += DiscordEmoji.FromUnicode("🔀");
                 if (opts != "")
-                {
-                    eb.AddField("Playback Options", opts);
-                }
+                    eb.AddField(new DiscordEmbedField("Playback Options", opts));
             }
             if (e == null)
-            {
                 await ctx.RespondAsync(embed: eb.Build());
-            }
             else
             {
                 DiscordMessageBuilder builder = new();
@@ -984,9 +1013,11 @@ namespace MikuSharp.Commands
                 {
 
                     string time = "";
-                    if (Track.track.Length.Hours < 1) time = Track.track.Length.ToString(@"mm\:ss");
-                    else time = Track.track.Length.ToString(@"hh\:mm\:ss");
-                    emb.AddField($"{songAmount+1}.{Track.track.Title.Replace("*", "").Replace("|", "")}",$"by {Track.track.Author.Replace("*", "").Replace("|", "")} [{time}] [Link]({Track.track.Uri})");
+                    if (Track.track.Length.Hours < 1) 
+                        time = Track.track.Length.ToString(@"mm\:ss");
+                    else 
+                        time = Track.track.Length.ToString(@"hh\:mm\:ss");
+                    emb.AddField(new DiscordEmbedField($"{songAmount+1}.{Track.track.Title.Replace("*", "").Replace("|", "")}",$"by {Track.track.Author.Replace("*", "").Replace("|", "")} [{time}] [Link]({Track.track.Uri})"));
                     songsPerPage++;
                     songAmount++;
                     if (songsPerPage == 10)
@@ -1018,9 +1049,7 @@ namespace MikuSharp.Commands
                     return;
                 }
                 foreach (var eP in Pages.Where(x => x.Embed.Fields.Count == 0).ToList())
-                {
                     Pages.Remove(eP);
-                }
                 await inter.SendPaginatedMessageAsync(ctx.Channel, ctx.User, Pages, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
             }
             catch (Exception ex)
