@@ -45,6 +45,7 @@ namespace MikuSharp
         public IReadOnlyDictionary<int, InteractivityExtension> interC { get; set; }
         public IReadOnlyDictionary<int, CommandsNextExtension> cmdC { get; set; }
         public IReadOnlyDictionary<int, ApplicationCommandsExtension> acC { get; set; }
+        public ApplicationCommandsExtension saaC { get; set; }
         public static IReadOnlyDictionary<int, LavalinkExtension> lavaC { get; set; }
         public static Dictionary<int, LavalinkNodeConnection> LLEU = new();
         public static Playstate ps = Playstate.Playing;
@@ -71,7 +72,6 @@ namespace MikuSharp
                 Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
                 MessageCacheSize = 2048,
                 LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
-
             });
             interC = bot.UseInteractivityAsync(new InteractivityConfiguration
             {
@@ -95,7 +95,11 @@ namespace MikuSharp
             acC = bot.UseApplicationCommandsAsync(new ApplicationCommandsConfiguration()
             {
                 EnableDefaultHelp = false,
-                DebugStartup = false
+                DebugStartup = true,
+                EnableLocalization = false,
+                AutoDefer = false,
+                CheckAllGuilds = false,
+                ManualOverride = true
             }).Result;
             cmdC = bot.UseCommandsNextAsync(new CommandsNextConfiguration
             {
@@ -113,6 +117,7 @@ namespace MikuSharp
                 sender.Logger.LogError(args.Exception.StackTrace);
                 return Task.CompletedTask;
             };
+            saaC = bot.GetShard(0).GetApplicationCommands();
         }
 
         public async Task setGame()
@@ -167,9 +172,9 @@ namespace MikuSharp
             cnext.RegisterCommands<Commands.MikuGuild>();
             cnext.RegisterCommands<Commands.Playlist>();
             cnext.RegisterCommands<Commands.Settings>();
-            client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Slash>(483279257431441410);
-            client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Developer>(483279257431441410);
-            client.GetShard(0).GetApplicationCommands().RegisterGuildCommands<Commands.Developer>(858089281214087179);
+            saaC.RegisterGuildCommands<Commands.Slash>(483279257431441410);
+            saaC.RegisterGuildCommands<Commands.Developer>(483279257431441410);
+            saaC.RegisterGuildCommands<Commands.Developer>(858089281214087179);
             await Task.Delay(1);
         }
 
@@ -221,14 +226,13 @@ namespace MikuSharp
 
         public async Task RunBot()
         {
-            int i = 0;
             await _weeb.Authenticate(cfg.WeebShToken, Weeb.net.TokenType.Wolke);
             var LL = await bot.UseLavalinkAsync();
             lavaC = LL;
             await RegisterEvents();
             foreach (var g in bot.ShardClients)
             {
-               // g.Value.GetApplicationCommands();
+                // g.Value.GetApplicationCommands();
                 g.Value.GuildMemberUpdated += async (sender, args) =>
                 {
                     if (args.Guild.Id == 483279257431441410)
@@ -241,14 +245,9 @@ namespace MikuSharp
                         await Task.FromResult(true);
                     }
                 };
-                g.Value.GuildDownloadCompleted += (sender, args) =>
-                {
-                    i++;
-                    return Task.CompletedTask;
-                };
             }
-            await bot.StartAsync();
             await RegisterCommands(bot, cmdC, acC);
+            await bot.StartAsync();
             foreach (var shard in lavaC)
             {
                 var LCon = await shard.Value.ConnectAsync(new LavalinkConfiguration
@@ -258,11 +257,6 @@ namespace MikuSharp
                     Password = cfg.LavaConfig.Password
                 });
                 LLEU.Add(shard.Key, LCon);
-            }
-
-            while (i != bot.ShardClients.Count - 1 && cmdC == null && interC == null)
-            {
-                await Task.Delay(1000);
             }
             //StatusThread = Task.Run(ShowConnections);
             while (!_cts.IsCancellationRequested)
@@ -342,6 +336,7 @@ namespace MikuSharp
         {
             cmdC = null;
             acC = null;
+            saaC = null;
             interC = null;
             lavaC = null;
             cfg = null;
