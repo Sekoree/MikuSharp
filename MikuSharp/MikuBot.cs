@@ -233,6 +233,7 @@ internal class MikuBot : IDisposable
 		// All other command classes are registered as global commands.
 		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Developer>();
 		ApplicationCommandsModules.RegisterGlobalCommands<Commands.General>();
+		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Utility>();
 	}
 
 	internal async Task RunAsync()
