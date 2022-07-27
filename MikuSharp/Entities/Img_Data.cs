@@ -2,13 +2,12 @@
 
 using System.IO;
 
-namespace MikuSharp.Entities
-{
-    public class Img_Data
-    {
-        public Stream Data { get; set; }
-        public string Filetype { get; set; }
+namespace MikuSharp.Entities;
 
-        public DiscordEmbed Embed { get; set; }
-    }
+public class Img_Data
+{
+	public Stream Data { get; set; }
+	public string Filetype { get; set; }
+
+	public DiscordEmbed Embed { get; set; }
 }

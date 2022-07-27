@@ -1,7 +1,6 @@
-﻿namespace MikuSharp.Entities
+﻿namespace MikuSharp.Entities;
+
+public class Nekos_Life : Img_Data
 {
-    public class Nekos_Life : Img_Data
-    {
-        public string Url { get; set; }
-    }
+	public string Url { get; set; }
 }

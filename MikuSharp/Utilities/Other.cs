@@ -1,22 +1,17 @@
-﻿using MikuSharp.Enums;
+﻿using DisCatSharp.ApplicationCommands;
+using DisCatSharp.Entities;
 
-namespace MikuSharp.Utilities
+using System.Threading.Tasks;
+
+namespace MikuSharp.Utilities;
+
+public static class Other
 {
-    public class Other
-    {
-        public static string resizeLink(string url)
-        {
-            return $"https://api.meek.moe/im/?image={url}&resize=500";
-        }
+	public static string resizeLink(string url)
+	{
+		return $"https://api.meek.moe/im/?image={url}&resize=500";
+	}
 
-        public static ExtService getExtService(string e)
-        {
-            if (e == "Youtube")
-                return ExtService.Youtube;
-            else if (e == "Soundcloud")
-                return ExtService.Soundcloud;
-            else
-                return ExtService.None;
-        }
-    }
+	public static async Task DeferAsync(this InteractionContext ctx, bool ephemeral = true)
+		=> await ctx.CreateResponseAsync(DisCatSharp.InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ephemeral));
 }

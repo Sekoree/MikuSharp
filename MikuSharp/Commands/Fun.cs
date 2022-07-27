@@ -1,5 +1,5 @@
-﻿using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
+﻿using DisCatSharp;
+using DisCatSharp.ApplicationCommands;
 using DisCatSharp.Entities;
 
 using HeyRed.Mime;
@@ -11,245 +11,172 @@ using Newtonsoft.Json;
 
 using System;
 using System.IO;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace MikuSharp.Commands
+namespace MikuSharp.Commands;
+
+[SlashCommandGroup("fun", "Fun commands")]
+internal class Fun : ApplicationCommandsModule
 {
-    [Description("Fun commands")]
-    class Fun : BaseCommandModule
+	[SlashCommand("8ball", "Yes? No? Maybe?")]
+	public static async Task EightBallAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var responses = new[] { "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful.", "No." };
+		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"> {text}\n\n{responses[new Random().Next(0, responses.Length)]}"));
+	}
+
+	[SlashCommand("cat", "Get a random cat image!")]
+	public static async Task CatAsync(InteractionContext ctx)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var ImgURL = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/v2/img/meow");
+
+		DiscordWebhookBuilder builder = new();
+		builder.AddFile($"image.{ImgURL.Filetype}", ImgURL.Data);
+		builder.AddEmbed(ImgURL.Embed);
+		await ctx.EditResponseAsync(builder);
+	}
+
+	[SlashCommand("clyde", "Say something as clyde bot")]
+	public static async Task ClydeAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}"));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.message));
+
+		DiscordWebhookBuilder builder = new();
+		builder.AddFile($"clyde.png", img);
+		await ctx.EditResponseAsync(builder);
+	}
+
+	[SlashCommand("coinflip", "Flip a coin lol")]
+	public static async Task CoinflipAsync(InteractionContext ctx)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var flip = new[] { $"Heads {DiscordEmoji.FromName(ctx.Client, ":arrow_up_small:")}", $"Tails {DiscordEmoji.FromName(ctx.Client, ":arrow_down_small:")}" };
+		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(flip[new Random().Next(0, flip.Length)]));
+	}
+
+	[SlashCommand("dog", "Random Dog Image")]
+	public static async Task DogAsync(InteractionContext ctx)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var dc = JsonConvert.DeserializeObject<DogCeo>(await ctx.Client.RestClient.GetStringAsync("https://dog.ceo/api/breeds/image/random"));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(dc.message)));
+		var em = new DiscordEmbedBuilder();
+		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
+		em.WithFooter("by dog.ceo", "https://dog.ceo/img/favicon.png");
+		em.WithDescription($"[Full Image]({dc.message})");
+
+		DiscordWebhookBuilder builder = new();
+		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+		builder.AddEmbed(em.Build());
+		await ctx.EditResponseAsync(builder);
+	}
+	/*
+    [SlashCommand("duck", "Random duck image")]
+    public static async Task DuckAsync(InteractionContext ctx)
     {
+        var dc = JsonConvert.DeserializeObject<Random_D>(await ctx.Client.RestClient.GetStringAsync("https://random-d.uk/api/v1/random"));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(dc.message)));
+        var em = new DiscordEmbedBuilder();
+        em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
+        em.WithFooter("by random-d.uk", "https://random-d.uk/favicon.png");
+        em.WithDescription($"[Full Image]({dc.message})");
 
-        [Command("8ball")]
-        [Description("Yes? No? Maybe?")]
-        public async Task EightBall(CommandContext ctx, [RemainingText]string stuff)
-        {
-            var responses = new[] { "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful.", "No." };
-            await ctx.RespondAsync(responses[new Random().Next(0, responses.Length)]);
-        }
+        DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
+        builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+        builder.WithEmbed(em.Build());
+        await ctx.EditResponseAsync(builder);
+    }*/
+	/*
+    [SlashCommand("lion", "Get a random lion image")]
+    public static async Task Lion(InteractionContext ctx)
+    {
+        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/lion"));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
 
-        [Command("cat")]
-        [Description("Get a random cat image!")]
-        public async Task Cat(CommandContext ctx)
-        {
-            var ImgURL = await Web.GetNekos_Life("https://nekos.life/api/v2/img/meow");
+        DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
+        builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+        await ctx.EditResponseAsync(builder);
+    }*/
 
-            DiscordMessageBuilder builder = new();
-            builder.WithFile($"image.{ImgURL.Filetype}", ImgURL.Data);
-            builder.WithEmbed(ImgURL.Embed);
-            await ctx.RespondAsync(builder);
-        }
+	[SlashCommand("lizard", "Get a random lizard image")]
+	public static async Task LizardAsync(InteractionContext ctx)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var get = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/lizard");
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(get.Url)));
 
-        [Command("cucknorris")]
-        [Description("Random Chuck Norris joke")]
-        public async Task ChuckNorris(CommandContext ctx)
-        {
-            var c = new HttpClient();
-            await ctx.RespondAsync(JsonConvert.DeserializeObject<ChuckNorrisObject>(await c.GetStringAsync("https://api.icndb.com/jokes/random")).Value.Joke);
-        }
+		DiscordWebhookBuilder builder = new();
+		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+		await ctx.EditResponseAsync(builder);
+	}
+	/*
+    [SlashCommand("panda", "Random panda image")]
+    public static async Task PandaAsync(InteractionContext ctx)
+    {
+        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/panda"));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
 
-        [Command("clapify")]
-        [Description("Clapify your message!")]
-        public async Task Clapify(CommandContext ctx, [RemainingText] string text)
-        {
-            await ctx.RespondAsync($"👏{text.Replace(" ", "👏")}👏");
-        } 
-
-        [Command("clyde")]
-        [Description("Say something as clyde bot")]
-        public async Task Clyde(CommandContext ctx, [RemainingText] string text)
-        {
-            var c = new HttpClient();
-            var e = JsonConvert.DeserializeObject<NekoBot>(await c.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}"));
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(e.message));
-
-            DiscordMessageBuilder builder = new();
-            builder.WithFile($"clyde.png", img);
-            await ctx.RespondAsync(builder);
-        }
-
-        [Command("coinflip")]
-        [Description("Flip a coin lol")]
-        public async Task Coinflip(CommandContext ctx)
-        {
-            var flip = new[] { $"Heads {DiscordEmoji.FromName(ctx.Client, ":arrow_up_small:")}", $"Tails {DiscordEmoji.FromName(ctx.Client,":arrow_down_small:")}"};
-            await ctx.RespondAsync(flip[new Random().Next(0, flip.Length)]);
-        }
-
-        [Command("dadjoke")]
-        [Description("Random dadjoke")]
-        public async Task DadJoke(CommandContext ctx)
-        {
-            var c = new HttpClient();
-            c.DefaultRequestHeaders.Add("User-Agent", "Hatsune-Miku-DiscordBot (speyd3r@meek.moe)");
-            await ctx.RespondAsync(JsonConvert.DeserializeObject<Dadjoke>(await c.GetStringAsync("https://icanhazdadjoke.com/")).joke);
-        }
-
-        [Command("dog")]
-        [Description("Random Dog Image")]
-        public async Task Dog(CommandContext ctx)
-        {
-            var c = new HttpClient();
-            var dc = JsonConvert.DeserializeObject<DogCeo>(await c.GetStringAsync("https://dog.ceo/api/breeds/image/random"));
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(dc.message)));
-            var em = new DiscordEmbedBuilder();
-            em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by dog.ceo", "https://dog.ceo/img/favicon.png");
-            em.WithDescription($"[Full Image]({dc.message})");
-
-            DiscordMessageBuilder builder = new();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            builder.WithEmbed(em.Build());
-            await ctx.RespondAsync(builder);
-        }
-        /*
-        [Command("duck")]
-        [Description("Radnom duck image")]
-        public async Task Duck(CommandContext ctx)
-        {
-            var c = new HttpClient();
-            var dc = JsonConvert.DeserializeObject<Random_D>(await c.GetStringAsync("https://random-d.uk/api/v1/random"));
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(dc.message)));
-            var em = new DiscordEmbedBuilder();
-            em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by random-d.uk", "https://random-d.uk/favicon.png");
-            em.WithDescription($"[Full Image]({dc.message})");
-
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            builder.WithEmbed(em.Build());
-            await ctx.RespondAsync(builder);
-        }*/
-
-        [Command("eyeify")]
-        [Description("eyeify your message :eyes:")]
-        public async Task Eyeify(CommandContext ctx, [RemainingText] string text)
-        {
-            await ctx.RespondAsync(DiscordEmoji.FromUnicode("👀") + text.Replace(" ", "👀") + DiscordEmoji.FromUnicode("👀"));
-        }
-
-        [Command("leet")]
-        [Description("Convert something to leetspeak")]
-        public async Task Leet(CommandContext ctx, [RemainingText] string text)
-        {
-            await ctx.RespondAsync("This command is not implemented yet.");
-        }
-        /*
-        [Command("lion")]
-        [Description("Get a random lion image")]
-        public async Task Lion(CommandContext ctx)
-        {
-            var c = new HttpClient();
-            var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await c.GetStringAsync("https://animals.anidiots.guide/lion"));
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
-
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            await ctx.RespondAsync(builder);
-        }*/
-
-        [Command("lizard")]
-        [Description("Get a random lizard image")]
-        public async Task Lizard(CommandContext ctx)
-        {
-            var c = new HttpClient();
-            var get = await Web.GetNekos_Life("https://nekos.life/api/lizard");
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(get.Url)));
-
-            DiscordMessageBuilder builder = new();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            await ctx.RespondAsync(builder);
-        }
-        /*
-        [Command("panda")]
-        [Description("Random panda image")]
-        public async Task Panda(CommandContext ctx)
-        {
-            var c = new HttpClient();
-            var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await c.GetStringAsync("https://animals.anidiots.guide/panda"));
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
-
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            await ctx.RespondAsync(builder);
-        }
-
-        [Command("penguin")]
-        [Description("Radnom penguin image")]
-        public async Task Penguin(CommandContext ctx)
-        {
-            var c = new HttpClient();
-            var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await c.GetStringAsync("https://animals.anidiots.guide/penguin"));
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
-
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            await ctx.RespondAsync(builder);
-        }*/
-
-        [Command("pirate")]
-        [Description("Convert some test into Pirate speech")]
-        public async Task Pirate(CommandContext ctx)
-        {
-            //soon
-            await ctx.RespondAsync("This command is not implemented yet.");
-        }
-        /*
-        [Command("redpanda")]
-        [Description("Random red panda image")]
-        public async Task RedPanda(CommandContext ctx)
-        {
-            var c = new HttpClient();
-            var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await c.GetStringAsync("https://animals.anidiots.guide/red_panda"));
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
-
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            await ctx.RespondAsync(builder);
-        }*/
-
-        [Command("rps")]
-        [Description("Play rock paper scissors!")]
-        public async Task RPS(CommandContext ctx, string rps)
-        {
-            var rock = new[] { $"Rock {DiscordEmoji.FromName(ctx.Client, ":black_circle:")}", $"Paper {DiscordEmoji.FromName(ctx.Client, ":pencil:")}", $"Scissors {DiscordEmoji.FromName(ctx.Client, ":scissors:")}"};
-            await ctx.RespondAsync(rock[new Random().Next(0, rock.Length)]);
-        }
-        /*
-        [Command("tiger")]
-        [Description("Radnom tiger image")]
-        public async Task Tiger(CommandContext ctx)
-        {
-            var c = new HttpClient();
-            var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await c.GetStringAsync("https://animals.anidiots.guide/tiger"));
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
-
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            await ctx.RespondAsync(builder);
-        }*/
-
-        [Command("tiny")]
-        [Description("Make some text tiny")]
-        public async Task Tiny(CommandContext ctx)
-        {
-            //soon
-            await ctx.RespondAsync("This command is not implemented yet.");
-        }
-        /*
-        [Command("trumptweet")]
-        [Description("generate a tweet by Trump")]
-        public async Task TrumpTweet(CommandContext ctx, [RemainingText]string text)
-        {
-            //https://nekobot.xyz/api/imagegen?type=trumptweet&text=
-            var c = new HttpClient();
-            var e = JsonConvert.DeserializeObject<NekoBot>(await c.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=trumptweet&text={text}"));
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(e.message));
-
-            DiscordMessageBuilder builder = new DiscordMessageBuilder();
-            builder.WithFile($"trump.png", img);
-            await ctx.RespondAsync(builder);
-        }*/
+        DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
+        builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+        await ctx.EditResponseAsync(builder);
     }
+
+    [SlashCommand("penguin", "Radnom penguin image")]
+    public static async Task PenguinAsync(InteractionContext ctx)
+    {
+        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/penguin"));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
+
+        DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
+        builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+        await ctx.EditResponseAsync(builder);
+    }*/
+
+	/*
+    [SlashCommand("redpanda", "Random red panda image")]
+    public static async Task RedPandaAsync(InteractionContext ctx)
+    {
+        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/red_panda"));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
+
+        DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
+        builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+        await ctx.EditResponseAsync(builder);
+    }*/
+
+	[SlashCommand("rps", "Play rock paper scissors!")]
+	public static async Task RPSAsync(InteractionContext ctx, [Option("rps", "Your rock paper scissor choice")] string rps)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var rock = new[] { $"Rock {DiscordEmoji.FromName(ctx.Client, ":black_circle:")}", $"Paper {DiscordEmoji.FromName(ctx.Client, ":pencil:")}", $"Scissors {DiscordEmoji.FromName(ctx.Client, ":scissors:")}" };
+		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"{ctx.User.Mention} choose {rps}!\n\nI choose {rock[new Random().Next(0, rock.Length)]}"));
+	}
+	/*
+    [SlashCommand("tiger", "Random tiger image")]
+    public static async Task TigerAsync(InteractionContext ctx)
+    {
+        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/tiger"));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
+
+        DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
+        builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+        await ctx.EditResponseAsync(builder);
+    }*/
+
+	/*
+    [SlashCommand("trumptweet", "generate a tweet by Trump")]
+    public static async Task TrumpTweetAsync(InteractionContext ctx, [RemainingText]string text)
+    {
+        //https://nekobot.xyz/api/imagegen?type=trumptweet&text=
+        var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=trumptweet&text={text}"));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.message));
+
+        DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
+        builder.AddFile($"trump.png", img);
+        await ctx.EditResponseAsync(builder);
+    }*/
 }

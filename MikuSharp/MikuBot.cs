@@ -1,6 +1,7 @@
 ﻿using DisCatSharp;
 using DisCatSharp.ApplicationCommands;
 using DisCatSharp.CommandsNext;
+using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Interactivity;
@@ -10,7 +11,7 @@ using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Net;
 
-using DiscordBotsList.Api.Internal;
+using DiscordBotsList.Api;
 
 using Microsoft.Extensions.Logging;
 
@@ -38,27 +39,30 @@ namespace MikuSharp;
 internal class MikuBot : IDisposable
 {
 	internal static CancellationTokenSource _cts { get; set; }
-	
+
 	internal static BotConfig Config { get; set; }
 	internal LavalinkConfiguration LavalinkConfig { get; set; }
 
 	internal Task GameSetThread { get; set; }
 	internal Task StatusThread { get; set; }
+	internal Task BotListThread { get; set; }
 
-	internal static WeebClient _weebClient = new("Hatsune Miku MikuBot", "4.0.0");
+	internal static WeebClient _weebClient = new("Hatsune Miku Bot", "4.0.0");
+	internal static AuthDiscordBotListApi DiscordBotListApi { get; set; }
 	internal static DiscordShardedClient ShardedClient { get; set; }
-	
+
 	internal IReadOnlyDictionary<int, InteractivityExtension> InteractivityModules { get; set; }
 	internal IReadOnlyDictionary<int, ApplicationCommandsExtension> ApplicationCommandsModules { get; set; }
-	internal static IReadOnlyDictionary<int, LavalinkExtension> LavalinkModules { get; set; }
+	internal IReadOnlyDictionary<int, CommandsNextExtension> CommandsNextModules { get; set; }
+	internal IReadOnlyDictionary<int, LavalinkExtension> LavalinkModules { get; set; }
 
 	internal static Dictionary<int, LavalinkNodeConnection> LavalinkNodeConnections = new();
 	internal static Dictionary<ulong, Guild> Guilds = new();
 
 	internal static Playstate ps = Playstate.Playing;
 	internal static Stopwatch psc = new();
-	
-	
+
+
 	internal MikuBot()
 	{
 		var fileData = File.ReadAllText(@"config.json");
@@ -69,17 +73,17 @@ internal class MikuBot : IDisposable
 		if (Config == null)
 			throw new ArgumentNullException("config.json is null");
 
-		Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database=MikuSharpDB";
+		Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database={Config.DbConfig.Database}";
 		_cts = new CancellationTokenSource();
-		
+
 		Log.Logger = new LoggerConfiguration()
 			.MinimumLevel.Debug()
 			.WriteTo.File("miku_log.txt", fileSizeLimitBytes: null, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2, shared: true)
 			.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
 			.CreateLogger();
 		Log.Logger.Information("Starting up!");
-		
-		ShardedClient = new DiscordShardedClient(new ()
+
+		ShardedClient = new DiscordShardedClient(new()
 		{
 			Token = Config.DiscordToken,
 			TokenType = DisCatSharp.TokenType.Bot,
@@ -91,7 +95,7 @@ internal class MikuBot : IDisposable
 			MessageCacheSize = 2048,
 			LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
 		});
-		
+
 		InteractivityModules = ShardedClient.UseInteractivityAsync(new()
 		{
 			Timeout = TimeSpan.FromMinutes(2),
@@ -111,13 +115,25 @@ internal class MikuBot : IDisposable
 			ResponseMessage = "Something went wrong.",
 			ResponseBehavior = InteractionResponseBehavior.Ignore
 		}).Result;
-		
+
 		ApplicationCommandsModules = ShardedClient.UseApplicationCommandsAsync(new()
 		{
-			EnableDefaultHelp = false,
+			EnableDefaultHelp = true,
 			DebugStartup = true,
 			EnableLocalization = false,
 			ManualOverride = true
+		}).Result;
+
+		CommandsNextModules = ShardedClient.UseCommandsNextAsync(new()
+		{
+			CaseSensitive = true,
+			EnableMentionPrefix = true,
+			DmHelp = false,
+			EnableDefaultHelp = true,
+			IgnoreExtraArguments = true,
+			StringPrefixes = Array.Empty<string>(),
+			UseDefaultCommandHandler = true,
+			DefaultHelpChecks = new List<CheckBaseAttribute>(1) { new Attributes.NotStaffAttribute() }
 		}).Result;
 
 		LavalinkConfig = new()
@@ -126,9 +142,11 @@ internal class MikuBot : IDisposable
 			RestEndpoint = new ConnectionEndpoint { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
 			Password = Config.LavaConfig.Password
 		};
+
+		LavalinkModules = ShardedClient.UseLavalinkAsync().Result;
 	}
-		
-	internal async Task RegisterEvents()
+
+	internal static async Task RegisterEvents()
 	{
 		ShardedClient.ClientErrored += (sender, args) =>
 		{
@@ -138,17 +156,17 @@ internal class MikuBot : IDisposable
 		};
 
 		await Task.Delay(1);
-		
+
 		foreach (var discordClientKvp in ShardedClient.ShardClients)
 		{
 			discordClientKvp.Value.VoiceStateUpdated += VoiceChat.LeftAlone;
-			
+
 			discordClientKvp.Value.GetApplicationCommands().ApplicationCommandsModuleStartupFinished += (sender, args) =>
 			{
 				sender.Client.Logger.LogInformation("Shard {shard} finished application command startup.", sender.Client.ShardId);
 				return Task.CompletedTask;
 			};
-			
+
 			discordClientKvp.Value.GuildMemberAdded += async (sender, args) =>
 			{
 				if (sender.CurrentApplication.Team.Members.Where(x => x.User.Id == args.Member.Id).Any())
@@ -183,64 +201,79 @@ internal class MikuBot : IDisposable
 	{
 		while (true)
 		{
-			var al = Guilds.Where(x => x.Value.musicInstance != null);
+			var al = Guilds.Where(x => x.Value?.musicInstance != null);
 			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.musicInstance.guildConnection?.IsConnected == true).Count());
 			await Task.Delay(15000);
 		}
 	}
 
+	internal async Task UpdateBotList()
+	{
+		await Task.Delay(15000);
+		while (true)
+		{
+			var me = await DiscordBotListApi.GetMeAsync();
+			int[] count = Array.Empty<int>();
+			var clients = ShardedClient.ShardClients.Values;
+			foreach (var client in clients)
+				count = count.Append(client.Guilds.Count).ToArray();
+			await me.UpdateStatsAsync(0, ShardedClient.ShardClients.Count, count);
+			await Task.Delay(TimeSpan.FromMinutes(15));
+		}
+	}
+
 	internal async Task SetActivity()
 	{
-		DiscordActivity debug = new()
-		{
-			Name = "debug! Gonna upgrade for ya!",
-			ActivityType = ActivityType.Playing
-		};
-		await ShardedClient.UpdateStatusAsync(activity: debug, userStatus: UserStatus.DoNotDisturb);
-
-		/*while (true)
+		while (true)
 		{
 			DiscordActivity test = new()
 			{
-				Name = "m%help for commands!",
+				Name = "m%help for music and nsfw commands!",
 				ActivityType = ActivityType.Playing
 			};
-			await bot.UpdateStatusAsync(activity: test, userStatus: UserStatus.Online);
-			await Task.Delay(TimeSpan.FromMinutes(5));
+			await ShardedClient.UpdateStatusAsync(activity: test, userStatus: UserStatus.Online);
+			await Task.Delay(TimeSpan.FromMinutes(20));
 			DiscordActivity test2 = new()
 			{
-				Name = "Check the new playlist commands!",
+				Name = "Using slash now!",
 				ActivityType = ActivityType.Playing
 			};
-			await bot.UpdateStatusAsync(activity: test2, userStatus: UserStatus.Online);
-			await Task.Delay(TimeSpan.FromMinutes(5));
+			await ShardedClient.UpdateStatusAsync(activity: test2, userStatus: UserStatus.Online);
+			await Task.Delay(TimeSpan.FromMinutes(20));
 			DiscordActivity test3 = new()
 			{
 				Name = "Full NND support!",
 				ActivityType = ActivityType.Playing
 			};
-			await bot.UpdateStatusAsync(activity: test3, userStatus: UserStatus.Online);
-			await Task.Delay(TimeSpan.FromMinutes(5));
-		}*/
+			await ShardedClient.UpdateStatusAsync(activity: test3, userStatus: UserStatus.Online);
+			await Task.Delay(TimeSpan.FromMinutes(20));
+		}
 	}
 
 	internal void RegisterCommands()
 	{
+		// Nsfw stuff needs to be hidden, that's why we use commands next
+		CommandsNextModules.RegisterCommands<Commands.NSFW>();
+
+		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Action>();
+		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Developer>();
+		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Fun>();
+		ApplicationCommandsModules.RegisterGlobalCommands<Commands.About>();
+		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Moderation>();
+		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Music>();
+		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Playlists>();
+		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Utility>();
+		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Weeb>();
+
 		// Smolcar command, only guild command
 		ApplicationCommandsModules.RegisterGuildCommands<Commands.MikuGuild>(483279257431441410);
-		//ApplicationCommandsModules.RegisterGuildCommands<Commands.Developer>(483279257431441410);
-
-		// All other command classes are registered as global commands.
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Developer>();
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.General>();
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Utility>();
 	}
 
 	internal async Task RunAsync()
 	{
 		await _weebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
-		LavalinkModules = await ShardedClient.UseLavalinkAsync();
 		await ShardedClient.StartAsync();
+		await Task.Delay(5000);
 		foreach (var lavalinkShard in LavalinkModules)
 		{
 			var LCon = await lavalinkShard.Value.ConnectAsync(LavalinkConfig);
@@ -248,6 +281,8 @@ internal class MikuBot : IDisposable
 		}
 		GameSetThread = Task.Run(SetActivity);
 		StatusThread = Task.Run(ShowConnections);
+		//DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
+		//BotListThread = Task.Run(UpdateBotList);
 		while (!_cts.IsCancellationRequested)
 		{
 			await Task.Delay(25);

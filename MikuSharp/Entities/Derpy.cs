@@ -1,7 +1,6 @@
-﻿namespace MikuSharp.Entities
+﻿namespace MikuSharp.Entities;
+
+public class Derpy : Img_Data
 {
-    public class Derpy : Img_Data
-    {
-        public string url {get;set;}
-    }
+	public string url { get; set; }
 }

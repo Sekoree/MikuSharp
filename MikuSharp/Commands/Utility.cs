@@ -1,7 +1,7 @@
 ﻿using DisCatSharp;
 using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.Entities;
+using DisCatSharp.Exceptions;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
@@ -15,18 +15,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DisCatSharp.Exceptions;
 
 namespace MikuSharp.Commands;
 
 [SlashCommandGroup("utility", "Utilities")]
 internal class Utility : ApplicationCommandsModule
-    {
-        [SlashCommandGroup("am", "Anime & Mange")]
+{
+	[SlashCommandGroup("am", "Anime & Mange")]
 	internal class AnimeMangaUtility : ApplicationCommandsModule
 	{
 		[SlashCommand("anime_search", "Search for an anime")]
-		public async Task SearchAnimeAsync(InteractionContext ctx, [Option("search_query", "Search query")] string search_query)
+		public static async Task SearchAnimeAsync(InteractionContext ctx, [Option("search_query", "Search query")] string search_query)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
 			try
@@ -78,9 +77,9 @@ internal class Utility : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No Anime found!"));
 			}
 		}
-		
+
 		[SlashCommand("manga_search", "Search for an manga")]
-		public async Task SearchMangaAsync(InteractionContext ctx, [Option("search_query", "Search query")] string search_query)
+		public static async Task SearchMangaAsync(InteractionContext ctx, [Option("search_query", "Search query")] string search_query)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
 			try
@@ -135,11 +134,11 @@ internal class Utility : ApplicationCommandsModule
 	internal class DiscordUtility : ApplicationCommandsModule
 	{
 		[SlashCommand("avatar", "Get the avatar of someone or yourself")]
-		public async Task GetAvatarAsync(InteractionContext ctx, [Option("user", "User to get the avatar from")] DiscordUser? user = null)
+		public static async Task GetAvatarAsync(InteractionContext ctx, [Option("user", "User to get the avatar from")] DiscordUser? user = null)
 			=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null).AddEmbed(new DiscordEmbedBuilder().WithImageUrl(user != null ? user.AvatarUrl : ctx.User.AvatarUrl).Build()));
 
 		[SlashCommand("server_info", "Get information about the server")]
-		public async Task GuildInfoAsync(InteractionContext ctx)
+		public static async Task GuildInfoAsync(InteractionContext ctx)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
 
@@ -162,12 +161,12 @@ internal class Utility : ApplicationCommandsModule
 			emb.AddField(new DiscordEmbedField("Created At", Formatter.Timestamp(ctx.Guild.CreationTimestamp, TimestampFormat.LongDateTime), true));
 			emb.AddField(new DiscordEmbedField("Emojis", ctx.Guild.Emojis.Count.ToString(), true));
 			emb.AddField(new DiscordEmbedField("Members (Bots)", $"{members.Count} ({bots})", true));
-			
+
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
 		}
 
 		[SlashCommand("user_info", "Get information about a user")]
-		public async Task UserInfoAsync(InteractionContext ctx, [Option("user", "The user to view")] DiscordUser? user = null)
+		public static async Task UserInfoAsync(InteractionContext ctx, [Option("user", "The user to view")] DiscordUser? user = null)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
 
@@ -200,7 +199,7 @@ internal class Utility : ApplicationCommandsModule
 		}
 
 		[SlashCommand("emojilist", "Lists all custom emoji on this server")]
-		public async Task EmojiListAsync(InteractionContext ctx)
+		public static async Task EmojiListAsync(InteractionContext ctx)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
 			string wat = "You have to execute this command in a server!";

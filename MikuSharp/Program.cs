@@ -5,13 +5,14 @@ namespace MikuSharp;
 
 class Program
 {
-    static void Main(string[] args)
-    {
+	static void Main(string[] args)
+	{
 		using (var bot = new MikuBot())
 		{
-            bot.RegisterEvents().Wait();
-            bot.RegisterCommands();
-            bot.RunAsync().Wait();
+			MikuBot.RegisterEvents().Wait();
+			bot.RegisterCommands();
+			bot.RunAsync().Wait();
+			bot.Dispose();
 		}
 		Log.Logger.Information("Shutdown!");
 	}

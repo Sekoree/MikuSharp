@@ -1,7 +1,6 @@
-﻿namespace MikuSharp.Entities
+﻿namespace MikuSharp.Entities;
+
+public class AnIdiotsGuide
 {
-    public class AnIdiotsGuide
-    {
-        public string link { get; set; }
-    }
+	public string link { get; set; }
 }

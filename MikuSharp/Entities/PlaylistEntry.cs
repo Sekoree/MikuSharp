@@ -2,14 +2,15 @@
 
 using System;
 
-namespace MikuSharp.Entities
+namespace MikuSharp.Entities;
+
+public class PlaylistEntry : Entry
 {
-    public class PlaylistEntry : Entry
-    {
-        public DateTimeOffset modifyDate { get; set; }
-        public PlaylistEntry(LavalinkTrack t, DateTimeOffset addDate, DateTimeOffset moddate) : base(t, addDate)
-        {
-            modifyDate = moddate;
-        }
-    }
+	public DateTimeOffset modifyDate { get; set; }
+	public int Position { get; set; }
+	public PlaylistEntry(LavalinkTrack t, DateTimeOffset addDate, DateTimeOffset moddate, int pos) : base(t, addDate)
+	{
+		modifyDate = moddate;
+		Position = pos;
+	}
 }

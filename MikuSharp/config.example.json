@@ -1,12 +1,14 @@
 {
   "discordToken": "",
+  "discordBotListToken": "",
   "weebShToken": "",
   "youtubeApiToken": "",
   "ksoftSiToken": "",
   "dbConfig": {
     "hostname": "",
     "user": "",
-    "password": ""
+    "password": "",
+    "database": ""
   },
   "lavaConfig": {
     "hostname": "",

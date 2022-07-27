@@ -5,11 +5,9 @@ VisualStudioVersion = 17.3.32611.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MikuSharp", "MikuSharp\MikuSharp.csproj", "{28C9C119-060F-4B2D-843E-3AE2B7BE72D2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.ApplicationCommands", "..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj", "{368C2D8E-1D2A-47A7-83CC-5B6A8C80B52C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NicoNicoNii", "NicoNicoNii\NicoNicoNii\NicoNicoNii.csproj", "{38EC14AC-1188-412F-A0C2-FC0BDA2C6BDD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp", "..\DisCatSharp\DisCatSharp\DisCatSharp.csproj", "{3E2CA778-C5C4-41B8-A7BE-93D4B1BAE784}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DisCatSharp.Interactivity", "..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj", "{C2BBC9D1-48A5-4E0A-ACA7-CA427967C81B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TranslatorGenerator", "TranslatorGenerator\TranslatorGenerator.csproj", "{1771BDCA-753F-4C3D-B6E7-920A9393C4ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +19,14 @@ Global
 		{28C9C119-060F-4B2D-843E-3AE2B7BE72D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28C9C119-060F-4B2D-843E-3AE2B7BE72D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28C9C119-060F-4B2D-843E-3AE2B7BE72D2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{368C2D8E-1D2A-47A7-83CC-5B6A8C80B52C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{368C2D8E-1D2A-47A7-83CC-5B6A8C80B52C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{368C2D8E-1D2A-47A7-83CC-5B6A8C80B52C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{368C2D8E-1D2A-47A7-83CC-5B6A8C80B52C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E2CA778-C5C4-41B8-A7BE-93D4B1BAE784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E2CA778-C5C4-41B8-A7BE-93D4B1BAE784}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E2CA778-C5C4-41B8-A7BE-93D4B1BAE784}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E2CA778-C5C4-41B8-A7BE-93D4B1BAE784}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C2BBC9D1-48A5-4E0A-ACA7-CA427967C81B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2BBC9D1-48A5-4E0A-ACA7-CA427967C81B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2BBC9D1-48A5-4E0A-ACA7-CA427967C81B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2BBC9D1-48A5-4E0A-ACA7-CA427967C81B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38EC14AC-1188-412F-A0C2-FC0BDA2C6BDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38EC14AC-1188-412F-A0C2-FC0BDA2C6BDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38EC14AC-1188-412F-A0C2-FC0BDA2C6BDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38EC14AC-1188-412F-A0C2-FC0BDA2C6BDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1771BDCA-753F-4C3D-B6E7-920A9393C4ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1771BDCA-753F-4C3D-B6E7-920A9393C4ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1771BDCA-753F-4C3D-B6E7-920A9393C4ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1771BDCA-753F-4C3D-B6E7-920A9393C4ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
