@@ -12,7 +12,7 @@ namespace MikuSharp.Utilities
 
         public static async Task<Dictionary<ulong, List<string>>> GetAllUserPrefixes(ulong u)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM prefixes WHERE userid = {u};", conn);
@@ -35,7 +35,7 @@ namespace MikuSharp.Utilities
 
         public static async Task<List<string>> GetGuildPrefixes(ulong g)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM guildprefixes WHERE guildid = {g};", conn);
@@ -54,7 +54,7 @@ namespace MikuSharp.Utilities
 
         public static async Task AddUserPrefix(ulong u, ulong g, string p)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"INSERT INTO prefixes VALUES (@u,@g,@p);", conn);
@@ -69,7 +69,7 @@ namespace MikuSharp.Utilities
 
         public static async Task AddGuildPrefix(ulong g, string p)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"INSERT INTO guildprefixes VALUES (@g,@p);", conn);
@@ -83,7 +83,7 @@ namespace MikuSharp.Utilities
 
         public static async Task RemoveUserPrefix(ulong u, ulong g, string p)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"DELETE FROM prefixes WHERE userid= @u AND guildid= @g AND prefix= @p;", conn);
@@ -98,7 +98,7 @@ namespace MikuSharp.Utilities
 
         public static async Task RemoveGuildPrefix(ulong g, string p)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"DELETE FROM guildprefixes WHERE guildid=@g AND prefix=@p;", conn);

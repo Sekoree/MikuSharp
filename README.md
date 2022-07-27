@@ -7,7 +7,7 @@ If you wanna do stuff with it go ahead, though if you're just here for some smal
 * For anything else feel free to add me on Discord and ask stuff (Sekoree#3939)
 
 The new version will be in this
-https://github.com/Miku-Bot/mN
+https://github.com/Miku-MikuBot/mN
 If you have good C# knowledge and want to help, feel free to contact me on Discord (again, Sekoree#3939)
 
 # MikuSharp

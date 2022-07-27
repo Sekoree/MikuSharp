@@ -58,7 +58,7 @@ namespace MikuSharp.Commands
         public async Task Pat(CommandContext ctx, DiscordMember m)
         {
             var c = new HttpClient();
-            var weeurl = await Bot._weeb.GetRandomAsync("pat", new[] { "" });
+            var weeurl = await MikuBot._weebClient.GetRandomAsync("pat", new[] { "" });
             Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
             var em = new DiscordEmbedBuilder();
             em.WithDescription($"{ctx.Member.Mention} pats {m.Mention} #w#");
@@ -76,7 +76,7 @@ namespace MikuSharp.Commands
         public async Task Poke(CommandContext ctx, DiscordMember m)
         {
             var c = new HttpClient();
-            var weeurl = await Bot._weeb.GetRandomAsync("poke", new[] { "" });
+            var weeurl = await MikuBot._weebClient.GetRandomAsync("poke", new[] { "" });
             Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
             var em = new DiscordEmbedBuilder();
             em.WithDescription($"{ctx.Member.Mention} pokes {m.Mention} ÓwÒ");
@@ -94,7 +94,7 @@ namespace MikuSharp.Commands
         public async Task Slap(CommandContext ctx, DiscordMember m)
         {
             var c = new HttpClient();
-            var weeurl = await Bot._weeb.GetRandomAsync("slap", new[] { "" });
+            var weeurl = await MikuBot._weebClient.GetRandomAsync("slap", new[] { "" });
             Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
             var em = new DiscordEmbedBuilder();
             em.WithDescription($"{ctx.Member.Mention} slaps {m.Mention} ÒwÓ");

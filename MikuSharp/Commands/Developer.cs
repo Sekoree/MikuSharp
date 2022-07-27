@@ -24,6 +24,16 @@ namespace MikuSharp.Commands
 			await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
 		}
 
+		[SlashCommand("guild_shard_test", "Testing")]
+		public static async Task GuildTestAsync(InteractionContext ctx)
+		{
+			await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
+			foreach (var shard in MikuBot.ShardedClient.ShardClients.Values)
+			{
+				await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent($"Shard {shard.ShardId} has {shard.Guilds.Count} guilds."));
+			}
+		}
+
 		[ContextMenu(ApplicationCommandType.Message, "Remove message - Miku Dev")]
 		public static async Task DeleteMessageAsync(ContextMenuContext ctx)
 		{
@@ -124,7 +134,7 @@ namespace MikuSharp.Commands
 			msg = await ctx.GetOriginalResponseAsync();
 			try
 			{
-				var globals = new SGTestVariables(ctx.TargetMessage, ctx.Client, ctx, Bot.bot);
+				var globals = new SGTestVariables(ctx.TargetMessage, ctx.Client, ctx, MikuBot.ShardedClient);
 
 				var sopts = ScriptOptions.Default;
 				sopts = sopts.WithImports("System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "DisCatSharp", "DisCatSharp.Entities", "DisCatSharp.CommandsNext", "DisCatSharp.CommandsNext.Attributes", "DisCatSharp.Interactivity", "DisCatSharp.Enums", "Microsoft.Extensions.Logging");

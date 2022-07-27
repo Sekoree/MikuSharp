@@ -22,7 +22,7 @@ namespace MikuSharp.Utilities
     {
         public static async Task<Dictionary<string, Playlist>> GetPlaylists(DiscordGuild guild, ulong u)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM playlists WHERE userid = {u} ORDER BY playlistname ASC;", conn);
@@ -41,7 +41,7 @@ namespace MikuSharp.Utilities
 
         public static async Task<List<string>> GetPlaylistsSimple(ulong u)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM playlists WHERE userid = {u} ORDER BY playlistname ASC;", conn);
@@ -60,7 +60,7 @@ namespace MikuSharp.Utilities
 
         public static async Task<Playlist> GetPlaylist(DiscordGuild guild, ulong u, string p)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             int am = 0;
@@ -92,7 +92,7 @@ namespace MikuSharp.Utilities
                 {
                     try
                     {
-                        var ss = await Bot.LLEU.First().Value.Rest.GetTracksAsync(new Uri(Convert.ToString(reader2["url"])));
+                        var ss = await MikuBot.LavalinkNodeConnections.First().Value.Rest.GetTracksAsync(new Uri(Convert.ToString(reader2["url"])));
                         am = ss.Tracks.Count();
                     }
                     catch { }
@@ -109,7 +109,7 @@ namespace MikuSharp.Utilities
 
         public static async Task ReorderList(DiscordGuild guild, string p, ulong u)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var listNow = await GetPlaylist(guild, u, p);
@@ -147,7 +147,7 @@ namespace MikuSharp.Utilities
 
         public static async Task RebuildList(ulong u, string p, List<PlaylistEntry> q)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var queueNow = q;
@@ -184,7 +184,7 @@ namespace MikuSharp.Utilities
 
         public static async Task AddPlaylist(string p, ulong u, ExtService e = ExtService.None, string url = "")
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd = new NpgsqlCommand("INSERT INTO playlists VALUES (@u,@p,@url,@ext,@cre,@mody)", conn);
@@ -220,7 +220,7 @@ namespace MikuSharp.Utilities
 
         public static async Task RemovePlaylist(string p, ulong u)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             Console.WriteLine("delete init");
@@ -240,7 +240,7 @@ namespace MikuSharp.Utilities
         public static async Task AddEntry(string p, ulong u, string ts)
         {
             int position = 0;
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM playlistentries WHERE userid = {u} AND playlistname = @pl;", conn);
@@ -287,7 +287,7 @@ namespace MikuSharp.Utilities
         public static async Task AddEntry(string p, ulong u, List<LavalinkTrack> ts)
         {
             int position = 0;
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM playlistentries WHERE userid = {u} AND playlistname = @pl;", conn);
@@ -353,7 +353,7 @@ namespace MikuSharp.Utilities
 
         public static async Task ClearList(string p, ulong u)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd = new NpgsqlCommand($"DELETE FROM playlistentries WHERE userid = {u} AND playlistname = @pl;", conn);
@@ -377,7 +377,7 @@ namespace MikuSharp.Utilities
 
         public static async Task RemoveFromList(DiscordGuild guild, int position, string p, ulong u)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd = new NpgsqlCommand($"DELETE FROM playlistentries WHERE pos = {position} AND userid = {u} AND playlistname = @pl;UPDATE playlists SET changed=@mody WHERE userid= {u} AND playlistname=@pl;", conn);
@@ -398,7 +398,7 @@ namespace MikuSharp.Utilities
 
         public static async Task RenameList(string p, ulong u, string newname)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd = new NpgsqlCommand($"UPDATE playlists SET playlistname = @newn WHERE userid = {u} AND playlistname = @pl;", conn);
@@ -435,7 +435,7 @@ namespace MikuSharp.Utilities
 
         public static async Task<TrackResult> GetSong(string n, CommandContext ctx)
         {
-            var nodeConnection = Bot.LLEU.First().Value;
+            var nodeConnection = MikuBot.LavalinkNodeConnections.First().Value;
             var inter = ctx.Client.GetInteractivity();
             if (n.ToLower().StartsWith("http://nicovideo.jp")
                 || n.ToLower().StartsWith("http://sp.nicovideo.jp")
@@ -447,7 +447,7 @@ namespace MikuSharp.Utilities
                 var msg = await ctx.RespondAsync("Processing NND Video...");
                 var split = n.Split("/".ToCharArray());
                 var nndID = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
-                FtpClient client = new(Bot.cfg.NndConfig.FtpConfig.Hostname, new NetworkCredential(Bot.cfg.NndConfig.FtpConfig.User, Bot.cfg.NndConfig.FtpConfig.Password));
+                FtpClient client = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
                 await client.ConnectAsync();
                 if (!await client.FileExistsAsync($"{nndID}.mp3"))
                 {
@@ -459,7 +459,7 @@ namespace MikuSharp.Utilities
                         return null;
                     }
                     await msg.ModifyAsync("Uploading");
-                    await client.UploadAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
+                    await client.UploadStreamAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
                 }
                 var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
                 return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());

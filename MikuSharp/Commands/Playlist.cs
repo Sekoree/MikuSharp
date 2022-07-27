@@ -84,7 +84,7 @@ namespace MikuSharp.Commands
             LavalinkLoadResult s = null;
             try
             {
-                s = await Bot.LLEU[ctx.Client.ShardId].Rest.GetTracksAsync(new Uri(gets.Result.Content));
+                s = await MikuBot.LavalinkNodeConnections[ctx.Client.ShardId].Rest.GetTracksAsync(new Uri(gets.Result.Content));
             }
             catch
             {
@@ -507,14 +507,14 @@ namespace MikuSharp.Commands
             var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, pl);
             var p = await pls.GetEntries();
             Console.WriteLine("Done");
-            if (!Bot.Guilds.Any(x => x.Key == ctx.Guild.Id))
+            if (!MikuBot.Guilds.Any(x => x.Key == ctx.Guild.Id))
             {
-                Bot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
+                MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
             }
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null)
             {
-                g.musicInstance = new MusicInstance(Bot.LLEU[ctx.Client.ShardId], ctx.Client.ShardId);
+                g.musicInstance = new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
             }
             if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false) await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
             g.musicInstance.usedChannel = ctx.Channel;

@@ -19,8 +19,8 @@ namespace MikuSharp.Events
         {
             try
             {
-                if (!Bot.Guilds.Any(x => x.Key == e.Guild.Id)) return;
-                var g = Bot.Guilds[e.Guild.Id];
+                if (!MikuBot.Guilds.Any(x => x.Key == e.Guild.Id)) return;
+                var g = MikuBot.Guilds[e.Guild.Id];
                 if (g.musicInstance == null
                     || g.musicInstance?.guildConnection?.IsConnected == false) return;
                 if ((e.After?.Channel?.Users.Where(x => !x.IsBot).Count() == 0

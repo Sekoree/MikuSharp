@@ -12,6 +12,12 @@
     <PackageProjectUrl>https://github.com/Speyd3r/MikuSharp/</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>Full Hatsune Miku Discord bot C# Rewrite!</Description>
+    <Nullable>enable</Nullable>
+    <Title>Hatsune Miku Discord MikuBot</Title>
+    <Copyright>MikuSharp Team</Copyright>
+    <PackageIcon>miku.jpg</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>discord bot; discatsharp; hatsune miku; miku; bot</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,45 +31,56 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<NoWarn>1701;1702;DV2001</NoWarn>
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
 
 	<ItemGroup>
     <PackageReference Include="AlbumArtExtraction" Version="1.0.2" />
     <PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.2.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.2.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.2.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.2.0" />
+	<PackageReference Include="DisCatSharp" Version="10.0.1-nightly-00419" />
+    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.0.1-nightly-00419" />
+    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.1-nightly-00419" />
+    <PackageReference Include="DisCatSharp.Interactivity" Version="10.0.1-nightly-00419" />
+    <PackageReference Include="DisCatSharp.Lavalink" Version="10.0.1-nightly-00419" />
 <!--
-    <PackageReference Include="DisCatSharp" Version="10.0.0-nightly-00352" />
-    <PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.0.0-nightly-00352" />
-    <PackageReference Include="DisCatSharp.CommandsNext" Version="10.0.0-nightly-00352" />
-    <PackageReference Include="DisCatSharp.Interactivity" Version="10.0.0-nightly-00352" />
-    <PackageReference Include="DisCatSharp.Lavalink" Version="10.0.0-nightly-00352" />
--->
+
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
+-->
 	<PackageReference Include="DiscordBotsList.Api" Version="1.5.0" />
-    <PackageReference Include="FluentFTP" Version="37.0.2" />
+    <PackageReference Include="FluentFTP" Version="38.0.0" />
     <PackageReference Include="Google.Apis" Version="1.57.0" />
-    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.57.0.2665" />
+    <PackageReference Include="Google.Apis.YouTube.v3" Version="1.57.0.2756" />
     <PackageReference Include="Kitsu" Version="1.4.2" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Include="Mime" Version="3.3.0" />
+    <PackageReference Include="Mime" Version="3.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Npgsql" Version="6.0.4" />
+    <PackageReference Include="Npgsql" Version="6.0.5" />
     <PackageReference Include="NYoutubeDL" Version="0.11.2" />
     <PackageReference Include="Serilog" Version="2.11.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00947" />
     <PackageReference Include="Weeb.net" Version="1.0.7" />
-    <PackageReference Include="YoutubeExplode" Version="6.1.2" />
+    <PackageReference Include="YoutubeExplode" Version="6.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="miku.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 

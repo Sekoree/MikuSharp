@@ -34,7 +34,7 @@ namespace MikuSharp.Utilities
                     UseDefaultCredentials = false
                 };
                 var client = new HttpClient(handler);
-                string loginForm = $"mail={Bot.cfg.NndConfig.Mail}&password={Bot.cfg.NndConfig.Password}&site=nicometro";
+                string loginForm = $"mail={MikuBot.Config.NndConfig.Mail}&password={MikuBot.Config.NndConfig.Password}&site=nicometro";
                 var body = new StringContent(loginForm, Encoding.UTF8, "application/x-www-form-urlencoded");
                 string login = "https://secure.nicovideo.jp/secure/login?site=niconico";
                 body.Headers.ContentType = new MediaTypeHeaderValue("application/x-www-form-urlencoded");

@@ -1,28 +1,26 @@
-﻿using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
-
-using MikuSharp.Attributes;
+﻿using DisCatSharp;
+using DisCatSharp.ApplicationCommands;
+using DisCatSharp.Entities;
 
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Commands
 {
-    [RequireSpecialGuild(483279257431441410)]
-    public class MikuGuild : BaseCommandModule
+    public class MikuGuild : ApplicationCommandsModule
     {
-        [Command("smolcar")]
-        public async Task SmolcarRole(CommandContext ctx)
+        [SlashCommand("smolcar", "#SmolArmy")]
+        public static async Task SmolCarAsync(InteractionContext ctx)
         {
+
             if (ctx.Member.Roles.Any(x => x.Id == 607989212696018945))
             {
                 await ctx.Member.RevokeRoleAsync(ctx.Guild.GetRole(607989212696018945));
-                await ctx.RespondAsync(":(");
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(":("));
                 return;
             }
             await ctx.Member.GrantRoleAsync(ctx.Guild.GetRole(607989212696018945));
-            await ctx.RespondAsync("Welcome to smolcar");
+            await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Welcome to smolcar"));
         }
-
     }
 }

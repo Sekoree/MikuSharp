@@ -38,7 +38,7 @@ namespace MikuSharp.Utilities
         public static async Task<KsoftSiRanImg> GetKsoftSiRanImg(string tag, bool nsfw = false)
         {
             var c = new HttpClient();
-            c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Bot.cfg.KsoftSiToken);
+            c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", MikuBot.Config.KsoftSiToken);
             var v = JsonConvert.DeserializeObject<KsoftSiRanImg>(await c.GetStringAsync("https://api.ksoft.si/images/random-image?tag=hentai_gif&nsfw=true"));
             MemoryStream img = new(await c.GetByteArrayAsync(Other.resizeLink(v.url)));
             v.Data = img;
@@ -86,7 +86,7 @@ namespace MikuSharp.Utilities
 
         public static async Task<WeebSh> GetWeebSh(CommandContext ctx, string query, string[] tags = null, NsfwSearch nsfw = NsfwSearch.False)
         {
-            var weeurl = await Bot._weeb.GetRandomAsync(query, tags, nsfw: nsfw);
+            var weeurl = await MikuBot._weebClient.GetRandomAsync(query, tags, nsfw: nsfw);
             var hc = new HttpClient();
             MemoryStream img = new(await hc.GetByteArrayAsync(weeurl.Url))
             {

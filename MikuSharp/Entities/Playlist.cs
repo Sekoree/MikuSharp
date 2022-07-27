@@ -37,7 +37,7 @@ namespace MikuSharp.Entities
             var Entries = new List<PlaylistEntry>(SongCount);
             if (ExternalService == ExtService.None)
             {
-                var connString = Bot.cfg.DbConnectString;
+                var connString = MikuBot.Config.DbConnectString;
                 var conn = new NpgsqlConnection(connString);
                 await conn.OpenAsync();
                 var cmd2 = new NpgsqlCommand($"SELECT * FROM playlistentries WHERE userid = {UserID} AND playlistname = @pl ORDER BY pos ASC;", conn);
@@ -54,7 +54,7 @@ namespace MikuSharp.Entities
             }
             else
             {
-                var trs = await Bot.LLEU.First().Value.ConnectedGuilds.First().Value.GetTracksAsync(new Uri(Url));
+                var trs = await MikuBot.LavalinkNodeConnections.First().Value.ConnectedGuilds.First().Value.GetTracksAsync(new Uri(Url));
                 int i = 0;
                 foreach (var t in trs.Tracks)
                 {

@@ -38,11 +38,11 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task Join(CommandContext ctx)
         {
-            if (!Bot.Guilds.Any(x => x.Key == ctx.Guild.Id))
-            Bot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
-            var g = Bot.Guilds[ctx.Guild.Id];
+            if (!MikuBot.Guilds.Any(x => x.Key == ctx.Guild.Id))
+            MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null)
-                g.musicInstance = new MusicInstance(Bot.LLEU[ctx.Client.ShardId], ctx.Client.ShardId);
+                g.musicInstance = new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
             if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false) 
                 await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
             g.musicInstance.usedChannel = ctx.Channel;
@@ -56,7 +56,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task Leave(CommandContext ctx, string Options = null)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null) 
                 return;
             if (Options?.ToLower() == "k" || Options?.ToLower() == "keep")
@@ -81,7 +81,7 @@ namespace MikuSharp.Commands
         [Command("lstats"), Description("Displays Lavalink statistics."), RequireOwner]
         public async Task StatsAsync(CommandContext ctx)
         {
-            var stats = Bot.LLEU[ctx.Client.ShardId].Statistics;
+            var stats = MikuBot.LavalinkNodeConnections[ctx.Client.ShardId].Statistics;
             var sb = new StringBuilder();
             sb.Append("Lavalink resources usage statistics: ```")
                 .Append("Uptime:                    ").Append(stats.Uptime).AppendLine()
@@ -116,11 +116,11 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task Play(CommandContext ctx, [RemainingText]string song = null)
         {
-            if (!Bot.Guilds.Any(x => x.Key == ctx.Guild.Id))
-                Bot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
-            var g = Bot.Guilds[ctx.Guild.Id];
+            if (!MikuBot.Guilds.Any(x => x.Key == ctx.Guild.Id))
+                MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null)
-                g.musicInstance = new MusicInstance(Bot.LLEU[ctx.Client.ShardId], ctx.Client.ShardId);
+                g.musicInstance = new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
             var curq = await Database.GetQueue(ctx.Guild);
             if (curq.Count != 0 && g.musicInstance.playstate == Playstate.NotPlaying)
             {
@@ -192,11 +192,11 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task InsertPlay(CommandContext ctx, int pos, [RemainingText]string song = null)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (pos < 1) 
                 return;
             if (g.musicInstance == null)
-                g.musicInstance = new MusicInstance(Bot.LLEU[ctx.Client.ShardId], ctx.Client.ShardId);
+                g.musicInstance = new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
             if (!g.musicInstance.guildConnection?.IsConnected == null || !g.musicInstance.guildConnection.IsConnected == false)
                 await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
             if (ctx.Message.Attachments.Count == 0 && song == null) 
@@ -237,7 +237,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task Skip(CommandContext ctx)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             var lastPlayedSongs = await Database.GetLPL(ctx.Guild);
             var queue = await Database.GetQueue(ctx.Guild);
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
@@ -268,7 +268,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task Stop(CommandContext ctx)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
             g.musicInstance.usedChannel = ctx.Channel;
@@ -283,7 +283,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task Volume(CommandContext ctx, int vol = 100)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
             g.musicInstance.usedChannel = ctx.Channel;
@@ -297,7 +297,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task Pause(CommandContext ctx)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false)
                 return;
             g.musicInstance.usedChannel = ctx.Channel;
@@ -325,7 +325,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task Resume(CommandContext ctx)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
             g.musicInstance.usedChannel = ctx.Channel;
@@ -347,7 +347,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task QueueClear(CommandContext ctx)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
             g.musicInstance.usedChannel = ctx.Channel;
@@ -362,7 +362,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task QueueMove(CommandContext ctx, int old, int newpos)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             var queue = await Database.GetQueue(ctx.Guild);
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
@@ -382,7 +382,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task QueueRemove(CommandContext ctx, int r)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             var queue = await Database.GetQueue(ctx.Guild);
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
@@ -400,7 +400,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task Repeat(CommandContext ctx, int e)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             var queue = await Database.GetQueue(ctx.Guild);
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
@@ -432,7 +432,7 @@ namespace MikuSharp.Commands
         [Command("repeat")]
         public async Task Repeat(CommandContext ctx, string e)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             var queue = await Database.GetQueue(ctx.Guild);
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
@@ -464,7 +464,7 @@ namespace MikuSharp.Commands
         [Command("repeat")]
         public async Task Repeat(CommandContext ctx)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
             g.musicInstance.usedChannel = ctx.Channel;
@@ -481,7 +481,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task RepeatAll(CommandContext ctx)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
             g.musicInstance.usedChannel = ctx.Channel;
@@ -497,7 +497,7 @@ namespace MikuSharp.Commands
         [RequireUserVoicechatConnection]
         public async Task Shuffle(CommandContext ctx)
         {
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             if (g.musicInstance == null || g.musicInstance?.guildConnection?.IsConnected == false) 
                 return;
             g.musicInstance.usedChannel = ctx.Channel;
@@ -515,7 +515,7 @@ namespace MikuSharp.Commands
             var queue = await Database.GetQueue(ctx.Guild);
             try
             {
-                var g = Bot.Guilds[ctx.Guild.Id];
+                var g = MikuBot.Guilds[ctx.Guild.Id];
                 if (queue.Count == 0)
                 {
                     await ctx.RespondAsync("Queue empty");
@@ -704,7 +704,7 @@ namespace MikuSharp.Commands
             var lastPlayedSongs = await Database.GetLPL(ctx.Guild);
             Stream img = null;
             FileStream e = null;
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             g.shardId = ctx.Client.ShardId;
             var eb = new DiscordEmbedBuilder();
             eb.WithTitle("Now Playing");
@@ -715,7 +715,7 @@ namespace MikuSharp.Commands
                 {
                     var youtubeService = new YouTubeService(new BaseClientService.Initializer()
                     {
-                        ApiKey = Bot.cfg.YoutubeApiToken,
+                        ApiKey = MikuBot.Config.YoutubeApiToken,
                         ApplicationName = this.GetType().ToString()
                     });
                     var searchListRequest = youtubeService.Search.List("snippet");
@@ -859,7 +859,7 @@ namespace MikuSharp.Commands
             var lastPlayedSongs = await Database.GetLPL(ctx.Guild);
             Stream img = null;
             FileStream e = null;
-            var g = Bot.Guilds[ctx.Guild.Id];
+            var g = MikuBot.Guilds[ctx.Guild.Id];
             g.shardId = ctx.Client.ShardId;
             var eb = new DiscordEmbedBuilder();
             eb.WithTitle("Now Playing");
@@ -870,7 +870,7 @@ namespace MikuSharp.Commands
                 {
                     var youtubeService = new YouTubeService(new BaseClientService.Initializer()
                     {
-                        ApiKey = Bot.cfg.YoutubeApiToken,
+                        ApiKey = MikuBot.Config.YoutubeApiToken,
                         ApplicationName = this.GetType().ToString()
                     });
                     var searchListRequest = youtubeService.Search.List("snippet");
@@ -995,7 +995,7 @@ namespace MikuSharp.Commands
             var lastPlayedSongs = await Database.GetLPL(ctx.Guild);
             try
             {
-                var g = Bot.Guilds[ctx.Guild.Id];
+                var g = MikuBot.Guilds[ctx.Guild.Id];
                 if (lastPlayedSongs.Count == 0)
                 {
                     await ctx.RespondAsync("Queue empty");

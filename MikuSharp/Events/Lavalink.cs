@@ -18,7 +18,7 @@ namespace MikuSharp.Events
         {
             try
             {
-                var g = Bot.Guilds[e.Player.Guild.Id];
+                var g = MikuBot.Guilds[e.Player.Guild.Id];
                 var lastPlayedSongs = await Database.GetLPL(e.Player.Guild);
                 switch (e.Reason)
                 {
@@ -79,8 +79,8 @@ namespace MikuSharp.Events
             }
             catch (Exception ex)
             {
-                Bot.bot.Logger.LogError(ex.Message);
-                Bot.bot.Logger.LogError(ex.StackTrace); 
+                MikuBot.ShardedClient.Logger.LogError(ex.Message);
+                MikuBot.ShardedClient.Logger.LogError(ex.StackTrace); 
             }
         }
 

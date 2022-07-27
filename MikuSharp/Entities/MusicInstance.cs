@@ -73,7 +73,7 @@ namespace MikuSharp.Entities
                 var msg = await ctx.RespondAsync("Processing NND Video...");
                 var split = n.Split("/".ToCharArray());
                 var nndID = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
-                FtpClient client = new(Bot.cfg.NndConfig.FtpConfig.Hostname, new NetworkCredential(Bot.cfg.NndConfig.FtpConfig.User, Bot.cfg.NndConfig.FtpConfig.Password));
+                FtpClient client = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
                 await client.ConnectAsync();
                 if (!await client.FileExistsAsync($"{nndID}.mp3"))
                 {
@@ -85,7 +85,7 @@ namespace MikuSharp.Entities
                         return null;
                     }
                     await msg.ModifyAsync("Uploading");
-                    await client.UploadAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
+                    await client.UploadStreamAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
                 }
                 var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
                 if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
@@ -99,7 +99,7 @@ namespace MikuSharp.Entities
                 var msg = await ctx.RespondAsync("Processing Bilibili Video...");
                 var split = n.Split("/".ToCharArray());
                 var nndID = split.First(x => x.StartsWith("anime") || x.StartsWith("av")).Split("?")[0];
-                FtpClient client = new(Bot.cfg.NndConfig.FtpConfig.Hostname, new NetworkCredential(Bot.cfg.NndConfig.FtpConfig.User, Bot.cfg.NndConfig.FtpConfig.Password));
+                FtpClient client = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
                 await client.ConnectAsync();
                 if (!await client.FileExistsAsync($"{nndID}.mp3"))
                 {
@@ -111,7 +111,7 @@ namespace MikuSharp.Entities
                         return null;
                     }
                     await msg.ModifyAsync("Uploading");
-                    await client.UploadAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
+                    await client.UploadStreamAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
                 }
                 var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
                 if (pos == -1) await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);

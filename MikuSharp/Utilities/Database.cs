@@ -16,7 +16,7 @@ namespace MikuSharp.Utilities
         public static async Task AddToLPL(ulong g, string ts)
         {
             int position = 0;
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM lastplayedsongs WHERE guildId = {g};", conn);
@@ -49,7 +49,7 @@ namespace MikuSharp.Utilities
 
         public static async Task ReorderQueue(DiscordGuild g)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var queueNow = await GetQueue(g);
@@ -77,7 +77,7 @@ namespace MikuSharp.Utilities
 
         public static async Task RebuildQueue(DiscordGuild g, List<QueueEntry> q)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var queueNow = q;
@@ -105,7 +105,7 @@ namespace MikuSharp.Utilities
 
         public static async Task<List<QueueEntry>> GetQueue(DiscordGuild g)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM queues WHERE guildId = {g.Id} ORDER BY position ASC;", conn);
@@ -125,7 +125,7 @@ namespace MikuSharp.Utilities
         public static async Task AddToQueue(DiscordGuild g, ulong u, string ts)
         {
             int position = 0;
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM queues WHERE guildId = {g.Id};", conn);
@@ -167,7 +167,7 @@ namespace MikuSharp.Utilities
         public static async Task AddToQueue(DiscordGuild g, ulong u, List<LavalinkTrack> ts)
         {
             int position = 0;
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM queues WHERE guildId = {g.Id};", conn);
@@ -207,7 +207,7 @@ namespace MikuSharp.Utilities
         public static async Task AddToQueue(DiscordGuild g, ulong u, List<PlaylistEntry> ts)
         {
             int position = 0;
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM queues WHERE guildId = {g.Id};", conn);
@@ -263,7 +263,7 @@ namespace MikuSharp.Utilities
 
         public static async Task RemoveFromQueue(int position, DiscordGuild g)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd = new NpgsqlCommand($"DELETE FROM queues WHERE position = {position} AND guildid = {g.Id};", conn);
@@ -276,7 +276,7 @@ namespace MikuSharp.Utilities
 
         public static async Task ClearQueue(DiscordGuild g)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd = new NpgsqlCommand($"DELETE FROM queues WHERE guildid = {g.Id};", conn);
@@ -297,7 +297,7 @@ namespace MikuSharp.Utilities
 
         public static async Task<List<Entry>> GetLPL(DiscordGuild g)
         {
-            var connString = Bot.cfg.DbConnectString;
+            var connString = MikuBot.Config.DbConnectString;
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
             var cmd2 = new NpgsqlCommand($"SELECT * FROM lastplayedsongs WHERE guildId = {g.Id} ORDER BY lastplayedsongs.trackposition DESC LIMIT 1000", conn);
