@@ -1,8 +1,6 @@
 ﻿using DisCatSharp;
 using DisCatSharp.ApplicationCommands;
 using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.CommandsNext.Attributes;
-using DisCatSharp.CommandsNext;
 using DisCatSharp.Entities;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;

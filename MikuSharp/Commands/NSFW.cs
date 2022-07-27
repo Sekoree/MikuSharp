@@ -102,6 +102,7 @@ namespace MikuSharp.Commands
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
             await ctx.RespondAsync(builder);
+            */
         }
              - discontinued
         /*[Command("konachan")]
@@ -132,7 +133,7 @@ namespace MikuSharp.Commands
             await ctx.RespondAsync(builder);
         }*/
 
-			[Command("lewdkitsune")]
+        [Command("lewdkitsune")]
         [Description("lewd")]
         public async Task LewdKitsune(CommandContext ctx)
         {
@@ -167,7 +168,7 @@ namespace MikuSharp.Commands
             DiscordMessageBuilder builder = new();
             builder.WithFile($"image.{d.Filetype}", d.Data);
             builder.WithEmbed(d.Embed);
-            await ctx.RespondAsync(builder);
+            await ctx.RespondAsync(builder);*/
         }
     
         [Command("nekoparagif")]
