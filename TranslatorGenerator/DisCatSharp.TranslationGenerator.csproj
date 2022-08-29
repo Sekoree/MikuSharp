@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <OutputType>WinExe</OutputType>
@@ -24,7 +24,7 @@
   <PropertyGroup>
     <ApplicationIcon>discatsharp.ico</ApplicationIcon>
     <UseWindowsForms>False</UseWindowsForms>
-    <StartupObject>TranslatorGenerator.App</StartupObject>
+    <StartupObject>DisCatSharp.TranslationGenerator.App</StartupObject>
     <Nullable>enable</Nullable>
     <Title>DisCatSharp Application Command Translation Generator</Title>
     <Authors>aiko, AITSYS, DisCatSharp</Authors>
@@ -37,6 +37,32 @@
     <PackageTags>dcs,discatsharp</PackageTags>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+    <PropertyGroup>
+	    <VersionPrefix>1.0.0</VersionPrefix>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(VersionSuffix)' != '' And '$(BuildNumber)' != ''">
+	    <Version>$(VersionPrefix)-$(VersionSuffix)-$(BuildNumber)</Version>
+	    <AssemblyVersion>$(VersionPrefix).$(BuildNumber)</AssemblyVersion>
+	    <FileVersion>$(VersionPrefix).$(BuildNumber)</FileVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(VersionSuffix)' != '' And '$(BuildNumber)' == ''">
+	    <Version>$(VersionPrefix)-$(VersionSuffix)</Version>
+	    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+	    <FileVersion>$(VersionPrefix).0</FileVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(VersionSuffix)' == ''">
+	    <Version>$(VersionPrefix)</Version>
+	    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+	    <FileVersion>$(VersionPrefix).0</FileVersion>
+    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;CA1824;DV2001</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;CA1824;DV2001</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Update="discatsharp.png">
@@ -46,9 +72,13 @@
     <None Update="out\README.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="miku.ico" />
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="Themes\images\slash.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
@@ -74,12 +104,32 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.336902">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Entities\" />
+    <Folder Include="Enums\" />
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

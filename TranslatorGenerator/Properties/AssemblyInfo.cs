@@ -1,20 +1,19 @@
 ﻿using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TranslatorGenerator")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("DCS Translation Generator")]
+[assembly: AssemblyDescription("Application Command Translation Generator for DisCatSharp")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("TranslatorGenerator")]
-[assembly: AssemblyCopyright("Copyright ©  2022")]
+[assembly: AssemblyCompany("Aiko IT Systems")]
+[assembly: AssemblyProduct("DisCatSharp.TranslationGenerator")]
+[assembly: AssemblyCopyright("Copyright © 2022 AITSYS")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: ObfuscateAssembly(true)]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -39,7 +38,6 @@ using System.Windows;
 											  //(used if a resource is not found in the page,
 											  // app, or any theme specific resource dictionaries)
 )]
-
 
 // Version information for an assembly consists of the following four values:
 //

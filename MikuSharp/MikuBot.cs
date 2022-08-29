@@ -121,7 +121,8 @@ internal class MikuBot : IDisposable
 			EnableDefaultHelp = true,
 			DebugStartup = true,
 			EnableLocalization = false,
-			ManualOverride = true
+			ManualOverride = true,
+			GenerateTranslationFilesOnly = true
 		}).Result;
 
 		CommandsNextModules = ShardedClient.UseCommandsNextAsync(new()

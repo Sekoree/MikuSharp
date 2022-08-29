@@ -1,5 +1,5 @@
 ﻿using DisCatSharp;
-using DisCatSharp.ApplicationCommands;
+using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Interactivity.Extensions;
