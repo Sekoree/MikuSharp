@@ -44,6 +44,81 @@ pip3 install nndownload
 echo "Done"
 ```
 
+#### Lavalink
+Download lavalink [v3.5-rc4](https://github.com/freyacodes/Lavalink/releases/download/3.5-rc4/Lavalink.jar)
+
+This [configuration](https://github.com/freyacodes/Lavalink/#server-configuration) is a bit different.
+- We use an youtube account to avoid age-restrictions
+- Additionally an spotify developer [application](https://developer.spotify.com/dashboard/applications) is needed
+
+```yml
+server:
+  port: 2333
+  address: 0.0.0.0
+lavalink:
+  server:
+    password: "YOU_SHALL_NOT_PASS"
+    sources:
+      youtube: true
+      bandcamp: true
+      soundcloud: true
+      twitch: true
+      vimeo: true
+      http: true
+      local: false
+    bufferDurationMs: 400
+    frameBufferDurationMs: 5000
+    trackStuckThresholdMs: 10000
+    youtubePlaylistLoadLimit: 6
+    playerUpdateInterval: 5
+    youtubeSearchEnabled: true
+    soundcloudSearchEnabled: true
+    gc-warnings: true
+    youtubeConfig:
+      email: "someone@gmail.com" # Email of Google account
+      password: "abcdefg" # App password for Google account
+  plugins:
+    - dependency: "com.github.Topis-Lavalink-Plugins:Topis-Source-Managers-Plugin:v2.0.7"
+      repository: "https://jitpack.io"
+    - dependency: "me.rohank05:lavalink-filter-plugin:0.0.1"
+      repository: "https://jitpack.io"
+
+plugins:
+  topissourcemanagers:
+    providers:
+      - "ytsearch:\"%ISRC%\""
+      - "ytsearch:%QUERY%"
+      - "scsearch:%QUERY%"
+    sources:
+      spotify: true
+      applemusic: true
+    spotify:
+        clientId: "SPOTIFY_CLIENT_ID" 
+        clientSecret: "SPOTIFY_CLIENT_SECRET"
+        countryCode: "DE"
+    applemusic:
+        countryCode: "DE"
+
+metrics:
+  prometheus:
+    enabled: false
+    endpoint: /metrics
+
+sentry:
+  dsn: ""
+  environment: ""
+
+logging:
+  file:
+    max-history: 30
+    max-size: 1GB
+  path: ./logs/
+
+  level:
+    root: INFO
+    lavalink: INFO
+```
+
 ### Used libraries ❤
 * [DisCatSharp](https://github.com/Aiko-IT-Systems/DisCatSharp) as Discord bot library
 * [AngleSharp](https://github.com/AngleSharp/AngleSharp) for various HTML parsing things
