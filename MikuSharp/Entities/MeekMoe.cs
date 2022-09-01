@@ -1,8 +1,7 @@
-﻿namespace MikuSharp.Entities
+﻿namespace MikuSharp.Entities;
+
+public class MeekMoe
 {
-    public class MeekMoe
-    {
-        public string url { get; set; }
-        public string creator { get; set; }
-    }
+	public string url { get; set; }
+	public string creator { get; set; }
 }

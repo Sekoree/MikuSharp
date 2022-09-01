@@ -1,5 +1,6 @@
-﻿using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
+﻿using DisCatSharp.ApplicationCommands;
+using DisCatSharp.ApplicationCommands.Attributes;
+using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
 
 using HeyRed.Mime;
@@ -7,104 +8,100 @@ using HeyRed.Mime;
 using MikuSharp.Utilities;
 
 using System.IO;
-using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace MikuSharp.Commands
+namespace MikuSharp.Commands;
+
+[SlashCommandGroup("action", "Actions", dmPermission: false)]
+internal class Action : ApplicationCommandsModule
 {
-    class Action : BaseCommandModule
-    {
-        [Command("hug")]
-        [Description("Hug someone!")]
-        public async Task Hug(CommandContext ctx, DiscordMember m)
-        {
-            var WSH = await Web.GetWeebSh(ctx, "hug", new[] { "" });
-            WSH.Embed.WithDescription($"{ctx.Member.Mention} hugs {m.Mention} uwu");
+	[SlashCommand("hug", "Hug someone!")]
+	public static async Task HugAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	{
+		await ctx.CreateResponseAsync(DisCatSharp.InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var WSH = await ctx.Client.RestClient.GetWeebShAsync("hug", new[] { "" });
+		WSH.Embed.WithDescription($"{ctx.User.Mention} hugs {user.Mention} uwu");
 
-            DiscordMessageBuilder builder = new();
-            builder.WithFile($"image.{WSH.Extension}", WSH.ImgData);
-            builder.WithEmbed(WSH.Embed.Build());
-            await ctx.RespondAsync(builder);
-        }
+		DiscordWebhookBuilder builder = new();
+		builder.AddFile($"image.{WSH.Extension}", WSH.ImgData);
+		builder.AddEmbed(WSH.Embed.Build());
+		await ctx.EditResponseAsync(builder);
+	}
 
-        [Command("kiss")]
-        [Description("Kiss someone!")]
-        public async Task Kiss(CommandContext ctx, DiscordMember m)
-        {
-            var WSH = await Web.GetWeebSh(ctx, "kiss", new[] { "" });
-            WSH.Embed.WithDescription($"{ctx.Member.Mention} kisses {m.Mention} >~<");
+	[SlashCommand("kiss", "Kiss someone!")]
+	public static async Task KissAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	{
+		await ctx.CreateResponseAsync(DisCatSharp.InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var WSH = await ctx.Client.RestClient.GetWeebShAsync("kiss", new[] { "" });
+		WSH.Embed.WithDescription($"{ctx.User.Mention} kisses {user.Mention} >~<");
 
-            DiscordMessageBuilder builder = new();
-            builder.WithFile($"image.{WSH.Extension}", WSH.ImgData);
-            builder.WithEmbed(WSH.Embed.Build());
-            await ctx.RespondAsync(builder);
-        }
+		DiscordWebhookBuilder builder = new();
+		builder.AddFile($"image.{WSH.Extension}", WSH.ImgData);
+		builder.AddEmbed(WSH.Embed.Build());
+		await ctx.EditResponseAsync(builder);
+	}
 
-        [Command("lick")]
-        [Description("Lick someone?")]
-        public async Task Lick(CommandContext ctx, DiscordMember m)
-        {
-            var WSH = await Web.GetWeebSh(ctx, "lick", new[] { "" });
-            WSH.Embed.WithDescription($"{ctx.Member.Mention} licks {m.Mention} owo");
+	[SlashCommand("lick", "Lick someone!")]
+	public static async Task LickAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	{
+		await ctx.CreateResponseAsync(DisCatSharp.InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var WSH = await ctx.Client.RestClient.GetWeebShAsync("lick", new[] { "" });
+		WSH.Embed.WithDescription($"{ctx.User.Mention} licks {user.Mention} owo");
 
-            DiscordMessageBuilder builder = new();
-            builder.WithFile($"image.{WSH.Extension}", WSH.ImgData);
-            builder.WithEmbed(WSH.Embed.Build());
-            await ctx.RespondAsync(builder);
-        }
+		DiscordWebhookBuilder builder = new();
+		builder.AddFile($"image.{WSH.Extension}", WSH.ImgData);
+		builder.AddEmbed(WSH.Embed.Build());
+		await ctx.EditResponseAsync(builder);
+	}
 
-        [Command("pat")]
-        [Description("Pat someone!")]
-        public async Task Pat(CommandContext ctx, DiscordMember m)
-        {
-            var c = new HttpClient();
-            var weeurl = await Bot._weeb.GetRandomAsync("pat", new[] { "" });
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
-            var em = new DiscordEmbedBuilder();
-            em.WithDescription($"{ctx.Member.Mention} pats {m.Mention} #w#");
-            em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by nekos.life");
+	[SlashCommand("pat", "Pat someone!")]
+	public static async Task PatAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	{
+		await ctx.CreateResponseAsync(DisCatSharp.InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var weeurl = await MikuBot._weebClient.GetRandomAsync("pat", new[] { "" });
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
+		var em = new DiscordEmbedBuilder();
+		em.WithDescription($"{ctx.User.Mention} pats {user.Mention} #w#");
+		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
+		em.WithFooter("by nekos.life");
 
-            DiscordMessageBuilder builder = new();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            builder.WithEmbed(em.Build());
-            await ctx.RespondAsync(builder);
-        }
+		DiscordWebhookBuilder builder = new();
+		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+		builder.AddEmbed(em.Build());
+		await ctx.EditResponseAsync(builder);
+	}
 
-        [Command("poke")]
-        [Description("Poke someone!")]
-        public async Task Poke(CommandContext ctx, DiscordMember m)
-        {
-            var c = new HttpClient();
-            var weeurl = await Bot._weeb.GetRandomAsync("poke", new[] { "" });
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
-            var em = new DiscordEmbedBuilder();
-            em.WithDescription($"{ctx.Member.Mention} pokes {m.Mention} ÓwÒ");
-            em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by nekos.life");
+	[SlashCommand("poke", "Poke someone!")]
+	public static async Task PokeAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	{
+		await ctx.CreateResponseAsync(DisCatSharp.InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var weeurl = await MikuBot._weebClient.GetRandomAsync("poke", new[] { "" });
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
+		var em = new DiscordEmbedBuilder();
+		em.WithDescription($"{ctx.User.Mention} pokes {user.Mention} ÓwÒ");
+		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
+		em.WithFooter("by nekos.life");
 
-            DiscordMessageBuilder builder = new();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            builder.WithEmbed(em.Build());
-            await ctx.RespondAsync(builder);
-        }
+		DiscordWebhookBuilder builder = new();
+		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+		builder.AddEmbed(em.Build());
+		await ctx.EditResponseAsync(builder);
+	}
 
-        [Command("slap")]
-        [Description("Slap someone!")]
-        public async Task Slap(CommandContext ctx, DiscordMember m)
-        {
-            var c = new HttpClient();
-            var weeurl = await Bot._weeb.GetRandomAsync("slap", new[] { "" });
-            Stream img = new MemoryStream(await c.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
-            var em = new DiscordEmbedBuilder();
-            em.WithDescription($"{ctx.Member.Mention} slaps {m.Mention} ÒwÓ");
-            em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
-            em.WithFooter("by nekos.life");
+	[SlashCommand("slap", "Slap someone!")]
+	public static async Task SlapAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	{
+		await ctx.CreateResponseAsync(DisCatSharp.InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		var weeurl = await MikuBot._weebClient.GetRandomAsync("slap", new[] { "" });
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
+		var em = new DiscordEmbedBuilder();
+		em.WithDescription($"{ctx.User.Mention} slaps {user.Mention} ÒwÓ");
+		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
+		em.WithFooter("by nekos.life");
 
-            DiscordMessageBuilder builder = new();
-            builder.WithFile($"image.{MimeGuesser.GuessExtension(img)}", img);
-            builder.WithEmbed(em.Build());
-            await ctx.RespondAsync(builder);
-        }
-    }
+		DiscordWebhookBuilder builder = new();
+		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
+		builder.AddEmbed(em.Build());
+		await ctx.EditResponseAsync(builder);
+	}
 }

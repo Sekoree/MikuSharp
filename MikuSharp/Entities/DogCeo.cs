@@ -1,8 +1,7 @@
-﻿namespace MikuSharp.Entities
+﻿namespace MikuSharp.Entities;
+
+public class DogCeo
 {
-    public class DogCeo
-    {
-        public string status { get; set; }
-        public string message { get; set; }
-    }
+	public string status { get; set; }
+	public string message { get; set; }
 }

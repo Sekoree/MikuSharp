@@ -1,71 +1,106 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DisCatSharp;
+using DisCatSharp.ApplicationCommands;
+using DisCatSharp.ApplicationCommands.Attributes;
+using DisCatSharp.ApplicationCommands.Context;
+using DisCatSharp.Entities;
+
+using MikuSharp.Utilities;
+
+using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-using DisCatSharp;
-using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
-using DisCatSharp.Entities;
-using DisCatSharp.Interactivity;
+namespace MikuSharp.Commands;
 
-namespace MikuSharp.Commands
+[SlashCommandGroup("mod", "Moderation", defaultMemberPermissions: (long)Permissions.BanMembers, dmPermission: false)]
+internal class Moderation : ApplicationCommandsModule
 {
-    class Moderation : BaseCommandModule
-    {
-        [Command("ban")]
-        [RequirePermissions(Permissions.Administrator | Permissions.BanMembers)]
-        [Description("Ban someone")]
-        public async Task Ban(CommandContext ctx, DiscordMember m)
-        {
-            await ctx.RespondAsync("Banned: " + m.Mention);
-            await ctx.Guild.BanMemberAsync(m);
-        }
+	[SlashCommand("disable_invites", "Disable invites usage for guild")]
+	public static async Task DisableInvitesAsync(InteractionContext ctx, [Option("reason", "Auditlog reason")] string? reason = null)
+	{
+		await ctx.DeferAsync(false);
+		try
+		{
+			await ctx.Guild.DisableInvitesAsync(reason);
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Disabled invites"));
+		}
+		catch (Exception)
+		{
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Could not disable invites"));
+		}
+	}
 
-        [Command("kick")]
-        [RequirePermissions(Permissions.Administrator | Permissions.KickMembers)]
-        [Description("Kick someone")]
-        public async Task Kick(CommandContext ctx, DiscordMember m)
-        {
-            await ctx.RespondAsync("Kicked: " + m.Mention);
-            await m.RemoveAsync();
-        }
+	[SlashCommand("enable_invites", "Enable invites usage for guild")]
+	public static async Task EnableInvitesAsync(InteractionContext ctx, [Option("reason", "Auditlog reason")] string? reason = null)
+	{
+		await ctx.DeferAsync(false);
+		try
+		{
+			await ctx.Guild.EnableInvitesAsync(reason);
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Enabled invites"));
+		}
+		catch (Exception)
+		{
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Could not enable invites"));
+		}
+	}
 
-        [Command("purge")]
-        [RequirePermissions(Permissions.Administrator 
-            | Permissions.ManageMessages 
-            | Permissions.ManageChannels
-            | Permissions.ManageGuild)]
-        [Description("Delete a large amount of messages fast")]
-        public async Task Purge(CommandContext ctx, int amount)
-        {
-            if (amount > 100) await ctx.RespondAsync("Can only delete 100 Messages at a time for now");
-            var msgs = await ctx.Channel.GetMessagesAsync(amount);
-            await ctx.Channel.DeleteMessagesAsync(msgs);
-        }
+	[SlashCommand("ban", "Ban someone")]
+	public static async Task BanAsync(InteractionContext ctx, [Option("user", "User to ban")] DiscordUser user, [Option("deletion_days", "Delete messages of x days"), MaximumValue(7)] int deletionDays = 0, [Option("reason", "Auditlog reason")] string? reason = null)
+	{
+		await ctx.DeferAsync(false);
+		try
+		{
+			await ctx.Guild.BanMemberAsync(user.Id, deletionDays, reason);
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Banned {user.UsernameWithDiscriminator}"));
+		}
+		catch (Exception)
+		{
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Could not ban {user.UsernameWithDiscriminator}"));
+		}
+	}
 
-        [Command("unban")]
-        [Priority(2)]
-        [RequirePermissions(Permissions.Administrator
-            | Permissions.BanMembers
-            | Permissions.ManageGuild)]
-        [Description("Unban someone by their ID or username")]
-        public async Task UnBan(CommandContext ctx, ulong id)
-        {
-            var m = await ctx.Guild.GetBansAsync();
-            await ctx.Guild.UnbanMemberAsync(m.First(x => x.User.Id == id).User);
-        }
+	[SlashCommand("unban", "Unban someone")]
+	public static async Task UnbanAsync(InteractionContext ctx, [Option("username", "User to unban", true), Autocomplete(typeof(AutocompleteProviders.BanProvider))] string id, [Option("reason", "Auditlog reason")] string? reason = null)
+	{
+		await ctx.DeferAsync(false);
+		var userId = Convert.ToUInt64(id);
+		var user = await ctx.Client.GetUserAsync(userId, true);
+		await ctx.Guild.UnbanMemberAsync(user, reason);
+		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Unbanned {user.UsernameWithDiscriminator}"));
+	}
 
-        [Command("unban")]
-        [Priority(1)]
-        [RequirePermissions(Permissions.Administrator
-            | Permissions.BanMembers
-            | Permissions.ManageGuild)]
-        public async Task UnBan(CommandContext ctx, string name)
-        {
-            var m = await ctx.Guild.GetBansAsync();
-            await ctx.Guild.UnbanMemberAsync(m.First(x => x.User.Username.StartsWith(name) | $"{x.User.Username}#{x.User.Discriminator}".StartsWith(name)).User);
-        }
-    }
+	[SlashCommand("kick", "Kick someone")]
+	public static async Task KickAsync(InteractionContext ctx, [Option("user", "User to kick")] DiscordUser user, [Option("reason", "Auditlog reason")] string? reason = null)
+	{
+		await ctx.DeferAsync(false);
+		try
+		{
+			var member = await user.ConvertToMember(ctx.Guild);
+			await member.RemoveAsync(reason);
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Kicked {user.UsernameWithDiscriminator}"));
+		}
+		catch (Exception)
+		{
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Could not kick {user.UsernameWithDiscriminator}"));
+		}
+	}
+
+	[SlashCommand("purge", "Delete a large amount of messages fast")]
+	public static async Task PurgeAsync(InteractionContext ctx, [Option("amount", "Amount of messages to purge"), MinimumValue(1), MaximumValue(100)] int amount, [Option("reason", "Auditlog reason")] string? reason = null)
+	{
+		await ctx.DeferAsync(true);
+		try
+		{
+			var msgs = await ctx.Channel.GetMessagesAsync(amount);
+			var under14DaysOld = msgs.Where(x => (DateTime.Now - x.CreationTimestamp.DateTime).TotalDays < 14).ToList().AsReadOnly();
+			if (under14DaysOld.Any())
+				await ctx.Channel.DeleteMessagesAsync(under14DaysOld, reason);
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Purged {under14DaysOld.Count} messages"));
+		}
+		catch (DisCatSharp.Exceptions.BadRequestException ex)
+		{
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(Formatter.BlockCode(ex.JsonMessage, "json")));
+		}
+	}
 }

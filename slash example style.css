@@ -1,0 +1,36 @@
+.lookFilled-yCfaCM.colorPrimary-2AuQVo {
+    color: hsl(0,calc(var(--saturation-factor, 1)*0%),100%);
+    background-color: var(--button-secondary-background);
+}
+
+.sizeIcon-1kBo12 {
+    height: auto;
+    padding: 4px;
+}
+
+.button-f2h6uQ {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    background: none;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 16px;
+    padding: 2px 16px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+

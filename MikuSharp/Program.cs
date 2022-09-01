@@ -1,17 +1,18 @@
-﻿
-using Serilog;
+﻿using Serilog;
 
-namespace MikuSharp
+namespace MikuSharp;
+
+class Program
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            using (var b = new Bot())
-            {
-                b.RunBot().Wait();
-            }
-            Log.Logger.Information("Shutdown!");
-        }
-    }
+	static void Main(string[] args)
+	{
+		using (var bot = new MikuBot())
+		{
+			MikuBot.RegisterEvents().Wait();
+			bot.RegisterCommands();
+			bot.RunAsync().Wait();
+			bot.Dispose();
+		}
+		Log.Logger.Information("Shutdown!");
+	}
 }

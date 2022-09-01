@@ -1,8 +1,7 @@
-﻿namespace MikuSharp.Entities
+﻿namespace MikuSharp.Entities;
+
+public class Random_D
 {
-    public class Random_D
-    {
-        public string url { get; set; }
-        public string message { get; set; }
-    }
+	public string url { get; set; }
+	public string message { get; set; }
 }

@@ -1,7 +1,9 @@
 ﻿using DisCatSharp;
-using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
+using DisCatSharp.ApplicationCommands;
+using DisCatSharp.ApplicationCommands.Attributes;
+using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
+using DisCatSharp.Exceptions;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.Extensions;
@@ -9,217 +11,209 @@ using DisCatSharp.Interactivity.Extensions;
 using Kitsu.Anime;
 using Kitsu.Manga;
 
+using Microsoft.Extensions.Logging;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MikuSharp.Commands
+namespace MikuSharp.Commands;
+
+[SlashCommandGroup("utility", "Utilities")]
+internal class Utility : ApplicationCommandsModule
 {
-    class Utility : BaseCommandModule
-    {
-        [Command("anime")]
-        [Description("Search for an anime")]
-        public async Task AnimeGet(CommandContext ctx, [RemainingText] string search)
-        {
-            try
-            {
-                var ine = ctx.Client.GetInteractivity();
-                var a = await Anime.GetAnimeAsync(search);
-                var emb = new DiscordEmbedBuilder();
-                List<DiscordEmbedBuilder> res = new();
-                List<Page> ress = new();
-                foreach (var aa in a.Data)
-                {
-                    emb.WithColor(new DiscordColor(0212255));
-                    emb.WithTitle(aa.Attributes.Titles.EnJp);
-                    if (aa.Attributes.Synopsis.Length != 0) 
-                        emb.WithDescription(aa.Attributes.Synopsis);
-                    if (aa.Attributes.Subtype.Length != 0) 
-                        emb.AddField(new DiscordEmbedField("Type", $"{aa.Attributes.Subtype}", true));
-                    if (aa.Attributes.EpisodeCount != null)
-                        emb.AddField(new DiscordEmbedField("Episodes", $"{aa.Attributes.EpisodeCount}", true));
-                    if (aa.Attributes.EpisodeLength != null)
-                        emb.AddField(new DiscordEmbedField("Length", $"{aa.Attributes.EpisodeLength}", true));
-                    if (aa.Attributes.StartDate != null) 
-                        emb.AddField(new DiscordEmbedField("Start Date", $"{aa.Attributes.StartDate}", true));
-                    if (aa.Attributes.EndDate != null)
-                        emb.AddField(new DiscordEmbedField("End Date", $"{aa.Attributes.EndDate}", true));
-                    if (aa.Attributes.AgeRating != null) 
-                        emb.AddField(new DiscordEmbedField("Age Rating", $"{aa.Attributes.AgeRating}", true));
-                    if (aa.Attributes.AverageRating != null) 
-                        emb.AddField(new DiscordEmbedField("Score", $"{aa.Attributes.AverageRating}", true));
-                    emb.AddField(new DiscordEmbedField("NSFW", $"{aa.Attributes.Nsfw}", true));
-                    if (aa.Attributes.CoverImage?.Small != null) emb.WithThumbnail(aa.Attributes.CoverImage.Small);
-                    res.Add(emb);
-                    emb = new DiscordEmbedBuilder();
-                }
-                res.Sort((x,y) => x.Title.CompareTo(y.Title));
-                int i = 1;
-                foreach(var aa in res)
-                {
-                    aa.WithFooter($"via Kitsu.io -- Page {i}/{a.Data.Count}", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
-                    ress.Add(new Page(embed: aa));
-                    i++;
-                }
-                await ine.SendPaginatedMessageAsync(ctx.Channel, ctx.User, ress, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                var ee = new DiscordEmbedBuilder();
-                ee.WithTitle("Error");
-                ee.WithDescription(ex.Message + "\n" + ex.StackTrace);
-                await ctx.RespondAsync("No Anime Found!", embed: ee.Build());
-            }
-        }
+	[SlashCommandGroup("am", "Anime & Mange")]
+	internal class AnimeMangaUtility : ApplicationCommandsModule
+	{
+		[SlashCommand("anime_search", "Search for an anime")]
+		public static async Task SearchAnimeAsync(InteractionContext ctx, [Option("search_query", "Search query")] string search_query)
+		{
+			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
+			try
+			{
+				var ine = ctx.Client.GetInteractivity();
+				var a = await Anime.GetAnimeAsync(search_query);
+				var emb = new DiscordEmbedBuilder();
+				List<DiscordEmbedBuilder> res = new();
+				List<Page> ress = new();
+				foreach (var aa in a.Data)
+				{
+					emb.WithColor(new DiscordColor(0212255));
+					emb.WithTitle(aa.Attributes.Titles.EnJp);
+					if (aa.Attributes.Synopsis.Length != 0)
+						emb.WithDescription(aa.Attributes.Synopsis);
+					if (aa.Attributes.Subtype.Length != 0)
+						emb.AddField(new DiscordEmbedField("Type", $"{aa.Attributes.Subtype}", true));
+					if (aa.Attributes.EpisodeCount != null)
+						emb.AddField(new DiscordEmbedField("Episodes", $"{aa.Attributes.EpisodeCount}", true));
+					if (aa.Attributes.EpisodeLength != null)
+						emb.AddField(new DiscordEmbedField("Length", $"{aa.Attributes.EpisodeLength}", true));
+					if (aa.Attributes.StartDate != null)
+						emb.AddField(new DiscordEmbedField("Start Date", $"{aa.Attributes.StartDate}", true));
+					if (aa.Attributes.EndDate != null)
+						emb.AddField(new DiscordEmbedField("End Date", $"{aa.Attributes.EndDate}", true));
+					if (aa.Attributes.AgeRating != null)
+						emb.AddField(new DiscordEmbedField("Age Rating", $"{aa.Attributes.AgeRating}", true));
+					if (aa.Attributes.AverageRating != null)
+						emb.AddField(new DiscordEmbedField("Score", $"{aa.Attributes.AverageRating}", true));
+					emb.AddField(new DiscordEmbedField("NSFW", $"{aa.Attributes.Nsfw}", true));
+					if (aa.Attributes.CoverImage?.Small != null) emb.WithThumbnail(aa.Attributes.CoverImage.Small);
+					res.Add(emb);
+					emb = new DiscordEmbedBuilder();
+				}
+				res.Sort((x, y) => x.Title.CompareTo(y.Title));
+				int i = 1;
+				foreach (var aa in res)
+				{
+					aa.WithFooter($"via Kitsu.io -- Page {i}/{a.Data.Count}", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
+					ress.Add(new Page(embed: aa));
+					i++;
+				}
+				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable);
+			}
+			catch (Exception ex)
+			{
+				ctx.Client.Logger.LogError(ex.Message);
+				ctx.Client.Logger.LogError(ex.StackTrace);
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No Anime found!"));
+			}
+		}
 
-        [Command("avatar")]
-        [Description("Get the avatar of someone or yourself")]
-        [Priority(2)]
-        public async Task Avatar(CommandContext ctx, DiscordMember member = null)
-        {
-            string avartURL = ctx.Member.AvatarUrl;
-            if (member != null)
-            {
-                avartURL = member.AvatarUrl;
-            }
-            var embed2 = new DiscordEmbedBuilder { };
-            embed2.WithImageUrl(avartURL);
-            await ctx.RespondAsync(embed: embed2.Build());
-        }
+		[SlashCommand("manga_search", "Search for an manga")]
+		public static async Task SearchMangaAsync(InteractionContext ctx, [Option("search_query", "Search query")] string search_query)
+		{
+			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
+			try
+			{
+				var ine = ctx.Client.GetInteractivity();
+				var a = await Manga.GetMangaAsync(search_query);
+				var emb = new DiscordEmbedBuilder();
+				List<DiscordEmbedBuilder> res = new();
+				List<Page> ress = new();
+				foreach (var aa in a.Data)
+				{
+					emb.WithColor(new DiscordColor(0212255));
+					emb.WithTitle(aa.Attributes.Titles.EnJp);
+					if (aa.Attributes.Synopsis != null)
+						emb.WithDescription(aa.Attributes.Synopsis);
+					if (aa.Attributes.Subtype != null)
+						emb.AddField(new DiscordEmbedField("Type", $"{aa.Attributes.Subtype}", true));
+					if (aa.Attributes.StartDate != null)
+						emb.AddField(new DiscordEmbedField("Start Date", $"{aa.Attributes.StartDate}", true));
+					if (aa.Attributes.EndDate != null)
+						emb.AddField(new DiscordEmbedField("End Date", $"{aa.Attributes.EndDate}", true));
+					if (aa.Attributes.AgeRating != null)
+						emb.AddField(new DiscordEmbedField("Age Rating", $"{aa.Attributes.AgeRating}", true));
+					if (aa.Attributes.AverageRating != null)
+						emb.AddField(new DiscordEmbedField("Score", $"{aa.Attributes.AverageRating}", true));
+					if (aa.Attributes.CoverImage?.Small != null)
+						emb.WithThumbnail(aa.Attributes.CoverImage.Small);
+					emb.WithFooter("via Kitsu.io", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
+					res.Add(emb);
+					emb = new DiscordEmbedBuilder();
+				}
+				res.Sort((x, y) => x.Title.CompareTo(y.Title));
+				int i = 1;
+				foreach (var aa in res)
+				{
+					aa.WithFooter($"via Kitsu.io -- Page {i}/{a.Data.Count}", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
+					ress.Add(new Page(embed: aa));
+					i++;
+				}
+				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable);
+			}
+			catch (Exception ex)
+			{
+				ctx.Client.Logger.LogError(ex.Message);
+				ctx.Client.Logger.LogError(ex.StackTrace);
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No Manga found!"));
+			}
+		}
+	}
 
-        [Command("avatar")]
-        [Priority(1)]
-        public async Task Avatar(CommandContext ctx, string member)
-        {
-            var AvatarUser = ctx.Guild.Members.Where(x => x.Value.Username.ToLower().Contains(member) | x.Value.DisplayName.ToLower().Contains(member));
-            var embed2 = new DiscordEmbedBuilder { };
-            embed2.WithImageUrl(AvatarUser.First().Value.AvatarUrl);
-            await ctx.RespondAsync(embed: embed2.Build());
-        }
+	[SlashCommandGroup("discord", "Discord Utilities")]
+	internal class DiscordUtility : ApplicationCommandsModule
+	{
+		[SlashCommand("avatar", "Get the avatar of someone or yourself")]
+		public static async Task GetAvatarAsync(InteractionContext ctx, [Option("user", "User to get the avatar from")] DiscordUser? user = null)
+			=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null).AddEmbed(new DiscordEmbedBuilder().WithImageUrl(user != null ? user.AvatarUrl : ctx.User.AvatarUrl).Build()));
 
-        [Command("emojilist")]
-        [Aliases("emotelist","emotes")]
-        [Description("Lists all custom emoji on this server")]
-        public async Task EmojiList(CommandContext ctx)
-        {
-            string wat = null;
-            foreach (var em in ctx.Guild.Emojis)
-            {
-                wat += em + "";
-            }
-            await ctx.RespondAsync(wat);
-        }
+		[SlashCommand("server_info", "Get information about the server")]
+		public static async Task GuildInfoAsync(InteractionContext ctx)
+		{
+			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
 
-        [Command("guildinfo")]
-        [Aliases("serverinfo")]
-        [Description("Get some info about this guild")]
-        public async Task GuildInfo(CommandContext ctx)
-        {
-            var emb = new DiscordEmbedBuilder();
-            emb.WithTitle(ctx.Guild.Name);
-            emb.WithColor(new DiscordColor(0212255));
-            emb.WithThumbnail(ctx.Guild.IconUrl);
-            emb.AddField(new DiscordEmbedField("Owner",ctx.Guild.Owner.Mention, true));
-            emb.AddField(new DiscordEmbedField("Region",ctx.Guild.VoiceRegion.Name, true));
-            emb.AddField(new DiscordEmbedField("ID",ctx.Guild.Id.ToString(), true));
-            emb.AddField(new DiscordEmbedField("Created At",ctx.Guild.CreationTimestamp.ToString(), true));
-            emb.AddField(new DiscordEmbedField("Emojis",ctx.Guild.Emojis.Count.ToString(), true));
-            emb.AddField(new DiscordEmbedField("Members (Humans)",$"{ctx.Guild.MemberCount}({ctx.Guild.Members.Where(x => !x.Value.IsBot).Count()})", true));
-            await ctx.RespondAsync(embed: emb.Build());
-        }
+			if (ctx.Guild == null)
+			{
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You have to execute this command on a server!"));
+				return;
+			}
 
-        [Command("manga")]
-        [Description("Search for a manga")]
-        public async Task MangaGet(CommandContext ctx, [RemainingText] string search)
-        {
-            try
-            {
-                var ine = ctx.Client.GetInteractivity();
-                var a = await Manga.GetMangaAsync(search);
-                var emb = new DiscordEmbedBuilder();
-                List<DiscordEmbedBuilder> res = new();
-                List<Page> ress = new();
-                foreach (var aa in a.Data)
-                {
-                    emb.WithColor(new DiscordColor(0212255));
-                    emb.WithTitle(aa.Attributes.Titles.EnJp);
-                    if (aa.Attributes.Synopsis != null)
-                        emb.WithDescription(aa.Attributes.Synopsis);
-                    if (aa.Attributes.Subtype != null) 
-                        emb.AddField(new DiscordEmbedField("Type", $"{aa.Attributes.Subtype}", true));
-                    if (aa.Attributes.StartDate != null) 
-                        emb.AddField(new DiscordEmbedField("Start Date", $"{aa.Attributes.StartDate}", true));
-                    if (aa.Attributes.EndDate != null) 
-                        emb.AddField(new DiscordEmbedField("End Date", $"{aa.Attributes.EndDate}", true));
-                    if (aa.Attributes.AgeRating != null) 
-                        emb.AddField(new DiscordEmbedField("Age Rating", $"{aa.Attributes.AgeRating}", true));
-                    if (aa.Attributes.AverageRating != null) 
-                        emb.AddField(new DiscordEmbedField("Score", $"{aa.Attributes.AverageRating}", true));
-                    if (aa.Attributes.CoverImage?.Small != null) 
-                        emb.WithThumbnail(aa.Attributes.CoverImage.Small);
-                    emb.WithFooter("via Kitsu.io", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
-                    res.Add(emb);
-                    emb = new DiscordEmbedBuilder();
-                }
-                res.Sort((x, y) => x.Title.CompareTo(y.Title));
-                int i = 1;
-                foreach (var aa in res)
-                {
-                    aa.WithFooter($"via Kitsu.io -- Page {i}/{a.Data.Count}", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
-                    ress.Add(new Page(embed: aa));
-                    i++;
-                }
-                await ine.SendPaginatedMessageAsync(ctx.Channel, ctx.User, ress, PaginationBehaviour.WrapAround, ButtonPaginationBehavior.Disable);
-            }
-            catch
-            {
-                await ctx.RespondAsync("No Manga Found!");
-            }
-        }
+			var members = await ctx.Guild.GetAllMembersAsync();
+			var bots = members.Where(x => x.IsBot).Count();
 
-        [Command("userinfo")]
-        [Priority(2)]
-        [Description("Get some info about a user or yourself")]
-        public async Task UserInfo(CommandContext ctx, DiscordMember m)
-        {
-            Console.WriteLine("VIA MEMBER");
-            var emb = new DiscordEmbedBuilder();
-            emb.WithColor(new DiscordColor(0212255));
-            emb.WithTitle("User Info");
-            emb.AddField(new DiscordEmbedField("Username", $"{m.Username}#{m.Discriminator}", true));
-            if (m.DisplayName != m.Username)
-                emb.AddField(new DiscordEmbedField("Nickname", $"{m.DisplayName}", true));
-            emb.AddField(new DiscordEmbedField("ID", $"{m.Id}", true));
-            emb.AddField(new DiscordEmbedField("Status", $"{m.Presence.Status}", true));
-            emb.AddField(new DiscordEmbedField("Account Creation", $"{Formatter.Timestamp(m.CreationTimestamp)}", true));
-            emb.AddField(new DiscordEmbedField("Join Date", $"{Formatter.Timestamp(m.JoinedAt)}", true));
-            emb.WithThumbnail(m.AvatarUrl);
-            await ctx.RespondAsync(embed: emb.Build());
-        }
+			var emb = new DiscordEmbedBuilder();
+			emb.WithTitle(ctx.Guild.Name);
+			emb.WithColor(new DiscordColor(0212255));
+			emb.WithThumbnail(ctx.Guild.IconUrl);
+			emb.AddField(new DiscordEmbedField("Owner", ctx.Guild.Owner.Mention, true));
+			emb.AddField(new DiscordEmbedField("Language", ctx.Guild.PreferredLocale, true));
+			emb.AddField(new DiscordEmbedField("ID", ctx.Guild.Id.ToString(), true));
+			emb.AddField(new DiscordEmbedField("Created At", Formatter.Timestamp(ctx.Guild.CreationTimestamp, TimestampFormat.LongDateTime), true));
+			emb.AddField(new DiscordEmbedField("Emojis", ctx.Guild.Emojis.Count.ToString(), true));
+			emb.AddField(new DiscordEmbedField("Members (Bots)", $"{members.Count} ({bots})", true));
 
-        [Command("userinfo")]
-        [Priority(1)]
-        public async Task UserInfo(CommandContext ctx, string me = null)
-        {
-            Console.WriteLine("VIA String");
-            var m = ctx.Member;
-            if (me != null){
-                m = ctx.Guild.Members.First(x => x.Value.Username.ToLower().Contains(me) | x.Value.DisplayName.ToLower().Contains(me)).Value;
-                if (m == null) return;
-            }
-            var emb = new DiscordEmbedBuilder();
-            emb.WithColor(new DiscordColor(0212255));
-            emb.WithTitle("User Info");
-            emb.AddField(new DiscordEmbedField("Username", $"{m.Username}#{m.Discriminator}", true));
-            if (m.DisplayName != m.Username)
-                emb.AddField(new DiscordEmbedField("Nickname", $"{m.DisplayName}", true));
-            emb.AddField(new DiscordEmbedField("ID", $"{m.Id}", true));
-            //emb.AddField("Status", $"{m.Presence.Status}", true); // Requires presence intent
-            emb.AddField(new DiscordEmbedField("Account Creation", $"{Formatter.Timestamp(m.CreationTimestamp)}", true));
-            emb.WithThumbnail(m.AvatarUrl);
-            await ctx.RespondAsync(embed: emb.Build());
-        }
-    }
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
+		}
+
+		[SlashCommand("user_info", "Get information about a user")]
+		public static async Task UserInfoAsync(InteractionContext ctx, [Option("user", "The user to view")] DiscordUser? user = null)
+		{
+			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
+
+			if (user == null)
+				user = ctx.User;
+
+			DiscordMember? member = null;
+			if (ctx.Guild != null)
+			{
+				try
+				{
+					member = await user.ConvertToMember(ctx.Guild);
+				}
+				catch (NotFoundException) { }
+			}
+
+			var emb = new DiscordEmbedBuilder();
+			emb.WithColor(new DiscordColor(0212255));
+			emb.WithTitle("User Info");
+			emb.AddField(new DiscordEmbedField("Username", $"{user.Username}#{user.Discriminator}", true));
+			if (member != null)
+				if (member.DisplayName != user.Username)
+					emb.AddField(new DiscordEmbedField("Nickname", $"{member.DisplayName}", true));
+			emb.AddField(new DiscordEmbedField("ID", $"{user.Id}", true));
+			emb.AddField(new DiscordEmbedField("Account Creation", $"{Formatter.Timestamp(user.CreationTimestamp)}", true));
+			if (member != null)
+				emb.AddField(new DiscordEmbedField("Join Date", $"{Formatter.Timestamp(member.JoinedAt)}", true));
+			emb.WithThumbnail(user.AvatarUrl);
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
+		}
+
+		[SlashCommand("emojilist", "Lists all custom emoji on this server")]
+		public static async Task EmojiListAsync(InteractionContext ctx)
+		{
+			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
+			string wat = "You have to execute this command in a server!";
+			if (ctx.Guild != null && ctx.Guild.Emojis.Any())
+			{
+				wat = "**Emojies:** ";
+				foreach (var em in ctx.Guild.Emojis.Values)
+				{
+					wat += em + " ";
+				}
+			}
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(wat));
+		}
+	}
 }
