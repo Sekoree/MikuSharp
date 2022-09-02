@@ -122,7 +122,7 @@ internal class MikuBot : IDisposable
 			DebugStartup = true,
 			EnableLocalization = false,
 			ManualOverride = true,
-			GenerateTranslationFilesOnly = true
+			GenerateTranslationFilesOnly = false
 		}).Result;
 
 		CommandsNextModules = ShardedClient.UseCommandsNextAsync(new()
