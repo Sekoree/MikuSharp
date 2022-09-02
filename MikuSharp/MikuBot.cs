@@ -229,14 +229,14 @@ internal class MikuBot : IDisposable
 		{
 			DiscordActivity test = new()
 			{
-				Name = "m%help for music and nsfw commands!",
+				Name = "I'm using slash commands now!",
 				ActivityType = ActivityType.Playing
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test, userStatus: UserStatus.Online);
 			await Task.Delay(TimeSpan.FromMinutes(20));
 			DiscordActivity test2 = new()
 			{
-				Name = "Using slash now!",
+				Name = "m%help for nsfw commands!",
 				ActivityType = ActivityType.Playing
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test2, userStatus: UserStatus.Online);
