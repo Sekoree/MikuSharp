@@ -4,9 +4,9 @@ using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
+using DisCatSharp.Interactivity.Extensions;
 
-using MikuSharp.Entities;
-
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -73,24 +73,39 @@ internal class About : ApplicationCommandsModule
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"News setup complete {DiscordEmoji.FromGuildEmote(client: MikuBot.ShardedClient.GetShard(483279257431441410), id: 623933340520546306)}\n\nYou'll get the newest news about the bot in your server in {channel.Mention}!"));
 	}
 
-
 	[SlashCommand("feedback", "Send feedback!")]
-	public static async Task FeedbackAsync(InteractionContext ctx, [Option("feedback", "The feedback you want to send")] string feedback)
+	public static async Task FeedbackAsync(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
-		var guild = await MikuBot.ShardedClient.GetShard(483279257431441410).GetGuildAsync(id: 483279257431441410);
-		var emb = new DiscordEmbedBuilder();
-		emb.WithAuthor(name: $"{ctx.User.UsernameWithDiscriminator}", iconUrl: ctx.User.AvatarUrl).
-			WithTitle(title: "Feedback").
-			WithDescription(feedback).
-			WithFooter(text: $"Sent from {ctx.Guild?.Name ?? "DM"}");
-		emb.AddField(new DiscordEmbedField(name: "User", value: $"{ctx.User.Mention}", inline: true));
-		if (ctx.Guild != null)
-			emb.AddField(new DiscordEmbedField(name: "Guild", value: $"{ctx.Guild.Id}", inline: true));
-		var embed = await guild.GetChannel(484698873411928075).SendMessageAsync(embed: emb.Build());
-		await embed.CreateReactionAsync(DiscordEmoji.FromName(client: ctx.Client, name: ":thumbsup:"));
-		await embed.CreateReactionAsync(DiscordEmoji.FromName(client: ctx.Client, name: ":thumbsdown:"));
-		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Feedback sent {DiscordEmoji.FromGuildEmote(client: MikuBot.ShardedClient.GetShard(483279257431441410), id: 623933340520546306)}"));
+		DiscordInteractionModalBuilder modalBuilder = new();
+		modalBuilder.WithTitle("Feedback modal");
+		modalBuilder.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Small, "feedbacktitle", "Title of feedback", null, 5, null, true, "Feedback"));
+		modalBuilder.AddTextComponent(new DiscordTextComponent(TextComponentStyle.Paragraph, "feedbackbody", "Your feedback", null, 20, null, true, null));
+		await ctx.CreateModalResponseAsync(modalBuilder);
+
+		var res = await ctx.Client.GetInteractivity().WaitForModalAsync(modalBuilder.CustomId, TimeSpan.FromMinutes(1));
+		if (!res.TimedOut)
+		{
+			await res.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
+			var title = res.Result.Interaction.Data.Components.First(x => x.CustomId == "feedbacktitle").Value;
+			var body = res.Result.Interaction.Data.Components.First(x => x.CustomId == "feedbackbody").Value;
+			var guild = await MikuBot.ShardedClient.GetShard(483279257431441410).GetGuildAsync(id: 483279257431441410);
+			var emb = new DiscordEmbedBuilder();
+			emb.WithAuthor($"{ctx.User.UsernameWithDiscriminator}", iconUrl: ctx.User.AvatarUrl).
+				WithTitle(title).
+				WithDescription(body).
+				WithFooter(text: $"Sent from {ctx.Guild?.Name ?? "DM"}");
+			emb.AddField(new DiscordEmbedField("User", $"{ctx.User.Mention}", true));
+			if (ctx.Guild != null)
+				emb.AddField(new DiscordEmbedField("Guild", $"{ctx.Guild.Id}", true));
+			var embed = await guild.GetChannel(484698873411928075).SendMessageAsync(embed: emb.Build());
+			await embed.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsup:"));
+			await embed.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsdown:"));
+			await res.Result.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent($"Feedback sent {DiscordEmoji.FromGuildEmote(MikuBot.ShardedClient.GetShard(483279257431441410), 623933340520546306)}"));
+
+		}
+		else
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent($"You were too slow :(\nThe time limit is one minute.").AsEphemeral(ctx.Guild != null));
+
 	}
 
 	[SlashCommand("ping", "Current ping to discord's services")]
