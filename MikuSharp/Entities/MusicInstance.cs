@@ -312,7 +312,7 @@ public class MusicInstance
 						for (int i = 0; i < leng; i++)
 						{
 							em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));
-							selectOptions.Add(new DiscordSelectComponentOption(s.Tracks.ElementAt(i).Title, i.ToString(), $"by {s.Tracks.ElementAt(i).Author}. Lenght: {s.Tracks.ElementAt(i).Length}"));
+							selectOptions.Add(new DiscordSelectComponentOption(s.Tracks.ElementAt(i).Title, i.ToString(), $"by {s.Tracks.ElementAt(i).Author}. Length: {s.Tracks.ElementAt(i).Length}"));
 						}
 						DiscordSelectComponent select = new("Select song to play", selectOptions, minOptions: 1, maxOptions: 1);
 						var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(em.Build()).AddComponents(select));
