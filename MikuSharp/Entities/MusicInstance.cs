@@ -327,7 +327,7 @@ public class MusicInstance
 						var trackSelect = Convert.ToInt32(resp.Result.Values.First());
 						var track = s.Tracks.ElementAt(trackSelect);
 						select.Disable();
-						await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent($"Choosed {track.Title}"));
+						await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent($"Chose {track.Title}"));
 						if (pos == -1)
 							await Database.AddToQueue(ctx.Guild, ctx.Member.Id, track.TrackString);
 						else
