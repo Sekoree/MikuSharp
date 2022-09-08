@@ -41,6 +41,12 @@ public class Developer : ApplicationCommandsModule
 		}
 	}
 
+	[SlashCommand("long_test", "Testing lib bug")]
+	public static async Task LongTestAsync(InteractionContext ctx, [Option("long", "Long")] long test)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"{test}"));
+	}
+
 	[ContextMenu(ApplicationCommandType.Message, "Remove message - Miku Dev")]
 	public static async Task DeleteMessageAsync(ContextMenuContext ctx)
 	{
