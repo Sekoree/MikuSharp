@@ -6,7 +6,10 @@ using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Interactivity.Extensions;
 
+using Google.Apis.YouTube.v3.Data;
+
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -92,14 +95,19 @@ internal class About : ApplicationCommandsModule
 			var emb = new DiscordEmbedBuilder();
 			emb.WithAuthor($"{ctx.User.UsernameWithDiscriminator}", iconUrl: ctx.User.AvatarUrl).
 				WithTitle(title).
-				WithDescription(body).
-				WithFooter(text: $"Sent from {ctx.Guild?.Name ?? "DM"}");
-			emb.AddField(new DiscordEmbedField("User", $"{ctx.User.Mention}", true));
+				WithDescription(body);
 			if (ctx.Guild != null)
 				emb.AddField(new DiscordEmbedField("Guild", $"{ctx.Guild.Id}", true));
-			var embed = await guild.GetChannel(484698873411928075).SendMessageAsync(embed: emb.Build());
-			await embed.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsup:"));
-			await embed.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsdown:"));
+			var forum = guild.GetChannel(1020433162662322257);
+			List<ForumPostTag> tags = new();
+			if (ctx.Guild != null)
+				tags.Add(forum.AvailableTags.First(x => x.Id == 1020434799493648404));
+			else
+				tags.Add(forum.AvailableTags.First(x => x.Id == 1020434935502360576));
+			var thread = await forum.CreatePostAsync("Feedback", new DiscordMessageBuilder().AddEmbed(emb.Build()).WithContent($"Feedback from {ctx.User.UsernameWithDiscriminator}"), null, tags, "Feedback");
+			var msg = await thread.GetMessageAsync(thread.Id);
+			await msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsup:"));
+			await msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsdown:"));
 			await res.Result.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent($"Feedback sent {DiscordEmoji.FromGuildEmote(MikuBot.ShardedClient.GetShard(483279257431441410), 623933340520546306)}"));
 
 		}
