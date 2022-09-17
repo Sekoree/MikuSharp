@@ -40,6 +40,7 @@ public class Developer : ApplicationCommandsModule
 			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent($"Shard {shard.ShardId} has {shard.Guilds.Count} guilds."));
 		}
 	}
+
 	[ContextMenu(ApplicationCommandType.Message, "Remove message - Miku Dev")]
 	public static async Task DeleteMessageAsync(ContextMenuContext ctx)
 	{
