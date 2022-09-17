@@ -106,8 +106,8 @@ internal class About : ApplicationCommandsModule
 				tags.Add(forum.AvailableTags.First(x => x.Id == 1020434935502360576));
 			var thread = await forum.CreatePostAsync("Feedback", new DiscordMessageBuilder().AddEmbed(emb.Build()).WithContent($"Feedback from {ctx.User.UsernameWithDiscriminator}"), null, tags, "Feedback");
 			var msg = await thread.GetMessageAsync(thread.Id);
-			await msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsup:"));
 			await msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsdown:"));
+			await msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsup:"));
 			await res.Result.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent($"Feedback sent {DiscordEmoji.FromGuildEmote(MikuBot.ShardedClient.GetShard(483279257431441410), 623933340520546306)}"));
 
 		}
