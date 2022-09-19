@@ -236,7 +236,7 @@ internal class MikuBot : IDisposable
 			await Task.Delay(TimeSpan.FromMinutes(20));
 			DiscordActivity test2 = new()
 			{
-				Name = "m%help for nsfw commands!",
+				Name = "Mention me with help for nsfw commands!",
 				ActivityType = ActivityType.Playing
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test2, userStatus: UserStatus.Online);
