@@ -24,13 +24,9 @@ internal class About : ApplicationCommandsModule
 		var emb = new DiscordEmbedBuilder();
 		emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl).
 			WithTitle("Donate Page!").
-			WithAuthor("Miku MikuBot uwu").
-			WithUrl("https://meek.moe/").
+			WithAuthor("Miku MikuBot").
+			WithUrl("https://about:blank/").
 			WithColor(new DiscordColor("#348573")).
-			WithDescription("Thank you for your interest in supporting the bot's development!\n" +
-			"Here are some links that may interest you").
-			AddField(new DiscordEmbedField("Patreon", "[Link](https://patreon.com/speyd3r)", true)).
-			AddField(new DiscordEmbedField("PayPal", "[Link](https://paypal.me/speyd3r)", true));
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(emb.Build()).AsEphemeral(ctx.Guild != null));
 	}
 
