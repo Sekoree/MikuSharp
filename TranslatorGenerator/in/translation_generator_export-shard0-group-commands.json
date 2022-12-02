@@ -1,0 +1,983 @@
+[
+  {
+    "name": "data",
+    "description": "Allows you to request or manage your user data.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "request",
+        "description": "Allows you to request your user data.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "delete",
+        "description": "Allows you to delete your user data.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "object",
+        "description": "Allows you to stop Ichigo from further processing of your user data.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "policy",
+        "description": "Allows you to view how Ichigo processes your data.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "vcc",
+    "description": "Allows you to modify your own voice channel.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "open",
+        "description": "Opens your channel so new users can freely join.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "close",
+        "description": "Closes your channel. You have to invite people for them to join.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "name",
+        "description": "Changes the name of your channel.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "name",
+            "description": "Name",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "limit",
+        "description": "Changes the user limit of your channel.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "limit",
+            "description": "Limit",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "invite",
+        "description": "Invites a new person to your channel.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "user",
+            "description": "User",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "kick",
+        "description": "Kicks person from your channel.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "user",
+            "description": "User",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "ban",
+        "description": "Bans person from your channel.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "user",
+            "description": "User",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "unban",
+        "description": "Unbans person from your channel.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "user",
+            "description": "User",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "change-owner",
+        "description": "Sets a new person to be the owner of your channel.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "user",
+            "description": "User",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "dev_tools",
+    "description": "Developer Tools used to develop/manage Ichigo.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "info",
+        "description": "Shows information about the current server and bot.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "raw-guild",
+        "description": "RawGuild Entry",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "guild",
+            "description": "guild",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "botnick",
+        "description": "Changes the bot's nickname on the current server.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "nickname",
+            "description": "The new nickname",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "ban-user",
+        "description": "Bans a user from usage of the bot.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "victim",
+            "description": "The user to ban",
+            "name_translations": null,
+            "description_translations": null
+          },
+          {
+            "name": "reason",
+            "description": "The reason",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "unban-user",
+        "description": "Unbans a user from usage of the bot.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "victim",
+            "description": "The user to unban",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "ban-guild",
+        "description": "Bans a guild from usage of the bot.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "guild",
+            "description": "The guild to ban",
+            "name_translations": null,
+            "description_translations": null
+          },
+          {
+            "name": "reason",
+            "description": "The reason",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "unban-guild",
+        "description": "Unbans a guild from usage of the bot.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "guild",
+            "description": "The guild to unban",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "globalban",
+        "description": "Bans a user from all servers opted into global bans.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "user",
+            "description": "The user to ban",
+            "name_translations": null,
+            "description_translations": null
+          },
+          {
+            "name": "reason",
+            "description": "The reason",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "globalnotes",
+        "description": "Add and remove global notes of a user.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "user",
+            "description": "The user's to notes to edit",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "globalunban",
+        "description": "Removes a user from global bans.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "user",
+            "description": "The user to unban",
+            "name_translations": null,
+            "description_translations": null
+          },
+          {
+            "name": "unbanfromguilds",
+            "description": "Unban user from all guilds.",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "log",
+        "description": "Change the bot's log level.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "loglevel",
+            "description": "The new loglevel",
+            "name_translations": null,
+            "description_translations": null,
+            "choices": [
+              {
+                "name": "NONE",
+                "name_translations": null
+              },
+              {
+                "name": "FATAL",
+                "name_translations": null
+              },
+              {
+                "name": "ERROR",
+                "name_translations": null
+              },
+              {
+                "name": "WARN",
+                "name_translations": null
+              },
+              {
+                "name": "INFO",
+                "name_translations": null
+              },
+              {
+                "name": "DEBUG",
+                "name_translations": null
+              },
+              {
+                "name": "DEBUG2",
+                "name_translations": null
+              },
+              {
+                "name": "TRACE",
+                "name_translations": null
+              },
+              {
+                "name": "TRACE2",
+                "name_translations": null
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "stop",
+        "description": "Shuts down the bot.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "save",
+        "description": "Save all data to Database.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "batch-lookup",
+        "description": "Looks up multiple users. Separate by spaces.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "users",
+            "description": "The users to look up",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "create-issue",
+        "description": "Create a new issue on Ichigo's Github Repository.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "use_old_tag_selector",
+            "description": "Allows the use of the legacy tag selector.",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "evaluate",
+        "description": "Evaluates CScript.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "message",
+            "description": "The message to evaluate, leave empty to use the last message.",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "debug",
+    "description": "Debug commands, only registered in this server.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "throw",
+        "description": "Throw.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "join",
+    "description": "Allows you to review and change settings in the event somebody joins the server.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows to review the currently used settings in the event somebody joins the server.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change the currently used settings in the event somebody joins the server.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "experience",
+    "description": "Allows you to review and change settings related to experience.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review the currently used settings related to experience.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change the currently used settings related to experience.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "levelrewards",
+    "description": "Allows you to review, add and change Level Rewards.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review currently defined Level Rewards.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to add, remove and modify currently defined Level Rewards.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "phishing",
+    "description": "Allows you to review and change settings related to phishing link protection.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review the currently used settings related to phshing link protection.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change the currently used settings related to phishing link protection.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "bumpreminder",
+    "description": "Allows you to review, set up and change settings related to the Bump Reminder.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review the currently used settings related to the Bump Reminder.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change currently used settings related to the Bump Reminder.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "actionlog",
+    "description": "Allows you to review and change settings related to the actionlog.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review currently used settings related to the actionlog.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change currently used settings related to the actionlog.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "autocrosspost",
+    "description": "Allows you to review and change settings related to automatic crossposting.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review currently used settings related to automatic crossposting.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change currently used settings related to automatic crossposting.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "reactionroles",
+    "description": "Allows you to review and change settings related to Reaction Roles.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review currently registered Reaction Roles.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to add and remove registered Reaction Roles.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "invoiceprivacy",
+    "description": "Allows you to review and change settings related to In-Voice Text Channel Privacy.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review currently used settings related to In-Voice Text Channel Privacy.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change currently used settings related to In-Voice Text Channel Privacy.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "invitetracker",
+    "description": "Allows you to review and change settings related to Invite Tracking.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review the currently used settings related to Invite Tracking.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change the currently used settings related to Invite Tracking.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "namenormalizer",
+    "description": "Allows you to review and change settings related to automatic name normalization.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review the currently used settings related to name normalization.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change the currently used settings related to name normalization.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "autounarchive",
+    "description": "Allows you to review and change settings related to automatic thread unarchiving.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review the currently used settings related to automatic thread unarchiving.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change the currently used settings related to automatic thread unarchiving.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "embedmessages",
+    "description": "Allows you to review and change settings related to automatic message embedding.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review the currently used settings related to automatic message embedding.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change the currently used settings related to automatic message embedding.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "tokendetection",
+    "description": "Allows you to review and change settings related to automatic token invalidation.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review the currently used settings related to automatic token invalidation.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change the currently used settings related to automatic token invalidation.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "invitenotes",
+    "description": "Allows you to add notes to invite codes.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review currently set up invite notes.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to add and remove currently set up invite notes.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "vccreator",
+    "description": "Allows you to review and change settings related to the Voice Channel Creator.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "review",
+        "description": "Allows you to review currently used settings related to the Voice Channel Creator.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "config",
+        "description": "Allows you to change currently used settings related to the Voice Channel Creator.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "scoresaber",
+    "description": "Interact with the ScoreSaber API.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "profile",
+        "description": "Displays you the registered profile of the mentioned user or looks up a profile by a ScoreSaber Id.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "profile",
+            "description": "Id|@User",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "search",
+        "description": "Search a user on Score Saber by name.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "name",
+            "description": "The name to search for",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "map-leaderboard",
+        "description": "Display the leaderboard off a specific map.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "leaderboardid",
+            "description": "The LeaderboardId",
+            "name_translations": null,
+            "description_translations": null
+          },
+          {
+            "name": "page",
+            "description": "The page",
+            "name_translations": null,
+            "description_translations": null
+          },
+          {
+            "name": "internal_page",
+            "description": "The internal page",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "unlink",
+        "description": "Allows you to remove the saved ScoreSaber profile from your Discord account.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "music",
+    "description": "Allows to play music and change the current playback settings.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "join",
+        "description": "The bot will join your channel if it's not already being used in this server.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "disconnect",
+        "description": "Starts a voting to disconnect the bot.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "forcedisconnect",
+        "description": "Forces the bot to disconnect. `DJ` role or Administrator permissions required.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "play",
+        "description": "Searches for a video and adds it to the queue. If given a direct url, adds it to the queue.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "search",
+            "description": "Search Query/Url",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "pause",
+        "description": "Pause or unpause the current song.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "queue",
+        "description": "Displays the current queue.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "removequeue",
+        "description": "Remove a song from the queue.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "video",
+            "description": "The Index or Video Title",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      },
+      {
+        "name": "skip",
+        "description": "Starts a voting to skip the current song.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "forceskip",
+        "description": "Forces skipping of the current song. `DJ` role or Administrator permissions required.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "clearqueue",
+        "description": "Starts a voting to clear the current queue.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "forceclearqueue",
+        "description": "Forces clearing the current queue. `DJ` role or Administrator permissions required.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "shuffle",
+        "description": "Toggles shuffling of the current queue.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "repeat",
+        "description": "Toggles repeating the current queue.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "playlists",
+    "description": "Allows you to manage your personal playlists.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "commands": [
+      {
+        "name": "manage",
+        "description": "Allows you to use and manage your playlists.",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "load-share",
+        "description": "Loads a playlist share.",
+        "name_translations": null,
+        "description_translations": null,
+        "options": [
+          {
+            "name": "user",
+            "description": "The user",
+            "name_translations": null,
+            "description_translations": null
+          },
+          {
+            "name": "id",
+            "description": "The Id",
+            "name_translations": null,
+            "description_translations": null
+          }
+        ]
+      }
+    ]
+  }
+]
