@@ -4,6 +4,8 @@
 ### The bot
 Rewritten from JS to C# with completely redone Music part!
 
+Not affiliated with Crypton Future Media. This bot features an adaptation of Hatsune Miku, © Crypton Future Media, Inc. 2007, licensed under a CC BY-NC: [https://creativecommons.org/licenses/by-nc/3.0/](https://creativecommons.org/licenses/by-nc/3.0/).
+
 ### Contact
 * If you want something to talk to NND, look at
 [NicoNicoNii](https://github.com/Sekoree/NicoNicoNii)

@@ -341,3 +341,5 @@ healthchecksdb
 MikuSharp/config.json
 *.txt
 *.bin
+.history/
+.vscode/
