@@ -7,9 +7,9 @@
     <ApplicationIcon>miku.ico</ApplicationIcon>
     <Version>4.0.0</Version>
     <Authors>MikuSharp Team</Authors>
-    <RepositoryUrl>https://github.com/Speyd3r/MikuSharp/</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Sekoree/MikuSharp/</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/Speyd3r/MikuSharp/</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Sekoree/MikuSharp/</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>Full Hatsune Miku Discord bot C# Rewrite!</Description>
     <Nullable>enable</Nullable>

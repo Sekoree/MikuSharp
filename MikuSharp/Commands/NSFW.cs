@@ -111,7 +111,7 @@ namespace MikuSharp.Commands
 		[Description("lewd")]
 		public async Task Thighs(CommandContext ctx)
 		{
-			var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/v2/image/thighs");
+			var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/image?type=thigh");
 
 			DiscordMessageBuilder builder = new();
 			builder.WithFile($"image.{d.Filetype}", d.Data);
