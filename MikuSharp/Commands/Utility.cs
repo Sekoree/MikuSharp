@@ -3,6 +3,7 @@ using DisCatSharp.ApplicationCommands;
 using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
+using DisCatSharp.Enums;
 using DisCatSharp.Exceptions;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
@@ -74,8 +75,8 @@ internal class Utility : ApplicationCommandsModule
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError(ex.Message);
-				ctx.Client.Logger.LogError(ex.StackTrace);
+				ctx.Client.Logger.LogError("{ex}", ex.Message);
+				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No Anime found!"));
 			}
 		}
@@ -125,8 +126,8 @@ internal class Utility : ApplicationCommandsModule
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError(ex.Message);
-				ctx.Client.Logger.LogError(ex.StackTrace);
+				ctx.Client.Logger.LogError("{ex}", ex.Message);
+				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No Manga found!"));
 			}
 		}

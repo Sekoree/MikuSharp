@@ -132,7 +132,7 @@ internal class MikuBot : IDisposable
 			DmHelp = false,
 			EnableDefaultHelp = true,
 			IgnoreExtraArguments = true,
-			StringPrefixes = Array.Empty<string>(),
+			StringPrefixes = new List<string>(),
 			UseDefaultCommandHandler = true,
 			DefaultHelpChecks = new List<CheckBaseAttribute>(1) { new Attributes.NotStaffAttribute() }
 		}).Result;
@@ -208,7 +208,7 @@ internal class MikuBot : IDisposable
 		}
 	}
 
-	internal async Task UpdateBotList()
+	internal static async Task UpdateBotList()
 	{
 		await Task.Delay(15000);
 		while (true)
