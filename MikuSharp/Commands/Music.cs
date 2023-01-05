@@ -159,7 +159,7 @@ public class Music : ApplicationCommandsModule
 				}
 				else if (hmm.Result.Id == "restore")
 				{
-					await hmm.Result.Interaction.CreateResponseAsync(DisCatSharp.InteractionResponseType.DeferredMessageUpdate);
+					await hmm.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 					buttons.ForEach(x => x.Disable());
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Restored").AddComponents(buttons));
 					await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
@@ -168,7 +168,7 @@ public class Music : ApplicationCommandsModule
 				}
 				else
 				{
-					await hmm.Result.Interaction.CreateResponseAsync(DisCatSharp.InteractionResponseType.DeferredMessageUpdate);
+					await hmm.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 					await Database.ClearQueue(ctx.Guild);
 					buttons.ForEach(x => x.Disable());
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Cleared").AddComponents(buttons));
@@ -499,8 +499,8 @@ public class Music : ApplicationCommandsModule
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError(ex.Message);
-				ctx.Client.Logger.LogError(ex.StackTrace);
+				ctx.Client.Logger.LogError("{ex}", ex.Message);
+				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
 			}
 		}
 
@@ -686,8 +686,8 @@ public class Music : ApplicationCommandsModule
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError(ex.Message);
-				ctx.Client.Logger.LogError(ex.StackTrace);
+				ctx.Client.Logger.LogError("{ex}", ex.Message);
+				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
 			}
 		}
 	}

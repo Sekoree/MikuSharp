@@ -32,7 +32,7 @@ public static class NND
 			downloadProcess.StartInfo.Arguments = $"-g -o {$@"{s}"}.mp4 {$@"{n}"}";
 			downloadProcess.OutputDataReceived += (d, f) =>
 			{
-				ctx.Client.Logger.LogDebug($"\n{f.Data}\n");
+				ctx.Client.Logger.LogDebug("{data}", $"\n{f.Data}\n");
 			};
 			downloadProcess.Start();
 			await downloadProcess.WaitForExitAsync();
@@ -44,7 +44,7 @@ public static class NND
 			convertProgress.StartInfo.Arguments = $"-i {$@"{s}"}.mp4 -metadata title=\"{songTitle}\" -metadata artist=\"{songArtist}\" {$@"{s}"}.mp3";
 			convertProgress.OutputDataReceived += (d, f) =>
 			{
-				ctx.Client.Logger.LogDebug(f.Data);
+				ctx.Client.Logger.LogDebug("{data}", f.Data);
 			};
 			convertProgress.Start();
 			await convertProgress.WaitForExitAsync();
@@ -56,8 +56,8 @@ public static class NND
 		}
 		catch (Exception ex)
 		{
-			ctx.Client.Logger.LogDebug(ex.Message);
-			ctx.Client.Logger.LogDebug(ex.StackTrace);
+			ctx.Client.Logger.LogDebug("{ex}", ex.Message);
+			ctx.Client.Logger.LogDebug("{ex}", ex.StackTrace);
 			await ctx.EditFollowupAsync(msg_id, new DiscordWebhookBuilder().WithContent("Encountered error"));
 			return null;
 		}

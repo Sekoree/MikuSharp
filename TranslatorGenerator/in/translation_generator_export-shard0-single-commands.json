@@ -1,0 +1,600 @@
+[
+  {
+    "name": "help",
+    "description": "Sends you a list of all available commands, their usage and their description.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "command",
+        "description": "The command to show help for",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "user-info",
+    "description": "Displays information the bot knows about you or the mentioned user.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The User",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "guild-info",
+    "description": "Displays information this or the mentioned guild.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "guild",
+        "description": "The Guild",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "reminders",
+    "description": "Allows you to manage your reminders.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null
+  },
+  {
+    "name": "avatar",
+    "description": "Displays your or the mentioned user's avatar as an embedded image.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The User",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "banner",
+    "description": "Displays your or the mentioned user's banner as an embedded image.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The User",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "rank",
+    "description": "Shows your or the mentioned user's rank and rank progress.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The User",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "leaderboard",
+    "description": "Displays the current experience rankings on this server.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "amount",
+        "description": "The amount of rankings to show",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "report-host",
+    "description": "Allows you to contribute a new malicious host to our database.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "url",
+        "description": "The host",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "upload",
+    "description": "Upload a file to the bot. Only use when instructed to.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "file",
+        "description": "The file you want to upload.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "urban-dictionary",
+    "description": "Look up a term on Urban Dictionary.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "term",
+        "description": "The term you want to look up.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "credits",
+    "description": "Allows you to view who contributed the bot.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null
+  },
+  {
+    "name": "Steal Emojis",
+    "type": 3,
+    "name_translations": null,
+    "description_translations": null
+  },
+  {
+    "name": "Translate Message",
+    "type": 3,
+    "name_translations": null,
+    "description_translations": null
+  },
+  {
+    "name": "Add a Reaction Role",
+    "type": 3,
+    "name_translations": null,
+    "description_translations": null
+  },
+  {
+    "name": "Remove a Reaction Role",
+    "type": 3,
+    "name_translations": null,
+    "description_translations": null
+  },
+  {
+    "name": "Remove all Reaction Roles",
+    "type": 3,
+    "name_translations": null,
+    "description_translations": null
+  },
+  {
+    "name": "poll",
+    "description": "Starts a poll.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null
+  },
+  {
+    "name": "purge",
+    "description": "Deletes the specified amount of messages.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "number",
+        "description": "1-2000",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "user",
+        "description": "Only delete messages by this user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "guild-purge",
+    "description": "Scans all channels and deletes the specified user's messages.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "number",
+        "description": "1-2000",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "user",
+        "description": "Only delete messages by this user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "clearbackup",
+    "description": "Clears the stored roles and nickname of a user.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "timeout",
+    "description": "Sets the specified user into a timeout.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "duration",
+        "description": "The duration",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "reason",
+        "description": "The reason",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "remove-timeout",
+    "description": "Removes a timeout from the specified user.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "kick",
+    "description": "Kicks the specified user.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "reason",
+        "description": "The reason",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "ban",
+    "description": "Bans the specified user.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "days",
+        "description": "Days of messages to delete",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "reason",
+        "description": "The reason",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "softban",
+    "description": "Soft bans the specified user.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "days",
+        "description": "Days of messages to delete",
+        "name_translations": null,
+        "description_translations": null
+      },
+      {
+        "name": "reason",
+        "description": "The reason",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "unban",
+    "description": "Unbans the specified user.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "follow",
+    "description": "Allows you to follow an announcement channel from our support server.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "channel",
+        "description": "The channel",
+        "name_translations": null,
+        "description_translations": null,
+        "choices": [
+          {
+            "name": "GithubUpdates",
+            "name_translations": null
+          },
+          {
+            "name": "GlobalBans",
+            "name_translations": null
+          },
+          {
+            "name": "News",
+            "name_translations": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "moveall",
+    "description": "Move all users in your Voice Channel to another Voice Channel",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "channel",
+        "description": "The channel to move to.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "movehere",
+    "description": "Move all users from another Voice Channel to your Voice Channel",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "channel",
+        "description": "The channel to move from.",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "customembed",
+    "description": "Create an embedded message",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null
+  },
+  {
+    "name": "override-bump-time",
+    "description": "Allows fixing of the last bump in case Disboard did not properly post a message.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null
+  },
+  {
+    "name": "afk",
+    "description": "Allows you to set yourself AFK. Users who ping you will be notified that you're unavailable.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "reason",
+        "description": "The reason",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "cuddle",
+    "description": "Cuddle with another user.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "kiss",
+    "description": "Kiss another user.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "slap",
+    "description": "Slap another user.",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "kill",
+    "description": "Kill another user..?",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "boop",
+    "description": "Give another user a boop!",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "highfive",
+    "description": "Give a high five!",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "hug",
+    "description": "Hug another user!",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  },
+  {
+    "name": "pat",
+    "description": "Give someone some headpats!",
+    "type": 1,
+    "name_translations": null,
+    "description_translations": null,
+    "options": [
+      {
+        "name": "user",
+        "description": "The user",
+        "name_translations": null,
+        "description_translations": null
+      }
+    ]
+  }
+]

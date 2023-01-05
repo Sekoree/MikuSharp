@@ -27,11 +27,11 @@ public static class Bilibili
 			youtubeDl.Options.PostProcessingOptions.KeepVideo = false;
 			youtubeDl.StandardOutputEvent += (e, f) =>
 			{
-				ctx.Client.Logger.LogDebug(f);
+				ctx.Client.Logger.LogDebug("{data}", f);
 			};
 			youtubeDl.StandardErrorEvent += (e, f) =>
 			{
-				ctx.Client.Logger.LogDebug(f);
+				ctx.Client.Logger.LogDebug("{data}", f);
 			};
 			youtubeDl.VideoUrl = "https://www.bilibili.com/video/" + s;
 			await youtubeDl.DownloadAsync();
@@ -48,8 +48,8 @@ public static class Bilibili
 		}
 		catch (Exception ex)
 		{
-			ctx.Client.Logger.LogDebug(ex.Message);
-			ctx.Client.Logger.LogDebug(ex.StackTrace);
+			ctx.Client.Logger.LogDebug("{ex}", ex.Message);
+			ctx.Client.Logger.LogDebug("{ex}", ex.StackTrace);
 			return null;
 		}
 	}

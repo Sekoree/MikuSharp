@@ -94,7 +94,7 @@ public class PlaylistDB
 				try
 				{
 					var ss = await MikuBot.LavalinkNodeConnections.First().Value.Rest.GetTracksAsync(new Uri(Convert.ToString(reader2["url"])));
-					am = ss.Tracks.Count();
+					am = ss.Tracks.Count;
 				}
 				catch { }
 			}
@@ -453,9 +453,9 @@ public class PlaylistDB
 			var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Processing NND Video...").AsEphemeral());
 			var split = n.Split("/".ToCharArray());
 			var nndID = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
-			FtpClient client = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
-			await client.ConnectAsync();
-			if (!await client.FileExistsAsync($"{nndID}.mp3"))
+			FtpClient ftpClient = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
+			ftpClient.Connect();
+			if (!ftpClient.FileExists($"{nndID}.mp3"))
 			{
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Preparing download..."));
 				var ex = await ctx.GetNNDAsync(n, nndID, msg.Id);
@@ -465,7 +465,7 @@ public class PlaylistDB
 					return null;
 				}
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading..."));
-				await client.UploadStreamAsync(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
+				ftpClient.UploadStream(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
 			}
 			var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
 			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
@@ -586,13 +586,13 @@ public class PlaylistDB
 					};
 				default:
 					{
-						int leng = s.Tracks.Count();
+						int leng = s.Tracks.Count;
 						if (leng > 5) leng = 5;
-						List<DiscordSelectComponentOption> selectOptions = new(leng)
+						List<DiscordStringSelectComponentOption> selectOptions = new(leng)
 						{
 
 						};
-						DiscordSelectComponent select = new("Select song to play", selectOptions, minOptions: 1, maxOptions: 1);
+						DiscordStringSelectComponent select = new("Select song to play", selectOptions, minOptions: 1, maxOptions: 1);
 						var em = new DiscordEmbedBuilder()
 							.WithTitle("Results!")
 							.WithDescription("Please select a track:\n")
@@ -602,7 +602,7 @@ public class PlaylistDB
 							em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));
 						}
 						var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(em.Build()).AddComponents(select));
-						var resp = await inter.WaitForSelectAsync(msg, ctx.User, select.CustomId, TimeSpan.FromSeconds(30));
+						var resp = await inter.WaitForSelectAsync(msg, ctx.User, select.CustomId, ComponentType.StringSelect, TimeSpan.FromSeconds(30));
 						if (resp.TimedOut)
 						{
 							select.Disable();

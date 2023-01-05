@@ -3,6 +3,7 @@ using DisCatSharp.ApplicationCommands;
 using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
+using DisCatSharp.Enums;
 
 using System.Linq;
 using System.Threading.Tasks;

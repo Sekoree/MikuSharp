@@ -117,7 +117,7 @@ public partial class MainWindow : AdonisWindow
 		string curFile = (string)btn.Tag;
 
 		InitTranslationEditStuff(curFile);
-		if (curFile.Contains("GROUP"))
+		if (curFile.ToLower().Contains("group"))
 		{
 			var data = App.LoadedGroupTranslationTemplates[curFile];
 			foreach (var dat in data)

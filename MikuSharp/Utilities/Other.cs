@@ -1,5 +1,6 @@
 ﻿using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
+using DisCatSharp.Enums;
 
 using System.Threading.Tasks;
 
@@ -13,5 +14,5 @@ public static class Other
 	}
 
 	public static async Task DeferAsync(this InteractionContext ctx, bool ephemeral = true)
-		=> await ctx.CreateResponseAsync(DisCatSharp.InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ephemeral));
+		=> await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ephemeral));
 }

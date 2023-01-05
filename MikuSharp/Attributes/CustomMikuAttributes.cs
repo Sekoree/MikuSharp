@@ -12,9 +12,9 @@ namespace MikuSharp.Attributes;
 /// Defines that usage of this command is restricted to users in a vc.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-public sealed class RequireUserVoicechatConnection : SlashCheckBaseAttribute
+public sealed class RequireUserVoicechatConnection : ApplicationCommandCheckBaseAttribute
 {
-	public override Task<bool> ExecuteChecksAsync(InteractionContext ctx)
+	public override Task<bool> ExecuteChecksAsync(BaseContext ctx)
 	{
 		if (ctx.Member.VoiceState?.Channel != null)
 			return Task.FromResult(true);
@@ -27,9 +27,9 @@ public sealed class RequireUserVoicechatConnection : SlashCheckBaseAttribute
 /// Defines that usage of this command is restricted to users & the bot in a vc.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-public sealed class RequireUserAndBotVoicechatConnection : SlashCheckBaseAttribute
+public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandCheckBaseAttribute
 {
-	public override async Task<bool> ExecuteChecksAsync(InteractionContext ctx)
+	public override async Task<bool> ExecuteChecksAsync(BaseContext ctx)
 	{
 		var bot = await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id);
 		if (ctx.Member.VoiceState?.Channel != null && bot.VoiceState?.Channel != null)

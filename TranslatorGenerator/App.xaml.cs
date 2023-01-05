@@ -37,9 +37,9 @@ public partial class App : Application
 	{
 		var translation_path = "in/";
 		var files = Directory.GetFiles(translation_path, "translation_generator_export*", SearchOption.TopDirectoryOnly);
-		foreach (var file in files.Where(x => x.Contains("GROUP")))
+		foreach (var file in files.Where(x => x.ToLower().Contains("group")))
 			LoadedGroupTranslationTemplates.Add(file.Replace("in/", ""), JsonConvert.DeserializeObject<List<GroupTranslator>>(File.ReadAllText(file)));
-		foreach (var file in files.Where(x => x.Contains("SINGLE")))
+		foreach (var file in files.Where(x => x.ToLower().Contains("single")))
 			LoadedNormalTranslationTemplates.Add(file.Replace("in/", ""), JsonConvert.DeserializeObject<List<CommandTranslator>>(File.ReadAllText(file)));
 	}
 }

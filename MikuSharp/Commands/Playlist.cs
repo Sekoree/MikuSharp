@@ -105,7 +105,7 @@ public class Playlists : ApplicationCommandsModule
 			{
 				await PlaylistDB.AddPlaylist(name, ctx.Member.Id, ExtService.Soundcloud, link);
 			}
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription($"Fixed playlist created with playlist -> {name} and {s.Tracks.Count()} Songs!").Build()));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription($"Fixed playlist created with playlist -> {name} and {s.Tracks.Count} Songs!").Build()));
 		}
 	}
 
