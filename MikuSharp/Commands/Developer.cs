@@ -92,15 +92,15 @@ public class Developer : ApplicationCommandsModule
 				File.Copy(target_file, $"temp-{target_file}");
 			}
 			FileStream log = new(path: $"temp-{target_file}", FileMode.Open, FileAccess.Read);
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddFile(target_file, log, true).WithContent($"Log {Formatter.Bold(target_file)}").AsEphemeral(false));
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddFile(target_file, log, true).WithContent($"Log {Formatter.Bold(target_file)}").AsEphemeral());
 			log.Close();
 			log.Dispose();
 			File.Delete($"temp-{target_file}");
 		}
 		catch (Exception ex)
 		{
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(ex.Message).AsEphemeral(false));
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(ex.StackTrace).AsEphemeral(false));
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(ex.Message).AsEphemeral());
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(ex.StackTrace).AsEphemeral());
 		}
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done"));
 	}

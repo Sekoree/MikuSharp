@@ -31,13 +31,13 @@ internal class About : ApplicationCommandsModule
 			"Here are some links that may interest you").
 			AddField(new DiscordEmbedField("Patreon", "[Link](https://patreon.com/sekoree)", true)).
 			AddField(new DiscordEmbedField("PayPal", "[Link](https://paypal.me/speyd3r)", true));
-		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(emb.Build()).AsEphemeral(ctx.Guild != null));
+		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(emb.Build()).AsEphemeral());
 	}
 
 	[SlashCommand("bot", "About the bot")]
 	public static async Task BotAsync(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 		var emb = new DiscordEmbedBuilder();
 		emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl).
 			WithTitle($"About {ctx.Client.CurrentUser.UsernameWithDiscriminator}!").
@@ -88,7 +88,7 @@ internal class About : ApplicationCommandsModule
 		var res = await ctx.Client.GetInteractivity().WaitForModalAsync(modalBuilder.CustomId, TimeSpan.FromMinutes(1));
 		if (!res.TimedOut)
 		{
-			await res.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
+			await res.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 			var title = res.Result.Interaction.Data.Components.First(x => x.CustomId == "feedbacktitle").Value;
 			var body = res.Result.Interaction.Data.Components.First(x => x.CustomId == "feedbackbody").Value;
 			var guild = await MikuBot.ShardedClient.GetShard(483279257431441410).GetGuildAsync(id: 483279257431441410);
@@ -112,22 +112,22 @@ internal class About : ApplicationCommandsModule
 
 		}
 		else
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent($"You were too slow :(\nThe time limit is one minute.").AsEphemeral(ctx.Guild != null));
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent($"You were too slow :(\nThe time limit is one minute.").AsEphemeral());
 
 	}
 
 	[SlashCommand("ping", "Current ping to discord's services")]
 	public static async Task PingAsync(InteractionContext ctx)
-		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null).WithContent($"Ping: {ctx.Client.Ping}ms"));
+		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Ping: {ctx.Client.Ping}ms"));
 
 	[SlashCommand("which_shard", "What shard am I on?")]
 	public static async Task GetExecutingShardAsync(InteractionContext ctx)
-		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null).WithContent($"Shard {ctx.Client.ShardId}"));
+		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Shard {ctx.Client.ShardId}"));
 
 	[SlashCommand("stats", "Some stats of the MikuBot!")]
 	public static async Task StatsAsync(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 		int GuildCount = 0;
 		int UserCount = 0;
 		int ChannelCount = 0;
@@ -155,7 +155,7 @@ internal class About : ApplicationCommandsModule
 	[SlashCommand("support", "Link to my support server")]
 	public static async Task SupportAsybc(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ctx.Guild != null));
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 		var guild = await MikuBot.ShardedClient.GetShard(483279257431441410).GetGuildAsync(id: 483279257431441410);
 		var widget = await guild.GetWidgetAsync();
 		var emb = new DiscordEmbedBuilder().

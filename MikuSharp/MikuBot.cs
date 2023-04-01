@@ -65,9 +65,7 @@ internal class MikuBot : IDisposable
 
 	internal MikuBot()
 	{
-		var fileData = File.ReadAllText(@"config.json");
-		if (fileData == null)
-			throw new ArgumentNullException("config.json is null or missing");
+		var fileData = File.ReadAllText(@"config.json") ?? throw new ArgumentNullException("config.json is null or missing");
 
 		Config = JsonConvert.DeserializeObject<BotConfig>(fileData);
 		if (Config == null)
@@ -86,7 +84,7 @@ internal class MikuBot : IDisposable
 		ShardedClient = new DiscordShardedClient(new()
 		{
 			Token = Config.DiscordToken,
-			TokenType = DisCatSharp.TokenType.Bot,
+			TokenType = DisCatSharp.Enums.TokenType.Bot,
 			MinimumLogLevel = LogLevel.Debug,
 			AutoReconnect = true,
 			UseCanary = true,

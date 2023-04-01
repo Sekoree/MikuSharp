@@ -14,5 +14,12 @@ public static class Other
 	}
 
 	public static async Task DeferAsync(this InteractionContext ctx, bool ephemeral = true)
-		=> await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral(ephemeral));
+	{
+		var builder = new DiscordInteractionResponseBuilder();
+		if (ephemeral)
+		{
+			builder.AsEphemeral();
+		}
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, builder);
+	}
 }
