@@ -102,7 +102,7 @@ internal class MikuBot : IDisposable
 #if DEBUG
 		level = LogEventLevel.Debug;
 #endif
-		var loggingTemplate = "[{Timestamp:HH:mm:ss}] [{Level:u4}] {SourceContext}: {Message:lj}{NewLine}{Exception}";
+		var loggingTemplate = "[{Timestamp:HH:mm:ss}] [{Level:u4}] {SourceContext}:{NewLine}{Message:lj}{NewLine}{Exception}";
 		Log.Logger = new LoggerConfiguration()
 			.MinimumLevel.Debug()
 			.WriteTo.File("miku_log.txt", outputTemplate: loggingTemplate, restrictedToMinimumLevel: LogEventLevel.Debug, fileSizeLimitBytes: null, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2, shared: true)
