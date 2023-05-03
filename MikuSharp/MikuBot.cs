@@ -90,7 +90,7 @@ internal class MikuBot : IDisposable
 			MinimumLogLevel = LogLevel.Debug,
 			AutoReconnect = true,
 			UseCanary = true,
-			HttpTimeout = TimeSpan.FromMinutes(1),
+			HttpTimeout = TimeSpan.FromMinutes(2),
 			Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
 			MessageCacheSize = 2048,
 			LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
@@ -171,26 +171,37 @@ internal class MikuBot : IDisposable
 
 			discordClientKvp.Value.GuildMemberAdded += async (sender, args) =>
 			{
-				if (sender.CurrentApplication.Team.Members.Where(x => x.User.Id == args.Member.Id).Any())
+				_ = Task.Run(async () =>
 				{
-					var text = $"Heywo <:MikuWave:655783221942026271>!" +
-					$"\n\nOne of my developers joined your server!" +
-					$"\nAs you're the owner of the server ({args.Guild.Name}) I want to inform you about that. But don't worry, they won't disturb anyone!" +
-					$"\nThey're here to debug me on different servers to transition to slash commands because discord forces us bots to use it (Read more here: https://support-dev.discord.com/hc/en-us/articles/4404772028055)." +
-					$"\nThe problem is the _message content intent_ which means I can't listen to my `m%` prefix anymore :(." +
-					$"\n\nIf you have a problem please contact my developer {args.Member.UsernameWithDiscriminator}!" +
-					$"\n\n\nI wish you a happy day <:mikuthumbsup:623933340520546306>";
-					var message = await args.Guild.Owner.SendMessageAsync(text);
-					sender.Logger.LogInformation("I wrote {owner} a message", args.Guild.Owner.UsernameWithDiscriminator);
-					sender.Logger.LogInformation("Message content: {content}", message.Content);
-				}
-				else
-					await Task.FromResult(true);
+					if (sender.CurrentApplication.Team.Members.Where(x => x.User.Id == args.Member.Id).Any())
+					{
+						var text = $"Heywo <:MikuWave:655783221942026271>!" +
+						$"\n\nOne of my developers joined your server!" +
+						$"\nAs you're the owner of the server ({args.Guild.Name}) I want to inform you about that. But don't worry, they won't disturb anyone!" +
+						$"\nThey're here to debug me on different servers." +
+						$"\n\nIf you have a problem please contact my developer {args.Member.UsernameWithDiscriminator}!" +
+						$"\n\n\nI wish you a happy day <:mikuthumbsup:623933340520546306>";
+						try
+						{
+							var message = await args.Guild.Owner.SendMessageAsync(text);
+							sender.Logger.LogInformation("I wrote {owner} a message", args.Guild.Owner.UsernameWithDiscriminator);
+							await Task.FromResult(true);
+						}
+						catch (Exception)
+						{
+							sender.Logger.LogWarning("Could not inform {owner} of dev presence", args.Guild.Owner.UsernameWithDiscriminator);
+							await Task.FromResult(false);
+						}
+					}
+					else
+						await Task.FromResult(true);
+				});
+				await Task.FromResult(true);
 			};
 			discordClientKvp.Value.GuildMemberUpdated += async (sender, args) =>
 			{
 				if (args.Guild.Id == 483279257431441410)
-					await MikuGuild.OnUpdateAsync(sender, args);
+					_ = Task.Run(async () => await MikuGuild.OnUpdateAsync(sender, args));
 				else
 					await Task.FromResult(true);
 			};
