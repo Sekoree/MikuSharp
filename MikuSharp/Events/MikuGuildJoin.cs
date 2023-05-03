@@ -6,16 +6,6 @@
 public class MikuGuild
 {
 	/// <summary>
-	/// Fired when a new guild member joins.
-	/// </summary>
-	/// <param name="sender">The client.</param>
-	/// <param name="args">The event args.</param>
-	public static async Task OnJoinAsync(DiscordClient sender, GuildMemberAddEventArgs args)
-	{
-		await Task.FromResult(true);
-	}
-
-	/// <summary>
 	/// Fired when a guild member is updated.
 	/// </summary>
 	/// <param name="sender">The discord client.</param>
