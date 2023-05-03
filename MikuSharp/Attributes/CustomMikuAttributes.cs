@@ -1,9 +1,4 @@
-﻿using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
-
-namespace MikuSharp.Attributes;
+﻿namespace MikuSharp.Attributes;
 
 /// <summary>
 /// Defines that usage of this command is restricted to users in a vc.

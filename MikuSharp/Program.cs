@@ -1,6 +1,4 @@
-﻿using Serilog;
-
-namespace MikuSharp;
+﻿namespace MikuSharp;
 
 public class Program
 {

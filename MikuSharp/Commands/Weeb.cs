@@ -1,13 +1,6 @@
-﻿using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-
-using HeyRed.Mime;
+﻿using HeyRed.Mime;
 
 using MikuSharp.Utilities;
-
-using Newtonsoft.Json;
 
 namespace MikuSharp.Commands;
 

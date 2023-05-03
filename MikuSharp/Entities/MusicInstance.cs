@@ -1,17 +1,4 @@
-﻿using System.Net;
-
-using DisCatSharp;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.Interactivity.Extensions;
-using DisCatSharp.Lavalink;
-
-using FluentFTP;
-
-using Microsoft.Extensions.Logging;
-
-using MikuSharp.Enums;
+﻿using MikuSharp.Enums;
 using MikuSharp.Events;
 using MikuSharp.Utilities;
 

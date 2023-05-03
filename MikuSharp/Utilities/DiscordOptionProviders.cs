@@ -1,8 +1,4 @@
-﻿using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-
-using MikuSharp.Entities;
+﻿using MikuSharp.Entities;
 using MikuSharp.Enums;
 
 namespace MikuSharp.Utilities;

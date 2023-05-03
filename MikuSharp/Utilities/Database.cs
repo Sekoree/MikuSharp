@@ -1,9 +1,4 @@
-﻿using DisCatSharp.Entities;
-using DisCatSharp.Lavalink;
-
-using MikuSharp.Entities;
-
-using Npgsql;
+﻿using MikuSharp.Entities;
 
 namespace MikuSharp.Utilities;
 

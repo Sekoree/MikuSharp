@@ -1,15 +1,9 @@
 ﻿using AlbumArtExtraction;
 
-using DisCatSharp;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 
 using HeyRed.Mime;
-
-using Microsoft.Extensions.Logging;
 
 using MikuSharp.Entities;
 using MikuSharp.Enums;

@@ -1,10 +1,4 @@
-﻿using DisCatSharp.Entities;
-using DisCatSharp.Lavalink;
-using DisCatSharp.Lavalink.EventArgs;
-
-using Microsoft.Extensions.Logging;
-
-using MikuSharp.Enums;
+﻿using MikuSharp.Enums;
 using MikuSharp.Utilities;
 
 namespace MikuSharp.Events;

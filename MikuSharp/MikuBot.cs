@@ -1,32 +1,5 @@
-﻿using System.Diagnostics;
-
-using DisCatSharp;
-using DisCatSharp.ApplicationCommands;
-using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.Interactivity;
-using DisCatSharp.Interactivity.Enums;
-using DisCatSharp.Interactivity.EventHandling;
-using DisCatSharp.Interactivity.Extensions;
-using DisCatSharp.Lavalink;
-using DisCatSharp.Net;
-
-using DiscordBotsList.Api;
-
-using Microsoft.Extensions.Logging;
-
-using MikuSharp.Entities;
-using MikuSharp.Enums;
+﻿using MikuSharp.Entities;
 using MikuSharp.Events;
-
-using Newtonsoft.Json;
-
-using Serilog;
-using Serilog.Events;
-
-using Weeb.net;
 
 namespace MikuSharp;
 

@@ -1,7 +1,3 @@
-using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
-using DisCatSharp.Entities;
-
 using MikuSharp.Utilities;
 
 namespace MikuSharp.Commands

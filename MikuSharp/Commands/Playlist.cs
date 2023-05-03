@@ -1,12 +1,4 @@
-﻿using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Interactivity;
-using DisCatSharp.Interactivity.Extensions;
-using DisCatSharp.Lavalink;
-
-using MikuSharp.Attributes;
+﻿using MikuSharp.Attributes;
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 using MikuSharp.Utilities;

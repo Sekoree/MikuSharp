@@ -1,7 +1,4 @@
-﻿using DisCatSharp;
-using DisCatSharp.EventArgs;
-
-namespace MikuSharp.Events;
+﻿namespace MikuSharp.Events;
 
 /// <summary>
 /// Event handler for the miku guild.

@@ -1,8 +1,4 @@
-﻿using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-
-namespace MikuSharp.Utilities;
+﻿namespace MikuSharp.Utilities;
 
 public static class Other
 {

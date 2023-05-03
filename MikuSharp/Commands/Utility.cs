@@ -1,18 +1,5 @@
-﻿using DisCatSharp;
-using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.Exceptions;
-using DisCatSharp.Interactivity;
-using DisCatSharp.Interactivity.Enums;
-using DisCatSharp.Interactivity.Extensions;
-
-using Kitsu.Anime;
+﻿using Kitsu.Anime;
 using Kitsu.Manga;
-
-using Microsoft.Extensions.Logging;
 
 namespace MikuSharp.Commands;
 

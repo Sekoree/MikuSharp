@@ -1,17 +1,5 @@
-﻿using System.Net;
-
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.Interactivity.Extensions;
-using DisCatSharp.Lavalink;
-
-using FluentFTP;
-
-using MikuSharp.Entities;
+﻿using MikuSharp.Entities;
 using MikuSharp.Enums;
-
-using Npgsql;
 
 namespace MikuSharp.Utilities;
 

@@ -1,14 +1,6 @@
-﻿using System.Net.Http.Headers;
-
-using DisCatSharp.Entities;
-
-using HeyRed.Mime;
+﻿using HeyRed.Mime;
 
 using MikuSharp.Entities;
-
-using Newtonsoft.Json;
-
-using Weeb.net;
 
 namespace MikuSharp.Utilities;
 

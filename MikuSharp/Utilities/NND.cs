@@ -1,11 +1,4 @@
-﻿using System.Diagnostics;
-
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-
-using Microsoft.Extensions.Logging;
-
-using NicoNicoNii;
+﻿using NicoNicoNii;
 
 namespace MikuSharp.Utilities;
 

@@ -1,9 +1,4 @@
-﻿using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-
-using Microsoft.Extensions.Logging;
-
-using NYoutubeDL;
+﻿using NYoutubeDL;
 
 namespace MikuSharp.Utilities;
 

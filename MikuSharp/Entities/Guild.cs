@@ -2,14 +2,13 @@
 
 public class Guild
 {
-	public int shardId { get; set; }
-	//CustomPrefix stuff
+	public int ShardId { get; set; }
 	public MusicInstance musicInstance { get; set; }
 	public Task AloneCheckThread { get; set; }
 
 	public Guild(int id, MusicInstance mi = null)
 	{
-		shardId = id;
+		ShardId = id;
 		musicInstance = mi;
 	}
 

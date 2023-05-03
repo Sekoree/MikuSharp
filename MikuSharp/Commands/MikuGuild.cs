@@ -1,10 +1,4 @@
-﻿using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-
-namespace MikuSharp.Commands;
+﻿namespace MikuSharp.Commands;
 
 public class MikuGuild : ApplicationCommandsModule
 {

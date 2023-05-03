@@ -133,4 +133,37 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="DisCatSharp" />
+    <Using Include="DisCatSharp.ApplicationCommands" />
+    <Using Include="DisCatSharp.ApplicationCommands.Attributes" />
+    <Using Include="DisCatSharp.ApplicationCommands.Context" />
+    <Using Include="DisCatSharp.CommandsNext" />
+    <Using Include="DisCatSharp.CommandsNext.Attributes" />
+    <Using Include="DisCatSharp.Entities" />
+    <Using Include="DisCatSharp.Enums" />
+    <Using Include="DisCatSharp.EventArgs" />
+    <Using Include="DisCatSharp.Exceptions" />
+    <Using Include="DisCatSharp.Exceptions" />
+    <Using Include="DisCatSharp.Interactivity" />
+    <Using Include="DisCatSharp.Interactivity.Enums" />
+    <Using Include="DisCatSharp.Interactivity.Extensions" />
+    <Using Include="DisCatSharp.Lavalink" />
+	<Using Include="DisCatSharp.Lavalink.EventArgs" />
+    <Using Include="DiscordBotsList.Api" />
+    <Using Include="FluentFTP" />
+    <Using Include="Microsoft.Extensions.Logging" />
+    <Using Include="Newtonsoft.Json" />
+    <Using Include="Npgsql" />
+    <Using Include="Npgsql" />
+    <Using Include="Serilog" />
+    <Using Include="Serilog.Events" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.Net" />
+    <Using Include="System.Net" />
+    <Using Include="System.Net.Http.Headers" />
+    <Using Include="System.Text" />
+    <Using Include="Weeb.net" />
+  </ItemGroup>
+
 </Project>

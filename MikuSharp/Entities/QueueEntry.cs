@@ -1,6 +1,4 @@
-﻿using DisCatSharp.Lavalink;
-
-namespace MikuSharp.Entities;
+﻿namespace MikuSharp.Entities;
 
 public class QueueEntry : Entry
 {

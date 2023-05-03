@@ -1,16 +1,4 @@
-﻿using System.Text;
-
-using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.Interactivity;
-using DisCatSharp.Interactivity.Extensions;
-
-using Microsoft.Extensions.Logging;
-
-using MikuSharp.Attributes;
+﻿using MikuSharp.Attributes;
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 using MikuSharp.Events;
@@ -592,7 +580,7 @@ public class Music : ApplicationCommandsModule
 		{
 			await ctx.DeferAsync(true);
 			var g = MikuBot.Guilds[ctx.Guild.Id];
-			g.shardId = ctx.Client.ShardId;
+			g.ShardId = ctx.Client.ShardId;
 			var eb = new DiscordEmbedBuilder();
 			eb.WithTitle("Now Playing");
 			eb.WithDescription("**__Current Song:__**");
@@ -610,7 +598,7 @@ public class Music : ApplicationCommandsModule
 				return;
 			}
 			var g = MikuBot.Guilds[ctx.Guild.Id];
-			g.shardId = ctx.Client.ShardId;
+			g.ShardId = ctx.Client.ShardId;
 			var eb = new DiscordEmbedBuilder();
 			eb.WithTitle("Last playing");
 			eb.WithDescription("**__Previous Song:__**");
