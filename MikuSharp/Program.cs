@@ -2,17 +2,14 @@
 
 namespace MikuSharp;
 
-class Program
+public class Program
 {
-	static void Main(string[] args)
+	public static async Task Main(string[] args = null)
 	{
-		using (var bot = new MikuBot())
-		{
-			MikuBot.RegisterEvents().Wait();
-			bot.RegisterCommands();
-			bot.RunAsync().Wait();
-			bot.Dispose();
-		}
+		using MikuBot bot = new();
+		await bot.SetupAsync();
+		await bot.RunAsync();
+		bot.Dispose();
 		Log.Logger.Information("Shutdown!");
 	}
 }

@@ -74,10 +74,15 @@ internal class MikuBot : IDisposable
 		Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database={Config.DbConfig.Database}";
 		_cts = new CancellationTokenSource();
 
+		LogEventLevel level = LogEventLevel.Information;
+#if DEBUG
+		level = LogEventLevel.Debug;
+#endif
+
 		Log.Logger = new LoggerConfiguration()
 			.MinimumLevel.Debug()
-			.WriteTo.File("miku_log.txt", fileSizeLimitBytes: null, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2, shared: true)
-			.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+			.WriteTo.File("miku_log.txt", restrictedToMinimumLevel: LogEventLevel.Debug, fileSizeLimitBytes: null, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2, shared: true)
+			.WriteTo.Console(restrictedToMinimumLevel: level, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
 			.CreateLogger();
 		Log.Logger.Information("Starting up!");
 
@@ -94,7 +99,11 @@ internal class MikuBot : IDisposable
 			LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
 		});
 
-		InteractivityModules = ShardedClient.UseInteractivityAsync(new()
+	}
+
+	internal async Task SetupAsync()
+	{
+		InteractivityModules = await ShardedClient.UseInteractivityAsync(new()
 		{
 			Timeout = TimeSpan.FromMinutes(2),
 			PaginationBehaviour = PaginationBehaviour.WrapAround,
@@ -112,18 +121,18 @@ internal class MikuBot : IDisposable
 			},
 			ResponseMessage = "Something went wrong.",
 			ResponseBehavior = InteractionResponseBehavior.Ignore
-		}).Result;
+		});
 
-		ApplicationCommandsModules = ShardedClient.UseApplicationCommandsAsync(new()
+		ApplicationCommandsModules = await ShardedClient.UseApplicationCommandsAsync(new()
 		{
 			EnableDefaultHelp = true,
 			DebugStartup = true,
 			EnableLocalization = false,
 			ManualOverride = true,
 			GenerateTranslationFilesOnly = false
-		}).Result;
+		});
 
-		CommandsNextModules = ShardedClient.UseCommandsNextAsync(new()
+		CommandsNextModules = await ShardedClient.UseCommandsNextAsync(new()
 		{
 			CaseSensitive = true,
 			EnableMentionPrefix = true,
@@ -133,7 +142,7 @@ internal class MikuBot : IDisposable
 			StringPrefixes = new List<string>(),
 			UseDefaultCommandHandler = true,
 			DefaultHelpChecks = new List<CheckBaseAttribute>(1) { new Attributes.NotStaffAttribute() }
-		}).Result;
+		});
 
 		LavalinkConfig = new()
 		{
@@ -142,10 +151,13 @@ internal class MikuBot : IDisposable
 			Password = Config.LavaConfig.Password
 		};
 
-		LavalinkModules = ShardedClient.UseLavalinkAsync().Result;
+		LavalinkModules = await ShardedClient.UseLavalinkAsync();
+
+		RegisterEvents();
+		RegisterCommands();
 	}
 
-	internal static async Task RegisterEvents()
+	internal void RegisterEvents()
 	{
 		ShardedClient.ClientErrored += (sender, args) =>
 		{
@@ -153,8 +165,6 @@ internal class MikuBot : IDisposable
 			sender.Logger.LogError(args.Exception.StackTrace);
 			return Task.CompletedTask;
 		};
-
-		await Task.Delay(1);
 
 		foreach (var discordClientKvp in ShardedClient.ShardClients)
 		{
@@ -206,7 +216,7 @@ internal class MikuBot : IDisposable
 		}
 	}
 
-	internal static async Task UpdateBotList()
+	internal async Task UpdateBotList()
 	{
 		await Task.Delay(15000);
 		while (true)

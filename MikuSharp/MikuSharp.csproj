@@ -18,6 +18,7 @@
     <PackageIcon>miku.jpg</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>discord bot; discatsharp; hatsune miku; miku; bot</PackageTags>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,9 +28,11 @@
   </ItemGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<NoWarn>1701;1702;DV2001;CS8603;CS8604;CS8618;CS8601;CS8602;CS8600;CS8625</NoWarn>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<NoWarn>1701;1702;DV2001;CS8603;CS8604;CS8618;CS8601;CS8602;CS8600;CS8625</NoWarn>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="nnd.python" />
