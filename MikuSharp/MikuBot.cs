@@ -17,6 +17,7 @@ internal class MikuBot : IDisposable
 	/// Gets the bot config.
 	/// </summary>
 	internal static BotConfig Config { get; set; }
+
 	/// <summary>
 	/// Gets the lavalink configuration for every voice connection.
 	/// </summary>
@@ -26,10 +27,12 @@ internal class MikuBot : IDisposable
 	/// Runs the activity update.
 	/// </summary>
 	internal Task SetActivityThread { get; set; }
+
 	/// <summary>
 	/// Runs the connection update.
 	/// </summary>
 	internal Task ConnectionThread { get; set; }
+
 	/// <summary>
 	/// Runs the bot list stats update.
 	/// </summary>
@@ -39,10 +42,12 @@ internal class MikuBot : IDisposable
 	/// Gets the weeb client for images and gifs.
 	/// </summary>
 	internal static WeebClient WeebClient { get; } = new("Hatsune Miku Bot", "4.0.0");
+
 	/// <summary>
 	/// Gets the discord bot list api client.
 	/// </summary>
 	internal static AuthDiscordBotListApi DiscordBotListApi { get; set; }
+
 	/// <summary>
 	/// Gets the discord sharded client.
 	/// </summary>
@@ -52,14 +57,17 @@ internal class MikuBot : IDisposable
 	/// Gets the interactivity extensions for every shard.
 	/// </summary>
 	internal IReadOnlyDictionary<int, InteractivityExtension> InteractivityModules { get; set; }
+
 	/// <summary>
 	/// Gets the application commands extensions for every shard.
 	/// </summary>
 	internal IReadOnlyDictionary<int, ApplicationCommandsExtension> ApplicationCommandsModules { get; set; }
+
 	/// <summary>
 	/// Gets the commands next extensions for every shard.
 	/// </summary>
 	internal IReadOnlyDictionary<int, CommandsNextExtension> CommandsNextModules { get; set; }
+
 	/// <summary>
 	/// Gets the lavalink extensions for every shard.
 	/// </summary>
@@ -69,6 +77,7 @@ internal class MikuBot : IDisposable
 	/// Gets the lavalink node connections for every shard.
 	/// </summary>
 	internal static Dictionary<int, LavalinkNodeConnection> LavalinkNodeConnections = new();
+
 	/// <summary>
 	/// Gets the custom guild entities.
 	/// </summary>
