@@ -26,9 +26,7 @@ public class Developer : ApplicationCommandsModule
 
 	[SlashCommand("test", "Testing")]
 	public static async Task TestAsync(InteractionContext ctx)
-	{
-		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
-	}
+		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
 
 	[SlashCommand("global_lstats", "Global lavalink stats")]
 	public static async Task GetGlobalLavalinkStatsAsync(InteractionContext ctx)
@@ -56,14 +54,39 @@ public class Developer : ApplicationCommandsModule
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
 	}
 
+	[SlashCommand("global_ll_restart", "Restarts all lavalink connection nodes")]
+	public static async Task Test(InteractionContext ctx)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent("Restarting all lavalink connections"));
+		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		{
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
+			return;
+		}
+		var ll = await MikuBot.ShardedClient.GetLavalinkAsync();
+		foreach (var l in ll)
+			foreach (var n in l.Value.ConnectedNodes)
+			{
+				await n.Value.StopAsync();
+				await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Stopped lavalink on shard {l.Key}"));
+			}
+
+		MikuBot.LavalinkNodeConnections.Clear();
+		foreach (var l in ll)
+		{
+			var LCon = await l.Value.ConnectAsync(MikuBot.LavalinkConfig);
+			MikuBot.LavalinkNodeConnections.Add(l.Key, LCon);
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Started lavalink on shard {l.Key}"));
+		}
+		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
+	}
+
 	[SlashCommand("guild_shard_test", "Testing")]
 	public static async Task GuildTestAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
 		foreach (var shard in MikuBot.ShardedClient.ShardClients.Values)
-		{
 			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent($"Shard {shard.ShardId} has {shard.Guilds.Count} guilds."));
-		}
 	}
 
 	[ContextMenu(ApplicationCommandType.Message, "Remove message - Miku Dev")]
@@ -102,15 +125,11 @@ public class Developer : ApplicationCommandsModule
 			return;
 		}
 		else
-		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Found log {Formatter.Bold(target_file)}"));
-		}
 		try
 		{
 			if (!File.Exists($"temp-{target_file}"))
-			{
 				File.Copy(target_file, $"temp-{target_file}");
-			}
 			else
 			{
 				File.Delete($"temp-{target_file}");

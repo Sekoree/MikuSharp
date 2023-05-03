@@ -21,7 +21,7 @@ internal class MikuBot : IDisposable
 	/// <summary>
 	/// Gets the lavalink configuration for every voice connection.
 	/// </summary>
-	internal LavalinkConfiguration LavalinkConfig { get; set; }
+	internal static LavalinkConfiguration LavalinkConfig { get; set; }
 
 	/// <summary>
 	/// Runs the activity update.
