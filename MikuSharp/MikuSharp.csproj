@@ -67,6 +67,9 @@
 	<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
 	<PackageReference Include="Mime" Version="3.5.2" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	<PackageReference Include="Sentry" Version="3.31.0" />
+	<PackageReference Include="Sentry.Extensions.Logging" Version="3.31.0" />
+	<PackageReference Include="Sentry.Serilog" Version="3.31.0" />
 	<ProjectReference Include="..\NicoNicoNii\NicoNicoNii\NicoNicoNii.csproj" />
 	<PackageReference Include="Npgsql" Version="7.0.4" />
     	<PackageReference Include="NYoutubeDL" Version="0.11.2" />
@@ -156,12 +159,14 @@
     <Using Include="Newtonsoft.Json" />
     <Using Include="Npgsql" />
     <Using Include="Npgsql" />
+    <Using Include="Sentry" />
     <Using Include="Serilog" />
     <Using Include="Serilog.Events" />
     <Using Include="System.Diagnostics" />
     <Using Include="System.Net" />
     <Using Include="System.Net" />
     <Using Include="System.Net.Http.Headers" />
+    <Using Include="System.Reflection" />
     <Using Include="System.Text" />
     <Using Include="Weeb.net" />
   </ItemGroup>

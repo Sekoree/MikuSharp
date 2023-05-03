@@ -125,6 +125,7 @@ internal class MikuBot : IDisposable
 				[ConsoleThemeStyle.LevelError] = "\x1b[31m",
 				[ConsoleThemeStyle.LevelFatal] = "\x1b[97;91m"
 			}))
+			.WriteTo.Sentry("https://268785ba3c604a9f8d5f0aba727566ee@o1113828.ingest.sentry.io/4505121211744256", LogEventLevel.Debug, LogEventLevel.Warning)
 			.CreateLogger();
 		Log.Logger.Information("Starting up!");
 
@@ -355,24 +356,53 @@ internal class MikuBot : IDisposable
 	/// </summary>
 	internal async Task RunAsync()
 	{
-		await WeebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
-		await ShardedClient.StartAsync();
-		await Task.Delay(5000);
-		foreach (var lavalinkShard in LavalinkModules)
+		using (SentrySdk.Init(o =>
 		{
-			var LCon = await lavalinkShard.Value.ConnectAsync(LavalinkConfig);
-			LavalinkNodeConnections.Add(lavalinkShard.Key, LCon);
-		}
-		SetActivityThread = Task.Run(SetActivity, _cts.Token);
-		ConnectionThread = Task.Run(ShowConnections, _cts.Token);
+			o.DetectStartupTime = StartupTimeDetectionMode.Fast;
+			o.DiagnosticLevel = SentryLevel.Debug;
+			o.Environment = "prod";
+			o.IsGlobalModeEnabled = true;
+			o.TracesSampleRate = 1.0;
+			o.ReportAssembliesMode = ReportAssembliesMode.InformationalVersion;
+			o.Dsn = "https://268785ba3c604a9f8d5f0aba727566ee@o1113828.ingest.sentry.io/4505121211744256";
+			o.AddInAppInclude("DisCatSharp");
+			o.AttachStacktrace = true;
+			o.StackTraceMode = StackTraceMode.Enhanced;
+			var a = typeof(MikuBot).GetTypeInfo().Assembly;
+			var vs = "";
+			var iv = a.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+			if (iv != null)
+				vs = iv.InformationalVersion;
+			else
+			{
+				var v = a.GetName().Version;
+				vs = v.ToString(3);
+			}
+			o.Release = $"MikuBot@{vs}";
+			o.SendClientReports = true;
+		}))
+		{
+			SentrySdk.StartSession();
+			await WeebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
+			await ShardedClient.StartAsync();
+			await Task.Delay(5000);
+			foreach (var lavalinkShard in LavalinkModules)
+			{
+				var LCon = await lavalinkShard.Value.ConnectAsync(LavalinkConfig);
+				LavalinkNodeConnections.Add(lavalinkShard.Key, LCon);
+			}
+			SetActivityThread = Task.Run(SetActivity, _cts.Token);
+			ConnectionThread = Task.Run(ShowConnections, _cts.Token);
 #if !DEBUG
-		DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
-		BotListThread = Task.Run(UpdateBotList, _cts.Token);
+			DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
+			BotListThread = Task.Run(UpdateBotList, _cts.Token);
 #endif
-		while (!_cts.IsCancellationRequested)
-			await Task.Delay(1000);
-		await ShardedClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
-		await ShardedClient.StopAsync();
+			while (!_cts.IsCancellationRequested)
+				await Task.Delay(1000);
+			await ShardedClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+			await ShardedClient.StopAsync();
+			SentrySdk.EndSession();
+		}
 	}
 
 	/// <summary>
