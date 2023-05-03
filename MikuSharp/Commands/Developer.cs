@@ -25,7 +25,7 @@ public class Developer : ApplicationCommandsModule
 		return $"{d:#,##0.00} {Units[u]}B";
 	}
 
-	[SlashCommand("test", "Testing")]
+	[SlashCommand("which_shard", "Which shard are we on?")]
 	public static async Task TestAsync(InteractionContext ctx)
 		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
 
@@ -102,12 +102,18 @@ public class Developer : ApplicationCommandsModule
 		}
 	}
 
-	[SlashCommand("guild_shard_test", "Testing")]
+	[SlashCommand("global_shards", "Get all shard infos")]
 	public static async Task GuildTestAsync(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
+		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"Loading shards"));
+		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		{
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
+			return;
+		}
 		foreach (var shard in MikuBot.ShardedClient.ShardClients.Values)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent($"Shard {shard.ShardId} has {shard.Guilds.Count} guilds."));
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(ctx.Client.ShardId == shard.ShardId ? $"Current shard {shard.ShardId} has {shard.Guilds.Count} guilds." : $"Shard {shard.ShardId} has {shard.Guilds.Count} guilds."));
+		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
 	}
 
 	[ContextMenu(ApplicationCommandType.Message, "Remove message - Miku Dev")]
