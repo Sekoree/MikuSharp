@@ -30,33 +30,90 @@ using Weeb.net;
 
 namespace MikuSharp;
 
+/// <summary>
+/// Represents the <see cref="MikuBot"/>.
+/// </summary>
 internal class MikuBot : IDisposable
 {
+	/// <summary>
+	/// Gets the global canellation token source.
+	/// </summary>
 	internal static CancellationTokenSource _cts { get; set; }
 
+	/// <summary>
+	/// Gets the bot config.
+	/// </summary>
 	internal static BotConfig Config { get; set; }
+	/// <summary>
+	/// Gets the lavalink configuration for every voice connection.
+	/// </summary>
 	internal LavalinkConfiguration LavalinkConfig { get; set; }
 
-	internal Task GameSetThread { get; set; }
-	internal Task StatusThread { get; set; }
-	internal Task BotListThread { get; set; }
+	/// <summary>
+	/// Runs the activity update.
+	/// </summary>
+	internal Task SetActivityThread { get; set; }
+	/// <summary>
+	/// Runs the connection update.
+	/// </summary>
+	internal Task ConnectionThread { get; set; }
+	/// <summary>
+	/// Runs the bot list stats update.
+	/// </summary>
+	internal Task BotlistThread { get; set; }
 
-	internal static WeebClient _weebClient = new("Hatsune Miku Bot", "4.0.0");
+	/// <summary>
+	/// Gets the weeb client for images and gifs.
+	/// </summary>
+	internal static WeebClient WeebClient { get; } = new("Hatsune Miku Bot", "4.0.0");
+	/// <summary>
+	/// Gets the discord bot list api client.
+	/// </summary>
 	internal static AuthDiscordBotListApi DiscordBotListApi { get; set; }
+	/// <summary>
+	/// Gets the discord sharded client.
+	/// </summary>
 	internal static DiscordShardedClient ShardedClient { get; set; }
 
+	/// <summary>
+	/// Gets the interactivity extensions for every shard.
+	/// </summary>
 	internal IReadOnlyDictionary<int, InteractivityExtension> InteractivityModules { get; set; }
+	/// <summary>
+	/// Gets the application commands extensions for every shard.
+	/// </summary>
 	internal IReadOnlyDictionary<int, ApplicationCommandsExtension> ApplicationCommandsModules { get; set; }
+	/// <summary>
+	/// Gets the commands next extensions for every shard.
+	/// </summary>
 	internal IReadOnlyDictionary<int, CommandsNextExtension> CommandsNextModules { get; set; }
+	/// <summary>
+	/// Gets the lavalink extensions for every shard.
+	/// </summary>
 	internal IReadOnlyDictionary<int, LavalinkExtension> LavalinkModules { get; set; }
 
+	/// <summary>
+	/// Gets the lavalink node connections for every shard.
+	/// </summary>
 	internal static Dictionary<int, LavalinkNodeConnection> LavalinkNodeConnections = new();
-	internal static Dictionary<ulong, Guild> Guilds = new();
+	/// <summary>
+	/// Gets the custom guild entities.
+	/// </summary>
+	internal static Dictionary<ulong, Guild> Guilds { get; } = new();
 
-	internal static Playstate ps = Playstate.Playing;
-	internal static Stopwatch psc = new();
+	/// <summary>
+	/// Gets the default play state.
+	/// </summary>
+	internal static Playstate DefaultPlaystate { get; } = Playstate.Playing;
+	/// <summary>
+	/// Gets the stop watch.
+	/// </summary>
+	internal static Stopwatch Psc { get; } = new();
 
-
+	/// <summary>
+	/// Constructs a new instance of <see cref="MikuBot"/>.
+	/// </summary>
+	/// <exception cref="ArgumentNullException">Thrown when the config.json was not found or null.</exception>
 	internal MikuBot()
 	{
 		var fileData = File.ReadAllText(@"config.json") ?? throw new ArgumentNullException("config.json is null or missing");
@@ -95,9 +152,11 @@ internal class MikuBot : IDisposable
 			MessageCacheSize = 2048,
 			LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
 		});
-
 	}
 
+	/// <summary>
+	/// Prepares the bot to run.
+	/// </summary>
 	internal async Task SetupAsync()
 	{
 		InteractivityModules = await ShardedClient.UseInteractivityAsync(new()
@@ -150,6 +209,9 @@ internal class MikuBot : IDisposable
 		RegisterCommands();
 	}
 
+	/// <summary>
+	/// Registers all events.
+	/// </summary>
 	internal static void RegisterEvents()
 	{
 		ShardedClient.ClientErrored += (sender, args) =>
@@ -210,6 +272,9 @@ internal class MikuBot : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Shows all voice node connections every 15 minutes.
+	/// </summary>
 	internal async Task ShowConnections()
 	{
 		while (!_cts.IsCancellationRequested)
@@ -220,6 +285,9 @@ internal class MikuBot : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Updates the bot list stats.
+	/// </summary>
 	internal static async Task UpdateBotList()
 	{
 		await Task.Delay(15000);
@@ -235,6 +303,10 @@ internal class MikuBot : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// <para>This functions updates the bots activity every 20 minutes.</para>
+	/// <para>We have 3 activities it's switching through.</para>
+	/// </summary>
 	internal async Task SetActivity()
 	{
 		while (!_cts.IsCancellationRequested)
@@ -263,6 +335,9 @@ internal class MikuBot : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Registers all text and slash commands
+	/// </summary>
 	internal void RegisterCommands()
 	{
 		// Nsfw stuff needs to be hidden, that's why we use commands next
@@ -282,9 +357,12 @@ internal class MikuBot : IDisposable
 		ApplicationCommandsModules.RegisterGuildCommands<Commands.MikuGuild>(483279257431441410);
 	}
 
+	/// <summary>
+	/// Runs the actual bot.
+	/// </summary>
 	internal async Task RunAsync()
 	{
-		await _weebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
+		await WeebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
 		await ShardedClient.StartAsync();
 		await Task.Delay(5000);
 		foreach (var lavalinkShard in LavalinkModules)
@@ -292,8 +370,8 @@ internal class MikuBot : IDisposable
 			var LCon = await lavalinkShard.Value.ConnectAsync(LavalinkConfig);
 			LavalinkNodeConnections.Add(lavalinkShard.Key, LCon);
 		}
-		GameSetThread = Task.Run(SetActivity);
-		StatusThread = Task.Run(ShowConnections);
+		SetActivityThread = Task.Run(SetActivity);
+		ConnectionThread = Task.Run(ShowConnections);
 #if !DEBUG
 		DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
 		BotListThread = Task.Run(UpdateBotList);
@@ -304,6 +382,9 @@ internal class MikuBot : IDisposable
 		await ShardedClient.StopAsync();
 	}
 
+	/// <summary>
+	/// Disposes the bot.
+	/// </summary>
 	public void Dispose()
 	{
 		GC.SuppressFinalize(this);

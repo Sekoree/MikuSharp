@@ -62,7 +62,7 @@ public static class Web
 
 	public static async Task<WeebSh> GetWeebShAsync(this HttpClient client, string query, string[] tags = null, NsfwSearch nsfw = NsfwSearch.False)
 	{
-		var weeurl = await MikuBot._weebClient.GetRandomAsync(query, tags, nsfw: nsfw);
+		var weeurl = await MikuBot.WeebClient.GetRandomAsync(query, tags, nsfw: nsfw);
 		MemoryStream img = new(await client.GetByteArrayAsync(weeurl.Url))
 		{
 			Position = 0

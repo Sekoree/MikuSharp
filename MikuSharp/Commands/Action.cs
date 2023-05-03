@@ -56,7 +56,7 @@ internal class Action : ApplicationCommandsModule
 	public static async Task PatAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
-		var weeurl = await MikuBot._weebClient.GetRandomAsync("pat", new[] { "" });
+		var weeurl = await MikuBot.WeebClient.GetRandomAsync("pat", new[] { "" });
 		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
 		var em = new DiscordEmbedBuilder();
 		em.WithDescription($"{ctx.User.Mention} pats {user.Mention} #w#");
@@ -73,7 +73,7 @@ internal class Action : ApplicationCommandsModule
 	public static async Task PokeAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
-		var weeurl = await MikuBot._weebClient.GetRandomAsync("poke", new[] { "" });
+		var weeurl = await MikuBot.WeebClient.GetRandomAsync("poke", new[] { "" });
 		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
 		var em = new DiscordEmbedBuilder();
 		em.WithDescription($"{ctx.User.Mention} pokes {user.Mention} ÓwÒ");
@@ -90,7 +90,7 @@ internal class Action : ApplicationCommandsModule
 	public static async Task SlapAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
-		var weeurl = await MikuBot._weebClient.GetRandomAsync("slap", new[] { "" });
+		var weeurl = await MikuBot.WeebClient.GetRandomAsync("slap", new[] { "" });
 		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
 		var em = new DiscordEmbedBuilder();
 		em.WithDescription($"{ctx.User.Mention} slaps {user.Mention} ÒwÓ");
