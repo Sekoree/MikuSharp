@@ -102,15 +102,6 @@ internal class MikuBot : IDisposable
 	internal static Dictionary<ulong, Guild> Guilds { get; } = new();
 
 	/// <summary>
-	/// Gets the default play state.
-	/// </summary>
-	internal static Playstate DefaultPlaystate { get; } = Playstate.Playing;
-	/// <summary>
-	/// Gets the stop watch.
-	/// </summary>
-	internal static Stopwatch Psc { get; } = new();
-
-	/// <summary>
 	/// Constructs a new instance of <see cref="MikuBot"/>.
 	/// </summary>
 	/// <exception cref="ArgumentNullException">Thrown when the config.json was not found or null.</exception>
