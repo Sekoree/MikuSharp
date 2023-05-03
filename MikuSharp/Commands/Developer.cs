@@ -10,10 +10,50 @@ namespace MikuSharp.Commands;
 /// </summary>
 public class Developer : ApplicationCommandsModule
 {
+	private static readonly string[] Units = new[] { "", "ki", "Mi", "Gi" };
+	private static string SizeToString(long l)
+	{
+		double d = l;
+		var u = 0;
+		while (d >= 900 && u < Units.Length - 2)
+		{
+			u++;
+			d /= 1024;
+		}
+
+		return $"{d:#,##0.00} {Units[u]}B";
+	}
+
 	[SlashCommand("test", "Testing")]
 	public static async Task TestAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
+	}
+
+	[SlashCommand("global_lstats", "Global lavalink stats")]
+	public static async Task GetGlobalLavalinkStatsAsync(InteractionContext ctx)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent("Loading statistics for every shard."));
+		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		{
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
+			return;
+		}
+		foreach (var lavaNode in MikuBot.LavalinkNodeConnections)
+		{
+			var stats = lavaNode.Value.Statistics;
+			var sb = new StringBuilder();
+			sb.Append($"Lavalink resources usage statistics for shard {lavaNode.Key}: ```")
+				.Append("Uptime:                    ").Append(stats.Uptime).AppendLine()
+				.Append("Players:                   ").AppendFormat("{0} active / {1} total", stats.ActivePlayers, stats.TotalPlayers).AppendLine()
+				.Append("CPU Cores:                 ").Append(stats.CpuCoreCount).AppendLine()
+				.Append("CPU Usage:                 ").AppendFormat("{0:#,##0.0%} lavalink / {1:#,##0.0%} system", stats.CpuLavalinkLoad, stats.CpuSystemLoad).AppendLine()
+				.Append("RAM Usage:                 ").AppendFormat("{0} allocated / {1} used / {2} free / {3} reservable", SizeToString(stats.RamAllocated), SizeToString(stats.RamUsed), SizeToString(stats.RamFree), SizeToString(stats.RamReservable)).AppendLine()
+				.Append("Audio frames (per minute): ").AppendFormat("{0:#,##0} sent / {1:#,##0} nulled / {2:#,##0} deficit", stats.AverageSentFramesPerMinute, stats.AverageNulledFramesPerMinute, stats.AverageDeficitFramesPerMinute).AppendLine()
+				.Append("```");
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent(sb.ToString()));
+		}
+		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
 	}
 
 	[SlashCommand("guild_shard_test", "Testing")]
