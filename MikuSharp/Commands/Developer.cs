@@ -105,14 +105,14 @@ public class Developer : ApplicationCommandsModule
 	[SlashCommand("global_shards", "Get all shard infos")]
 	public static async Task GuildTestAsync(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"Loading shards"));
+		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"Loading shards").AsEphemeral());
 		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
 		}
 		foreach (var shard in MikuBot.ShardedClient.ShardClients.Values)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(ctx.Client.ShardId == shard.ShardId ? $"Current shard {shard.ShardId} has {shard.Guilds.Count} guilds." : $"Shard {shard.ShardId} has {shard.Guilds.Count} guilds."));
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(ctx.Client.ShardId == shard.ShardId ? $"Current shard {shard.ShardId} has {shard.Guilds.Count} guilds." : $"Shard {shard.ShardId} has {shard.Guilds.Count} guilds.").AsEphemeral());
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
 	}
 
@@ -133,7 +133,7 @@ public class Developer : ApplicationCommandsModule
 	/// Gets the debug log.
 	/// </summary>
 	/// <param name="ctx">The interaction context.</param>
-	[SlashCommand("dbg", "Get the logs of today")]
+	[SlashCommand("dbg", "Get the debug logs of today")]
 	public static async Task GetDebugLogsAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Log request"));
