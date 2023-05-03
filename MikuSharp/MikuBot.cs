@@ -397,10 +397,12 @@ internal class MikuBot : IDisposable
 			DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
 			BotListThread = Task.Run(UpdateBotList, _cts.Token);
 #endif
+			SentrySdk.CaptureMessage("MikuBot started!", SentryLevel.Warning);
 			while (!_cts.IsCancellationRequested)
 				await Task.Delay(1000);
 			await ShardedClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
 			await ShardedClient.StopAsync();
+			SentrySdk.CaptureMessage("MikuBot stopped!", SentryLevel.Warning);
 			SentrySdk.EndSession();
 		}
 	}
