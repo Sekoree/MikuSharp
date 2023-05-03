@@ -49,6 +49,7 @@ public class MusicInstance
 	{
 		var queue = await Database.GetQueueAsync(ctx.Guild);
 		var inter = ctx.Client.GetInteractivity();
+		// NicoNicoNii
 		if (n.ToLower().StartsWith("http://nicovideo.jp")
 			|| n.ToLower().StartsWith("http://sp.nicovideo.jp")
 			|| n.ToLower().StartsWith("https://nicovideo.jp")
@@ -82,6 +83,7 @@ public class MusicInstance
 				await PlaySong();
 			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
 		}
+		// Bilibili
 		else if (n.ToLower().StartsWith("https://www.bilibili.com")
 			|| n.ToLower().StartsWith("http://www.bilibili.com"))
 		{
@@ -118,6 +120,7 @@ public class MusicInstance
 				await PlaySong();
 			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
 		}
+		// Http(s) stream/file
 		else if (n.StartsWith("http://") | n.StartsWith("https://"))
 		{
 			try
@@ -139,6 +142,7 @@ public class MusicInstance
 						};
 					case LavalinkLoadResultType.PlaylistLoaded:
 						{
+							// This is a playlist
 							if (s.PlaylistInfo.SelectedTrack == -1)
 							{
 								List<DiscordButtonComponent> buttons = new(2)
@@ -175,6 +179,7 @@ public class MusicInstance
 									return null;
 								}
 							}
+							// We detected an attached playlist link
 							else
 							{
 								List<DiscordButtonComponent> buttons = new(3)
@@ -233,6 +238,7 @@ public class MusicInstance
 								}
 							}
 						};
+					// We play a single song
 					default:
 						{
 							await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {s.Tracks.First().Title}"));
@@ -253,6 +259,7 @@ public class MusicInstance
 				return null;
 			}
 		}
+		// A search is triggered
 		else
 		{
 			var type = LavalinkSearchType.Youtube;

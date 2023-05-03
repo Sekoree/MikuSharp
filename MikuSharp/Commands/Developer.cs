@@ -44,7 +44,7 @@ public class Developer : ApplicationCommandsModule
 	/// </summary>
 	/// <param name="ctx">The interaction context.</param>
 	[SlashCommand("dbg", "Get the logs of today")]
-	public static async Task GetDebugLogAsync(InteractionContext ctx)
+	public static async Task GetDebugLogsAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Log request"));
 		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
@@ -95,7 +95,7 @@ public class Developer : ApplicationCommandsModule
 	/// </summary>
 	/// <param name="ctx">The context menu context.</param>
 	[ContextMenu(ApplicationCommandType.Message, "Eval - Miku Dev")]
-	public static async Task EvalCSAsync(ContextMenuContext ctx)
+	public static async Task EvalCodeAsync(ContextMenuContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Eval request").AsEphemeral());
 		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
@@ -126,13 +126,13 @@ public class Developer : ApplicationCommandsModule
 		msg = await ctx.GetOriginalResponseAsync();
 		try
 		{
-			var globals = new SGTestVariables(ctx.TargetMessage, ctx.Client, ctx, MikuBot.ShardedClient);
+			var globals = new EvaluationVariables(ctx.TargetMessage, ctx.Client, ctx);
 
 			var sopts = ScriptOptions.Default;
 			sopts = sopts.WithImports("System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "DisCatSharp", "DisCatSharp.Entities", "DisCatSharp.CommandsNext", "DisCatSharp.CommandsNext.Attributes", "DisCatSharp.Interactivity", "DisCatSharp.Interactivity.Extensions", "DisCatSharp.Enums", "Microsoft.Extensions.Logging", "MikuSharp.Entities", "DisCatSharp.Lavalink");
 			sopts = sopts.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
 
-			var script = CSharpScript.Create(cs, sopts, typeof(SGTestVariables));
+			var script = CSharpScript.Create(cs, sopts, typeof(EvaluationVariables));
 			script.Compile();
 			var result = await script.RunAsync(globals).ConfigureAwait(false);
 
@@ -151,14 +151,12 @@ public class Developer : ApplicationCommandsModule
 /// <summary>
 /// The test variables.
 /// </summary>
-public class SGTestVariables
+public class EvaluationVariables
 {
 	/// <summary>
 	/// Gets or sets the message.
 	/// </summary>
 	public DiscordMessage Message { get; set; }
-
-	public InteractivityExtension Inter { get; set; }
 
 	/// <summary>
 	/// Gets or sets the channel.
@@ -185,29 +183,40 @@ public class SGTestVariables
 	/// </summary>
 	public ContextMenuContext Context { get; set; }
 
-	public Dictionary<ulong, Guild> Bot = MikuBot.Guilds;
+	/// <summary>
+	/// Gets the custom guild entities.
+	/// </summary>
+	public Dictionary<ulong, Guild> Guilds = MikuBot.Guilds;
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="TestVariables"/> class.
+	/// Gets the lavalink node connections.
+	/// </summary>
+	public Dictionary<int, LavalinkNodeConnection> Connections = MikuBot.LavalinkNodeConnections;
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref="EvaluationVariables"/> class.
 	/// </summary>
 	/// <param name="msg">The message.</param>
 	/// <param name="client">The client.</param>
 	/// <param name="ctx">The context menu context.</param>
-	public SGTestVariables(DiscordMessage msg, DiscordClient client, ContextMenuContext ctx, DiscordShardedClient shard)
+	public EvaluationVariables(DiscordMessage msg, DiscordClient client, ContextMenuContext ctx)
 	{
 		Client = client;
-		ShardClient = shard;
-
 		Message = msg;
 		Channel = ctx.Channel;
 		Guild = ctx.Guild;
 		User = ctx.User;
 		Member = ctx.Member;
 		Context = ctx;
-		Inter = Client.GetInteractivity();
 	}
 
-	public DiscordShardedClient ShardClient { get; set; }
+	/// <summary>
+	/// Gets the sharded client.
+	/// </summary>
+	public DiscordShardedClient ShardClient { get; set; } = MikuBot.ShardedClient;
 
+	/// <summary>
+	/// Gets or sets the client.
+	/// </summary>
 	public DiscordClient Client { get; set; }
 }
