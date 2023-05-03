@@ -56,11 +56,6 @@ internal class MikuBot : IDisposable
 	internal static DiscordShardedClient ShardedClient { get; set; }
 
 	/// <summary>
-	/// Gets the interactivity extensions for every shard.
-	/// </summary>
-	internal IReadOnlyDictionary<int, InteractivityExtension> InteractivityModules { get; set; }
-
-	/// <summary>
 	/// Gets the application commands extensions for every shard.
 	/// </summary>
 	internal IReadOnlyDictionary<int, ApplicationCommandsExtension> ApplicationCommandsModules { get; set; }
@@ -78,7 +73,7 @@ internal class MikuBot : IDisposable
 	/// <summary>
 	/// Gets the lavalink node connections for every shard.
 	/// </summary>
-	internal static Dictionary<int, LavalinkNodeConnection> LavalinkNodeConnections = new();
+	internal static Dictionary<int, LavalinkNodeConnection> LavalinkNodeConnections { get; } = new();
 
 	/// <summary>
 	/// Gets the custom guild entities.
@@ -153,7 +148,7 @@ internal class MikuBot : IDisposable
 	/// </summary>
 	internal async Task SetupAsync()
 	{
-		InteractivityModules = await ShardedClient.UseInteractivityAsync(new()
+		_ = await ShardedClient.UseInteractivityAsync(new()
 		{
 			Timeout = TimeSpan.FromMinutes(2),
 			PaginationBehaviour = PaginationBehaviour.WrapAround,
