@@ -7,6 +7,9 @@ public partial class BotConfig
 	[JsonProperty("discordToken")]
 	public string DiscordToken { get; set; }
 
+	[JsonProperty("discordTokenDev")]
+	public string DiscordTokenDev { get; set; }
+
 	[JsonProperty("discordBotListToken")]
 	public string DiscordBotListToken { get; set; }
 

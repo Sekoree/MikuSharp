@@ -78,9 +78,14 @@ internal class MikuBot : IDisposable
 			.CreateLogger();
 		Log.Logger.Information("Starting up!");
 
+		string token = Config.DiscordToken;
+#if DEBUG
+		token = Config.DiscordTokenDev;
+#endif
+
 		ShardedClient = new DiscordShardedClient(new()
 		{
-			Token = Config.DiscordToken,
+			Token = token,
 			TokenType = DisCatSharp.Enums.TokenType.Bot,
 			MinimumLogLevel = LogLevel.Debug,
 			AutoReconnect = true,
@@ -278,8 +283,8 @@ internal class MikuBot : IDisposable
 		}
 		GameSetThread = Task.Run(SetActivity);
 		StatusThread = Task.Run(ShowConnections);
-		//DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
-		//BotListThread = Task.Run(UpdateBotList);
+		DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
+		BotListThread = Task.Run(UpdateBotList);
 		while (!_cts.IsCancellationRequested)
 			await Task.Delay(1000);
 		await ShardedClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
