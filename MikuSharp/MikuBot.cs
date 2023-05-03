@@ -1,6 +1,8 @@
 ﻿using MikuSharp.Entities;
 using MikuSharp.Events;
 
+using Serilog.Sinks.SystemConsole.Themes;
+
 namespace MikuSharp;
 
 /// <summary>
@@ -100,11 +102,29 @@ internal class MikuBot : IDisposable
 #if DEBUG
 		level = LogEventLevel.Debug;
 #endif
-
+		var loggingTemplate = "[{Timestamp:HH:mm:ss}] [{Level:u4}] {SourceContext}: {Message:lj}{NewLine}{Exception}";
 		Log.Logger = new LoggerConfiguration()
 			.MinimumLevel.Debug()
-			.WriteTo.File("miku_log.txt", restrictedToMinimumLevel: LogEventLevel.Debug, fileSizeLimitBytes: null, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2, shared: true)
-			.WriteTo.Console(restrictedToMinimumLevel: level, outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+			.WriteTo.File("miku_log.txt", outputTemplate: loggingTemplate, restrictedToMinimumLevel: LogEventLevel.Debug, fileSizeLimitBytes: null, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2, shared: true)
+			.WriteTo.Console(restrictedToMinimumLevel: level, outputTemplate: loggingTemplate, theme: new AnsiConsoleTheme(new Dictionary<ConsoleThemeStyle, string>
+			{
+				[ConsoleThemeStyle.Text] = "\x1b[0m",
+				[ConsoleThemeStyle.SecondaryText] = "\x1b[90m",
+				[ConsoleThemeStyle.TertiaryText] = "\x1b[90m",
+				[ConsoleThemeStyle.Invalid] = "\x1b[31m",
+				[ConsoleThemeStyle.Null] = "\x1b[95m",
+				[ConsoleThemeStyle.Name] = "\x1b[93m",
+				[ConsoleThemeStyle.String] = "\x1b[96m",
+				[ConsoleThemeStyle.Number] = "\x1b[95m",
+				[ConsoleThemeStyle.Boolean] = "\x1b[95m",
+				[ConsoleThemeStyle.Scalar] = "\x1b[95m",
+				[ConsoleThemeStyle.LevelVerbose] = "\x1b[34m",
+				[ConsoleThemeStyle.LevelDebug] = "\x1b[90m",
+				[ConsoleThemeStyle.LevelInformation] = "\x1b[36m",
+				[ConsoleThemeStyle.LevelWarning] = "\x1b[33m",
+				[ConsoleThemeStyle.LevelError] = "\x1b[31m",
+				[ConsoleThemeStyle.LevelFatal] = "\x1b[97;91m"
+			}))
 			.CreateLogger();
 		Log.Logger.Information("Starting up!");
 
