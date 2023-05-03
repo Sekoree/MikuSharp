@@ -42,7 +42,7 @@ public class VoiceChat
 				}
 				g.musicInstance.aloneTime = DateTime.UtcNow;
 				g.musicInstance.aloneCTS = new CancellationTokenSource();
-				g.AloneCheckThread = Task.Run(g.CheckAlone);
+				g.AloneCheckThread = Task.Run(g.CheckAlone, MikuBot._cts.Token);
 			}
 			else if (e.After?.Channel?.Users.Where(x => !x.IsBot).Count() != 0 && e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
 			{

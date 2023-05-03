@@ -297,7 +297,7 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.musicInstance.usedChannel = ctx.Channel;
-			await Task.Run(async () => await g.musicInstance.guildConnection.StopAsync());
+			await Task.Run(g.musicInstance.guildConnection.StopAsync, MikuBot._cts.Token);
 			var cmd_id = ctx.Client.GetApplicationCommands().GlobalCommands.First(x => x.Name == "music").Id;
 			await ctx.EditResponseAsync(builder: new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Stopped** (use </music playback resume:{cmd_id}> to start playback again)").Build()));
 		}

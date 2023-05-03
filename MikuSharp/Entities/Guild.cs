@@ -22,7 +22,7 @@ public class Guild
 		}
 		if (DateTime.UtcNow.Subtract(musicInstance.aloneTime).Minutes == 5 && !musicInstance.aloneCTS.IsCancellationRequested)
 		{
-			await Task.Run(async () => await musicInstance.guildConnection.DisconnectAsync());
+			await Task.Run(async () => await musicInstance.guildConnection.DisconnectAsync(), MikuBot._cts.Token);
 			await Task.Delay(500);
 			musicInstance = null;
 		}

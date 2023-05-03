@@ -230,13 +230,13 @@ internal class MikuBot : IDisposable
 					}
 					else
 						await Task.FromResult(true);
-				});
+				}, _cts.Token);
 				await Task.FromResult(true);
 			};
 			discordClientKvp.Value.GuildMemberUpdated += async (sender, args) =>
 			{
 				if (args.Guild.Id == 483279257431441410)
-					_ = Task.Run(async () => await MikuGuild.OnUpdateAsync(sender, args));
+					_ = Task.Run(async () => await MikuGuild.OnUpdateAsync(sender, args), _cts.Token);
 				else
 					await Task.FromResult(true);
 			};
@@ -250,7 +250,7 @@ internal class MikuBot : IDisposable
 	/// </summary>
 	internal async Task ShowConnections()
 	{
-		while (!_cts.IsCancellationRequested)
+		while (true)
 		{
 			var al = Guilds.Where(x => x.Value?.musicInstance != null);
 			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.musicInstance.guildConnection?.IsConnected == true).Count());
@@ -264,7 +264,7 @@ internal class MikuBot : IDisposable
 	internal static async Task UpdateBotList()
 	{
 		await Task.Delay(15000);
-		while (!_cts.IsCancellationRequested)
+		while (true)
 		{
 			var me = await DiscordBotListApi.GetMeAsync();
 			int[] count = Array.Empty<int>();
@@ -282,7 +282,7 @@ internal class MikuBot : IDisposable
 	/// </summary>
 	internal async Task SetActivity()
 	{
-		while (!_cts.IsCancellationRequested)
+		while (true)
 		{
 			DiscordActivity test = new()
 			{
@@ -343,11 +343,11 @@ internal class MikuBot : IDisposable
 			var LCon = await lavalinkShard.Value.ConnectAsync(LavalinkConfig);
 			LavalinkNodeConnections.Add(lavalinkShard.Key, LCon);
 		}
-		SetActivityThread = Task.Run(SetActivity);
-		ConnectionThread = Task.Run(ShowConnections);
+		SetActivityThread = Task.Run(SetActivity, _cts.Token);
+		ConnectionThread = Task.Run(ShowConnections, _cts.Token);
 #if !DEBUG
 		DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
-		BotListThread = Task.Run(UpdateBotList);
+		BotListThread = Task.Run(UpdateBotList, _cts.Token);
 #endif
 		while (!_cts.IsCancellationRequested)
 			await Task.Delay(1000);

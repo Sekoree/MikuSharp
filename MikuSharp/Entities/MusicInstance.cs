@@ -358,7 +358,7 @@ public class MusicInstance
 		MikuBot.ShardedClient.Logger.LogDebug(currentSong?.track.TrackString);
 		guildConnection.PlaybackFinished += Lavalink.LavalinkTrackFinish;
 		playstate = Playstate.Playing;
-		await Task.Run(async () => await guildConnection.PlayAsync(currentSong.track));
+		await Task.Run(async () => await guildConnection.PlayAsync(currentSong.track), MikuBot._cts.Token);
 		return currentSong;
 	}
 }

@@ -90,14 +90,13 @@ public class Developer : ApplicationCommandsModule
 			try
 			{
 				await MikuBot.Guilds[guildConnection.Key].musicInstance.usedChannel.SendMessageAsync(new DiscordEmbedBuilder().WithAuthor(ctx.User.UsernameWithDiscriminator, ctx.User.ProfileUrl, ctx.User.AvatarUrl).WithTitle("Developer Notice").WithDescription("⚠️ This music instance was forcefully disconnected by the developers ⚠️\n\nReasons could be:\n- Maintenance\n- Fatal Errors").Build());
-				
 			}
 			catch(Exception)
 			{ }
 
 			await guildConnection.Value.StopAsync();
 			if (clearQueues)
-				_ = Task.Run(async() => await Database.ClearQueueAsync(guildConnection.Value.Guild));
+				_ = Task.Run(async() => await Database.ClearQueueAsync(guildConnection.Value.Guild), MikuBot._cts.Token);
 			await guildConnection.Value.DisconnectAsync(true);
 			connection.Discord.Logger.LogInformation("Forcefully disconnected lavalink voice from {guild}", guildConnection.Key);
 		}
