@@ -157,12 +157,12 @@ internal class MikuBot : IDisposable
 		RegisterCommands();
 	}
 
-	internal void RegisterEvents()
+	internal static void RegisterEvents()
 	{
 		ShardedClient.ClientErrored += (sender, args) =>
 		{
-			sender.Logger.LogError(args.Exception.Message);
-			sender.Logger.LogError(args.Exception.StackTrace);
+			sender.Logger.LogError("{msg}", args.Exception.Message);
+			sender.Logger.LogError("{stack}", args.Exception.StackTrace);
 			return Task.CompletedTask;
 		};
 
@@ -208,7 +208,7 @@ internal class MikuBot : IDisposable
 
 	internal async Task ShowConnections()
 	{
-		while (true)
+		while (!_cts.IsCancellationRequested)
 		{
 			var al = Guilds.Where(x => x.Value?.musicInstance != null);
 			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.musicInstance.guildConnection?.IsConnected == true).Count());
@@ -216,10 +216,10 @@ internal class MikuBot : IDisposable
 		}
 	}
 
-	internal async Task UpdateBotList()
+	internal static async Task UpdateBotList()
 	{
 		await Task.Delay(15000);
-		while (true)
+		while (!_cts.IsCancellationRequested)
 		{
 			var me = await DiscordBotListApi.GetMeAsync();
 			int[] count = Array.Empty<int>();
@@ -233,7 +233,7 @@ internal class MikuBot : IDisposable
 
 	internal async Task SetActivity()
 	{
-		while (true)
+		while (!_cts.IsCancellationRequested)
 		{
 			DiscordActivity test = new()
 			{
@@ -293,9 +293,8 @@ internal class MikuBot : IDisposable
 		//DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
 		//BotListThread = Task.Run(UpdateBotList);
 		while (!_cts.IsCancellationRequested)
-		{
-			await Task.Delay(25);
-		}
+			await Task.Delay(1000);
+		await ShardedClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
 		await ShardedClient.StopAsync();
 	}
 
