@@ -76,9 +76,9 @@ public class MusicInstance
 			}
 			var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
 			if (pos == -1)
-				await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
+				await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
 			else
-				await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
+				await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
 			if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped))
 				await PlaySong();
 			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
@@ -113,9 +113,9 @@ public class MusicInstance
 			}
 			var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
 			if (pos == -1)
-				await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
+				await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
 			else
-				await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
+				await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
 			if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped))
 				await PlaySong();
 			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
@@ -166,7 +166,7 @@ public class MusicInstance
 									await resp.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 									buttons.ForEach(x => x.Disable());
 									await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Adding entire playlist"));
-									await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ToList());
+									await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.ToList());
 									if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped))
 										await PlaySong();
 									return new TrackResult(s.PlaylistInfo, s.Tracks);
@@ -206,9 +206,9 @@ public class MusicInstance
 									buttons.ForEach(x => x.Disable());
 									await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding single song: {s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).Title}"));
 									if (pos == -1)
-										await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).TrackString);
+										await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).TrackString);
 									else
-										await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).TrackString, pos);
+										await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).TrackString, pos);
 									if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped))
 										await PlaySong();
 									return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack));
@@ -219,7 +219,7 @@ public class MusicInstance
 									buttons.ForEach(x => x.Disable());
 									await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding entire playlist: {s.PlaylistInfo.Name}"));
 									if (pos == -1)
-										await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks);
+										await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks);
 									else
 									{
 										s.Tracks.Reverse();
@@ -243,9 +243,9 @@ public class MusicInstance
 						{
 							await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {s.Tracks.First().Title}"));
 							if (pos == -1)
-								await Database.AddToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.First().TrackString);
+								await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.First().TrackString);
 							else
-								await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks.First().TrackString, pos);
+								await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.First().TrackString, pos);
 							if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped))
 								await PlaySong();
 							return new TrackResult(s.PlaylistInfo, s.Tracks.First());
@@ -331,9 +331,9 @@ public class MusicInstance
 						select.Disable();
 						await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent($"Chose {track.Title}"));
 						if (pos == -1)
-							await Database.AddToQueue(ctx.Guild, ctx.Member.Id, track.TrackString);
+							await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, track.TrackString);
 						else
-							await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, track.TrackString, pos);
+							await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, track.TrackString, pos);
 						if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped))
 							await PlaySong();
 						return new TrackResult(s.PlaylistInfo, track);

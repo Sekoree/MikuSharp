@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.Scripting;
 
 using MikuSharp.Entities;
+using MikuSharp.Utilities;
 
 namespace MikuSharp.Commands;
 
@@ -55,7 +56,7 @@ public class Developer : ApplicationCommandsModule
 	}
 
 	[SlashCommand("global_ll_restart", "Restarts all lavalink connection nodes")]
-	public static async Task Test(InteractionContext ctx)
+	public static async Task Test(InteractionContext ctx, [Option("clear_queues", "Clear all queues?")] bool clearQueues = false)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent("Restarting all lavalink connections"));
 		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
@@ -67,6 +68,7 @@ public class Developer : ApplicationCommandsModule
 		foreach (var l in ll)
 			foreach (var n in l.Value.ConnectedNodes)
 			{
+				await DisconnectVoiceConnectionsAsync(ctx, n.Value, clearQueues);
 				await n.Value.StopAsync();
 				await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Stopped lavalink on shard {l.Key}"));
 			}
@@ -79,6 +81,26 @@ public class Developer : ApplicationCommandsModule
 			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Started lavalink on shard {l.Key}"));
 		}
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
+	}
+
+	private static async Task DisconnectVoiceConnectionsAsync(InteractionContext ctx, LavalinkNodeConnection connection, bool clearQueues)
+	{
+		foreach(var guildConnection in connection.ConnectedGuilds)
+		{
+			try
+			{
+				await MikuBot.Guilds[guildConnection.Key].musicInstance.usedChannel.SendMessageAsync(new DiscordEmbedBuilder().WithAuthor(ctx.User.UsernameWithDiscriminator, ctx.User.ProfileUrl, ctx.User.AvatarUrl).WithTitle("Developer Notice").WithDescription("⚠️ This music instance was forcefully disconnected by the developers ⚠️\n\nReasons could be:\n- Maintenance\n- Fatal Errors").Build());
+				
+			}
+			catch(Exception)
+			{ }
+
+			await guildConnection.Value.StopAsync();
+			if (clearQueues)
+				_ = Task.Run(async() => await Database.ClearQueueAsync(guildConnection.Value.Guild));
+			await guildConnection.Value.DisconnectAsync(true);
+			connection.Discord.Logger.LogInformation("Forcefully disconnected lavalink voice from {guild}", guildConnection.Key);
+		}
 	}
 
 	[SlashCommand("guild_shard_test", "Testing")]

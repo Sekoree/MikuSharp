@@ -338,7 +338,7 @@ public class Playlists : ApplicationCommandsModule
 			g.musicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
 			await g.ConditionalConnect(ctx);
 			g.musicInstance.usedChannel = ctx.Channel;
-			await Database.AddToQueue(ctx.Guild, ctx.Member.Id, p);
+			await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, p);
 			if (g.musicInstance.guildConnection.IsConnected && (g.musicInstance.playstate == Playstate.NotPlaying || g.musicInstance.playstate == Playstate.Stopped))
 				await g.musicInstance.PlaySong();
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Play Playlist").WithDescription($"Playing playlist/Added to queue!").Build()));

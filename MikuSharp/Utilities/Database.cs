@@ -37,7 +37,7 @@ public class Database
 		conn.Dispose();
 	}
 
-	public static async Task ReorderQueue(DiscordGuild g)
+	public static async Task ReorderQueueAsync(DiscordGuild g)
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
@@ -77,7 +77,7 @@ public class Database
 		conn.Dispose();
 	}
 
-	public static async Task RebuildQueue(DiscordGuild g, List<QueueEntry> q)
+	public static async Task RebuildQueueAsync(DiscordGuild g, List<QueueEntry> q)
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
@@ -136,7 +136,7 @@ public class Database
 		return queue;
 	}
 
-	public static async Task AddToQueue(DiscordGuild g, ulong u, string ts)
+	public static async Task AddToQueueAsync(DiscordGuild g, ulong u, string ts)
 	{
 		int position = 0;
 		var connString = MikuBot.Config.DbConnectString;
@@ -177,7 +177,7 @@ public class Database
 		conn.Dispose();
 	}
 
-	public static async Task AddToQueue(DiscordGuild g, ulong u, List<LavalinkTrack> ts)
+	public static async Task AddToQueueAsync(DiscordGuild g, ulong u, List<LavalinkTrack> ts)
 	{
 		int position = 0;
 		var connString = MikuBot.Config.DbConnectString;
@@ -216,7 +216,7 @@ public class Database
 		conn.Dispose();
 	}
 
-	public static async Task AddToQueue(DiscordGuild g, ulong u, List<PlaylistEntry> ts)
+	public static async Task AddToQueueAsync(DiscordGuild g, ulong u, List<PlaylistEntry> ts)
 	{
 		int position = 0;
 		var connString = MikuBot.Config.DbConnectString;
@@ -255,11 +255,11 @@ public class Database
 		conn.Dispose();
 	}
 
-	public static async Task InsertToQueue(DiscordGuild g, ulong u, string ts, int pos)
+	public static async Task InsertToQueueAsync(DiscordGuild g, ulong u, string ts, int pos)
 	{
 		var qnow = await GetQueueAsync(g);
 		qnow.Insert(pos, new QueueEntry(LavalinkUtilities.DecodeTrack(ts), u, DateTimeOffset.UtcNow, pos));
-		await RebuildQueue(g, qnow);
+		await RebuildQueueAsync(g, qnow);
 	}
 
 	public static async Task InsertToQueue(DiscordGuild g, ulong u, List<LavalinkTrack> ts, int pos)
@@ -269,7 +269,7 @@ public class Database
 		{
 			qnow.Insert(pos, new QueueEntry(LavalinkUtilities.DecodeTrack(tt.TrackString), u, DateTimeOffset.UtcNow, pos));
 		}
-		await RebuildQueue(g, qnow);
+		await RebuildQueueAsync(g, qnow);
 	}
 
 	public static async Task RemoveFromQueueAsync(int position, DiscordGuild g)
@@ -280,12 +280,12 @@ public class Database
 		var cmd = new NpgsqlCommand($"DELETE FROM queues WHERE position = {position} AND guildid = {g.Id};", conn);
 		await cmd.ExecuteNonQueryAsync();
 		cmd.Dispose();
-		await ReorderQueue(g);
+		await ReorderQueueAsync(g);
 		conn.Close();
 		conn.Dispose();
 	}
 
-	public static async Task ClearQueue(DiscordGuild g)
+	public static async Task ClearQueueAsync(DiscordGuild g)
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
@@ -297,13 +297,13 @@ public class Database
 		conn.Dispose();
 	}
 
-	public static async Task MoveQueueItems(DiscordGuild g, int oldpos, int newpos)
+	public static async Task MoveQueueItemsAsync(DiscordGuild g, int oldpos, int newpos)
 	{
 		var qnow = await GetQueueAsync(g);
 		var temp = qnow[oldpos];
 		qnow.RemoveAt(oldpos);
 		qnow.Insert(newpos, temp);
-		await RebuildQueue(g, qnow);
+		await RebuildQueueAsync(g, qnow);
 	}
 
 	public static async Task<List<Entry>> GetLastPlayingListAsync(DiscordGuild g)

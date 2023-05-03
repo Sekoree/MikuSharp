@@ -60,7 +60,7 @@ public class Music : ApplicationCommandsModule
 					await g.musicInstance.guildConnection.StopAsync();
 				await g.musicInstance.guildConnection.DisconnectAsync();
 				if (!keep)
-					await Database.ClearQueue(ctx.Guild);
+					await Database.ClearQueueAsync(ctx.Guild);
 				g.musicInstance = null;
 			}
 			catch (Exception)
@@ -153,7 +153,7 @@ public class Music : ApplicationCommandsModule
 				else
 				{
 					await hmm.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
-					await Database.ClearQueue(ctx.Guild);
+					await Database.ClearQueueAsync(ctx.Guild);
 					buttons.ForEach(x => x.Disable());
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Cleared").AddComponents(buttons));
 				}
@@ -497,9 +497,9 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.musicInstance.usedChannel = ctx.Channel;
-			await Database.ClearQueue(ctx.Guild);
+			await Database.ClearQueueAsync(ctx.Guild);
 			if (g.musicInstance.currentSong != null)
-				await Database.AddToQueue(ctx.Guild, g.musicInstance.currentSong.addedBy, g.musicInstance.currentSong.track.TrackString);
+				await Database.AddToQueueAsync(ctx.Guild, g.musicInstance.currentSong.addedBy, g.musicInstance.currentSong.track.TrackString);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Cleared queue!**").Build()));
 		}
 
@@ -520,7 +520,7 @@ public class Music : ApplicationCommandsModule
 			if (old_pos < 1 || new_pos < 1 || old_pos == new_pos || new_pos >= queue.Count)
 				return;
 			var oldSong = queue[old_pos];
-			await Database.MoveQueueItems(ctx.Guild, old_pos, new_pos);
+			await Database.MoveQueueItemsAsync(ctx.Guild, old_pos, new_pos);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Moved**:\n **{oldSong.track.Title}**\nby {oldSong.track.Author}\n from position **{old_pos}** to **{new_pos}**!").Build()));
 		}
 
