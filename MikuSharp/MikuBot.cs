@@ -241,7 +241,7 @@ internal class MikuBot : IDisposable
 		{
 			DiscordActivity test = new()
 			{
-				Name = "I'm using slash commands now!",
+				Name = "Mikuuuuuuuuuuu!",
 				ActivityType = ActivityType.Playing
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test, userStatus: UserStatus.Online);
@@ -294,8 +294,10 @@ internal class MikuBot : IDisposable
 		}
 		GameSetThread = Task.Run(SetActivity);
 		StatusThread = Task.Run(ShowConnections);
+#if !DEBUG
 		DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
 		BotListThread = Task.Run(UpdateBotList);
+#endif
 		while (!_cts.IsCancellationRequested)
 			await Task.Delay(1000);
 		await ShardedClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
