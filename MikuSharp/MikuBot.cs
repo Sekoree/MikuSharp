@@ -158,20 +158,20 @@ internal class MikuBot : IDisposable
 			PollBehaviour = PollBehaviour.DeleteEmojis,
 			AckPaginationButtons = true,
 			ButtonBehavior = ButtonPaginationBehavior.Disable,
-			PaginationButtons = new PaginationButtons()
+			PaginationButtons = new()
 			{
-				SkipLeft = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-left", "First", false, new DiscordComponentEmoji("⏮️")),
-				Left = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-left", "Previous", false, new DiscordComponentEmoji("◀️")),
-				Stop = new DiscordButtonComponent(ButtonStyle.Danger, "pgb-stop", "Cancel", false, new DiscordComponentEmoji("⏹️")),
-				Right = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-right", "Next", false, new DiscordComponentEmoji("▶️")),
-				SkipRight = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-right", "Last", false, new DiscordComponentEmoji("⏭️"))
+				SkipLeft = new(ButtonStyle.Primary, "pgb-skip-left", "First", false, new("⏮️")),
+				Left = new(ButtonStyle.Primary, "pgb-left", "Previous", false, new("◀️")),
+				Stop = new(ButtonStyle.Danger, "pgb-stop", "Cancel", false, new("⏹️")),
+				Right = new(ButtonStyle.Primary, "pgb-right", "Next", false, new("▶️")),
+				SkipRight = new(ButtonStyle.Primary, "pgb-skip-right", "Last", false, new("⏭️"))
 			},
 			ResponseBehavior = InteractionResponseBehavior.Ignore
 		});
 
 		ApplicationCommandsModules = await ShardedClient.UseApplicationCommandsAsync(new()
 		{
-			DebugStartup = true,
+			DebugStartup = false,
 			ManualOverride = true
 		});
 
@@ -189,8 +189,8 @@ internal class MikuBot : IDisposable
 
 		LavalinkConfig = new()
 		{
-			SocketEndpoint = new ConnectionEndpoint { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
-			RestEndpoint = new ConnectionEndpoint { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
+			SocketEndpoint = new() { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
+			RestEndpoint = new() { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
 			Password = Config.LavaConfig.Password
 		};
 
