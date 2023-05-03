@@ -254,16 +254,16 @@ internal class MikuBot : IDisposable
 		{
 			var al = Guilds.Where(x => x.Value?.musicInstance != null);
 			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.musicInstance.guildConnection?.IsConnected == true).Count());
-			await Task.Delay(15000);
+			await Task.Delay(TimeSpan.FromMinutes(15));
 		}
 	}
 
 	/// <summary>
-	/// Updates the bot list stats.
+	/// Updates the bot list stats every 15 minutes.
 	/// </summary>
 	internal static async Task UpdateBotList()
 	{
-		await Task.Delay(15000);
+		await Task.Delay(TimeSpan.FromMinutes(15));
 		while (true)
 		{
 			var me = await DiscordBotListApi.GetMeAsync();
