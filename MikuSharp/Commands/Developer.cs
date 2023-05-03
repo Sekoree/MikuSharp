@@ -29,7 +29,7 @@ public class Developer : ApplicationCommandsModule
 	public static async Task TestAsync(InteractionContext ctx)
 		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
 
-	[SlashCommand("global_lstats", "Global lavalink stats")]
+	[SlashCommand("global_ll_stats", "Global lavalink stats")]
 	public static async Task GetGlobalLavalinkStatsAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent("Loading statistics for every shard."));
@@ -54,9 +54,22 @@ public class Developer : ApplicationCommandsModule
 		}
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
 	}
+	[SlashCommand("global_restart", "Restarts all lavalink connection nodes")]
+	public static async Task RestartGlobalShardsAsync(InteractionContext ctx)
+	{
+		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent("Restarting all shards"));
+		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		{
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
+			return;
+		}
+		foreach (var shard in MikuBot.ShardedClient.ShardClients.Values)
+			await shard.ReconnectAsync(true);
+		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
+	}
 
 	[SlashCommand("global_ll_restart", "Restarts all lavalink connection nodes")]
-	public static async Task Test(InteractionContext ctx, [Option("clear_queues", "Clear all queues?")] bool clearQueues = false)
+	public static async Task RestartLalalinkGlobalAsync(InteractionContext ctx, [Option("clear_queues", "Clear all queues?")] bool clearQueues = false)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent("Restarting all lavalink connections"));
 		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
