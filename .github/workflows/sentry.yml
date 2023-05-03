@@ -1,0 +1,31 @@
+name: "Sentry Release"
+
+on:
+  push:
+
+permissions: write-all
+
+jobs:
+  release:
+    name: Sentry Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v3
+      - name: "Checkout LFS"
+        run: git lfs pull
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: "Create Sentry release"
+        uses: getsentry/action-release@v1.3.1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: "prod"
+          ignore_missing: true
+          strip_common_prefix: true
+          url_prefix: ~/
+          version: ${{ steps.vars.outputs.sha_short }}
