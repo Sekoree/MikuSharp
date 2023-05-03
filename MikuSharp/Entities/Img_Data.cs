@@ -1,7 +1,5 @@
 ﻿using DisCatSharp.Entities;
 
-using System.IO;
-
 namespace MikuSharp.Entities;
 
 public class Img_Data

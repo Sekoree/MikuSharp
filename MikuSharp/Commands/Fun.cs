@@ -1,5 +1,4 @@
-﻿using DisCatSharp;
-using DisCatSharp.ApplicationCommands;
+﻿using DisCatSharp.ApplicationCommands;
 using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
@@ -11,10 +10,6 @@ using MikuSharp.Entities;
 using MikuSharp.Utilities;
 
 using Newtonsoft.Json;
-
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Commands;
 

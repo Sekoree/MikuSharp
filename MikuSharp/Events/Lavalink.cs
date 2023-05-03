@@ -7,9 +7,6 @@ using Microsoft.Extensions.Logging;
 using MikuSharp.Enums;
 using MikuSharp.Utilities;
 
-using System;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Events;
 
 public class Lavalink
@@ -54,14 +51,17 @@ public class Lavalink
 						g.musicInstance.lastSong = g.musicInstance.currentSong;
 						g.musicInstance.currentSong = null;
 						var queue = await Database.GetQueueAsync(e.Player.Guild);
-						if (queue.Count != 0) await g.musicInstance.PlaySong();
-						else g.musicInstance.playstate = Playstate.NotPlaying;
+						if (queue.Count != 0)
+							await g.musicInstance.PlaySong();
+						else
+							g.musicInstance.playstate = Playstate.NotPlaying;
 						break;
 					}
 				case TrackEndReason.Finished:
 					{
 						g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-						if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All) await Database.RemoveFromQueueAsync(g.musicInstance.currentSong.position, e.Player.Guild);
+						if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All)
+							await Database.RemoveFromQueueAsync(g.musicInstance.currentSong.position, e.Player.Guild);
 						if (lastPlayedSongs.Count == 0)
 						{
 							await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
@@ -73,8 +73,10 @@ public class Lavalink
 						g.musicInstance.lastSong = g.musicInstance.currentSong;
 						g.musicInstance.currentSong = null;
 						var queue = await Database.GetQueueAsync(e.Player.Guild);
-						if (queue.Count != 0) await g.musicInstance.PlaySong();
-						else g.musicInstance.playstate = Playstate.NotPlaying;
+						if (queue.Count != 0)
+							await g.musicInstance.PlaySong();
+						else
+							g.musicInstance.playstate = Playstate.NotPlaying;
 						break;
 					}
 			}

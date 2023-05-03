@@ -1,7 +1,5 @@
 ﻿using DisCatSharp.Lavalink;
 
-using System.Collections.Generic;
-
 namespace MikuSharp.Entities;
 
 public class TrackResult

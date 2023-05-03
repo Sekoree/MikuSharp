@@ -3,9 +3,6 @@ using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
 
-using System;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Attributes;
 
 /// <summary>

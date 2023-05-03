@@ -5,10 +5,6 @@ using MikuSharp.Entities;
 
 using Npgsql;
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Utilities;
 
 public class Database
@@ -72,7 +68,7 @@ public class Database
 		para.Value = Convert.ToInt64(g.Id);
 		cmd2.Parameters.Add(para);
 		i = 0;
-		foreach(var qi in queueNow)
+		foreach (var qi in queueNow)
 		{
 			var para2 = cmd2.CreateParameter();
 			para2.ParameterName = $"adddate{i}";

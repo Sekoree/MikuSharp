@@ -14,11 +14,6 @@ using Kitsu.Manga;
 
 using Microsoft.Extensions.Logging;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Commands;
 
 [SlashCommandGroup("utility", "Utilities")]
@@ -59,7 +54,8 @@ internal class Utility : ApplicationCommandsModule
 					if (aa.Attributes.AverageRating != null)
 						emb.AddField(new DiscordEmbedField("Score", $"{aa.Attributes.AverageRating}", true));
 					emb.AddField(new DiscordEmbedField("NSFW", $"{aa.Attributes.Nsfw}", true));
-					if (aa.Attributes.CoverImage?.Small != null) emb.WithThumbnail(aa.Attributes.CoverImage.Small);
+					if (aa.Attributes.CoverImage?.Small != null)
+						emb.WithThumbnail(aa.Attributes.CoverImage.Small);
 					res.Add(emb);
 					emb = new DiscordEmbedBuilder();
 				}

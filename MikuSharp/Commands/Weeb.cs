@@ -5,15 +5,9 @@ using DisCatSharp.Entities;
 
 using HeyRed.Mime;
 
-using Microsoft.Extensions.Logging;
-
 using MikuSharp.Utilities;
 
 using Newtonsoft.Json;
-
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Commands;
 

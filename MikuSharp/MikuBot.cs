@@ -1,4 +1,6 @@
-﻿using DisCatSharp;
+﻿using System.Diagnostics;
+
+using DisCatSharp;
 using DisCatSharp.ApplicationCommands;
 using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
@@ -23,14 +25,6 @@ using Newtonsoft.Json;
 
 using Serilog;
 using Serilog.Events;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 using Weeb.net;
 
@@ -67,11 +61,9 @@ internal class MikuBot : IDisposable
 	{
 		var fileData = File.ReadAllText(@"config.json") ?? throw new ArgumentNullException("config.json is null or missing");
 
-		Config = JsonConvert.DeserializeObject<BotConfig>(fileData);
-		if (Config == null)
-			throw new ArgumentNullException("config.json is null");
-
+		Config = JsonConvert.DeserializeObject<BotConfig>(fileData) ?? throw new ArgumentNullException("config.json is null");
 		Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database={Config.DbConfig.Database}";
+
 		_cts = new CancellationTokenSource();
 
 		LogEventLevel level = LogEventLevel.Information;
@@ -119,17 +111,13 @@ internal class MikuBot : IDisposable
 				Right = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-right", "Next", false, new DiscordComponentEmoji("▶️")),
 				SkipRight = new DiscordButtonComponent(ButtonStyle.Primary, "pgb-skip-right", "Last", false, new DiscordComponentEmoji("⏭️"))
 			},
-			ResponseMessage = "Something went wrong.",
 			ResponseBehavior = InteractionResponseBehavior.Ignore
 		});
 
 		ApplicationCommandsModules = await ShardedClient.UseApplicationCommandsAsync(new()
 		{
-			EnableDefaultHelp = true,
 			DebugStartup = true,
-			EnableLocalization = false,
-			ManualOverride = true,
-			GenerateTranslationFilesOnly = false
+			ManualOverride = true
 		});
 
 		CommandsNextModules = await ShardedClient.UseCommandsNextAsync(new()

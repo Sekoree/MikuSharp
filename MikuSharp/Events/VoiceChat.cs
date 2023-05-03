@@ -6,11 +6,6 @@ using Microsoft.Extensions.Logging;
 
 using MikuSharp.Enums;
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Events;
 
 public class VoiceChat
@@ -19,10 +14,12 @@ public class VoiceChat
 	{
 		try
 		{
-			if (!MikuBot.Guilds.Any(x => x.Key == e.Guild.Id)) return;
+			if (!MikuBot.Guilds.Any(x => x.Key == e.Guild.Id))
+				return;
 			var g = MikuBot.Guilds[e.Guild.Id];
 			if (g.musicInstance == null
-				|| g.musicInstance?.guildConnection?.IsConnected == false) return;
+				|| g.musicInstance?.guildConnection?.IsConnected == false)
+				return;
 			if ((e.After?.Channel?.Users.Where(x => !x.IsBot).Count() == 0
 			|| e.Before?.Channel?.Users.Where(x => !x.IsBot).Count() == 0
 			|| e.Channel?.Users.Where(x => !x.IsBot).Count() == 0)

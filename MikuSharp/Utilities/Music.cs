@@ -14,12 +14,6 @@ using Microsoft.Extensions.Logging;
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Utilities;
 
 public static class Music
@@ -127,7 +121,7 @@ public static class Music
 			builder.WithImageUrl(searchListResponse.Items[0].Snippet.Thumbnails.High.Url);
 			builder.AddField(new DiscordEmbedField("Playback options", guild.musicInstance.GetPlaybackOptions()));
 		}
-		catch(Exception)
+		catch (Exception)
 		{
 			if (builder.Fields.Count != 1)
 			{

@@ -1,20 +1,17 @@
-﻿using DisCatSharp.ApplicationCommands.Context;
+﻿using System.Diagnostics;
+
+using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
 
 using Microsoft.Extensions.Logging;
 
 using NicoNicoNii;
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Utilities;
 
 public static class NND
 {
-	public static async Task<MemoryStream> GetNNDAsync(this InteractionContext ctx,string n, string s, ulong msg_id)
+	public static async Task<MemoryStream> GetNNDAsync(this InteractionContext ctx, string n, string s, ulong msg_id)
 	{
 		try
 		{

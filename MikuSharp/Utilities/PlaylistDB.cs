@@ -1,4 +1,6 @@
-﻿using DisCatSharp.ApplicationCommands.Context;
+﻿using System.Net;
+
+using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Interactivity.Extensions;
@@ -10,12 +12,6 @@ using MikuSharp.Entities;
 using MikuSharp.Enums;
 
 using Npgsql;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Utilities;
 
@@ -104,7 +100,8 @@ public class PlaylistDB
 		cmd2.Dispose();
 		conn.Close();
 		conn.Dispose();
-		if (pl == null) throw new Exception("Tf is up? " + p);
+		if (pl == null)
+			throw new Exception("Tf is up? " + p);
 		return pl;
 	}
 
@@ -369,7 +366,7 @@ public class PlaylistDB
 		//(q[newpos], q[oldpos]) = (q[oldpos], q[newpos]);
 		List<PlaylistEntry> tempQ = new(q.Count);
 		List<PlaylistEntry> newQ = new(q.Count);
-		foreach(var entry in q)
+		foreach (var entry in q)
 		{
 			if (entry.Position == oldpos)
 				entry.Position = newpos;
@@ -587,7 +584,8 @@ public class PlaylistDB
 				default:
 					{
 						int leng = s.Tracks.Count;
-						if (leng > 5) leng = 5;
+						if (leng > 5)
+							leng = 5;
 						List<DiscordStringSelectComponentOption> selectOptions = new(leng)
 						{
 

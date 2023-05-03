@@ -6,17 +6,10 @@ using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink;
 
-using Microsoft.Extensions.Logging;
-
 using MikuSharp.Attributes;
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 using MikuSharp.Utilities;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Commands;
 
@@ -28,7 +21,7 @@ public class Playlists : ApplicationCommandsModule
 	{
 		[SlashCommand("copy_queue", "Copy the current queue to a playlist!")]
 		[RequireUserAndBotVoicechatConnection]
-		public static async Task CopyQueueToNewPlaylistAsync(InteractionContext ctx, 
+		public static async Task CopyQueueToNewPlaylistAsync(InteractionContext ctx,
 			[Option("name", "Name of new playlist")] string name
 		)
 		{
@@ -54,7 +47,7 @@ public class Playlists : ApplicationCommandsModule
 		}
 
 		[SlashCommand("create", "Create a playlist")]
-		public static async Task CreatePlaylistAsync(InteractionContext ctx, 
+		public static async Task CreatePlaylistAsync(InteractionContext ctx,
 			[Option("name", "Name of new playlist")] string name
 		)
 		{
@@ -70,7 +63,7 @@ public class Playlists : ApplicationCommandsModule
 		}
 
 		[SlashCommand("create_fixed", "Create a fixed playlist (linked to a Youtube or Soundcloud playlist)")]
-		public static async Task CreateFixedPlaylistAsync(InteractionContext ctx, 
+		public static async Task CreateFixedPlaylistAsync(InteractionContext ctx,
 			[Option("name", "Name of new playlist")] string name,
 			[Option("link", "Link to playlist")] string link
 		)
@@ -128,7 +121,8 @@ public class Playlists : ApplicationCommandsModule
 			int currentPage = 1;
 			int songAmount = 0;
 			int totalP = pls.Count / 5;
-			if ((pls.Count % 5) != 0) totalP++;
+			if ((pls.Count % 5) != 0)
+				totalP++;
 			var emb = new DiscordEmbedBuilder();
 			List<Page> Pages = new();
 			foreach (var Track in pls)
@@ -186,7 +180,7 @@ public class Playlists : ApplicationCommandsModule
 		}
 
 		[SlashCommand("show", "Show the contents of a playlist")]
-		public static async Task ShowPlaylistAsync(InteractionContext ctx, 
+		public static async Task ShowPlaylistAsync(InteractionContext ctx,
 			[Option("playlist", "Name of playlist to show", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist
 		)
 		{
@@ -214,14 +208,17 @@ public class Playlists : ApplicationCommandsModule
 			int currentPage = 1;
 			int songAmount = 0;
 			int totalP = queue.Count / 5;
-			if ((queue.Count % 5) != 0) totalP++;
+			if ((queue.Count % 5) != 0)
+				totalP++;
 			var emb = new DiscordEmbedBuilder();
 			List<Page> Pages = new();
 			foreach (var Track in queue)
 			{
 				string time = "";
-				if (Track.track.Length.Hours < 1) time = Track.track.Length.ToString(@"mm\:ss");
-				else time = Track.track.Length.ToString(@"hh\:mm\:ss");
+				if (Track.track.Length.Hours < 1)
+					time = Track.track.Length.ToString(@"mm\:ss");
+				else
+					time = Track.track.Length.ToString(@"hh\:mm\:ss");
 				emb.AddField(new DiscordEmbedField($"**{songAmount + 1}.{Track.track.Title.Replace("*", "").Replace("|", "")}** by {Track.track.Author.Replace("*", "").Replace("|", "")} [{time}]",
 					$"Added on {Track.additionDate} [Link]({Track.track.Uri.AbsoluteUri})"));
 				songsPerPage++;
@@ -260,7 +257,7 @@ public class Playlists : ApplicationCommandsModule
 		}
 
 		[SlashCommand("delete", "Delete a playlist")]
-		public static async Task DeletePlaylistAsync(InteractionContext ctx, 
+		public static async Task DeletePlaylistAsync(InteractionContext ctx,
 			[Option("playlist", "Name of playlist to delete", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist
 		)
 		{
@@ -282,7 +279,7 @@ public class Playlists : ApplicationCommandsModule
 
 		[SlashCommand("rename", "Rename a playlist")]
 		public static async Task RenamePlaylistAsync(InteractionContext ctx,
-			[Option("playlist", "Name of playlist to rename", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist, 
+			[Option("playlist", "Name of playlist to rename", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist,
 			[Option("name", "New name for playlist")] string name
 		)
 		{
@@ -300,13 +297,13 @@ public class Playlists : ApplicationCommandsModule
 			}
 			var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
 			await pls.GetEntries();
-			
+
 			await PlaylistDB.RenameList(playlist, ctx.Member.Id, name);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Rename Playlist").WithDescription($"Renamed Playlist to {playlist} -> {name}!").Build()));
 		}
 
 		[SlashCommand("clear", "Clear all entries from a playlist")]
-		public static async Task ClearPlaylistAsync(InteractionContext ctx, 
+		public static async Task ClearPlaylistAsync(InteractionContext ctx,
 			[Option("playlist", "Name of playlist to clear", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist
 		)
 		{
@@ -360,7 +357,7 @@ public class Playlists : ApplicationCommandsModule
 	public class SongOperations : ApplicationCommandsModule
 	{
 		[SlashCommand("add", "Add a song to a playlist")]
-		public static async Task AddSongAsync(InteractionContext ctx, 
+		public static async Task AddSongAsync(InteractionContext ctx,
 			[Option("playlist", "Name of playlist to add song to", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist,
 			[Option("url_or_search", "Url or name of song to add")] string song
 		)
@@ -391,9 +388,9 @@ public class Playlists : ApplicationCommandsModule
 		}
 
 		[SlashCommand("insert_at", "Insert a song into a playlist at a choosen position")]
-		public static async Task InsertAtAsync(InteractionContext ctx, 
-			[Option("playlist", "Name of playlist to add song to", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist, 
-			[Option("position", "Position to insert song at" ,true), Autocomplete(typeof(AutocompleteProviders.SongProvider))] string posi,
+		public static async Task InsertAtAsync(InteractionContext ctx,
+			[Option("playlist", "Name of playlist to add song to", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist,
+			[Option("position", "Position to insert song at", true), Autocomplete(typeof(AutocompleteProviders.SongProvider))] string posi,
 			[Option("url_or_search", "Url or name of song to add")] string song
 		)
 		{
@@ -426,8 +423,8 @@ public class Playlists : ApplicationCommandsModule
 
 		[SlashCommand("move", "Move a song to a specific position in your playlist")]
 		public static async Task MoveSongAsync(InteractionContext ctx,
-			[Option("playlist", "Name of playlist to move the song within", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist, 
-			[Option("old_position", "Position to move the song from", true), Autocomplete(typeof(AutocompleteProviders.SongProvider))] string oldposi, 
+			[Option("playlist", "Name of playlist to move the song within", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist,
+			[Option("old_position", "Position to move the song from", true), Autocomplete(typeof(AutocompleteProviders.SongProvider))] string oldposi,
 			[Option("new_position", "Position to move song to", true), Autocomplete(typeof(AutocompleteProviders.SongProvider))] string newposi
 		)
 		{
@@ -459,8 +456,8 @@ public class Playlists : ApplicationCommandsModule
 		}
 
 		[SlashCommand("remove", "Remove a song from a playlist")]
-		public static async Task RemoveSongAsync(InteractionContext ctx, 
-			[Option("playlist", "Name of playlist to remove the song from", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist, 
+		public static async Task RemoveSongAsync(InteractionContext ctx,
+			[Option("playlist", "Name of playlist to remove the song from", true), Autocomplete(typeof(AutocompleteProviders.PlaylistProvider))] string playlist,
 			[Option("song", "Song to remove", true), Autocomplete(typeof(AutocompleteProviders.SongProvider))] string posi
 		)
 		{

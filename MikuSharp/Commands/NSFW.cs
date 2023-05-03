@@ -4,8 +4,6 @@ using DisCatSharp.Entities;
 
 using MikuSharp.Utilities;
 
-using System.Threading.Tasks;
-
 namespace MikuSharp.Commands
 {
 	[RequireNsfw]

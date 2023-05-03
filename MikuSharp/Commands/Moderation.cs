@@ -7,10 +7,6 @@ using DisCatSharp.Enums;
 
 using MikuSharp.Utilities;
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Commands;
 
 [SlashCommandGroup("mod", "Moderation", defaultMemberPermissions: (long)Permissions.BanMembers, dmPermission: false)]

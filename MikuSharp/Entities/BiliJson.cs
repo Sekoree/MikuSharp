@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace MikuSharp.Entities;
+﻿namespace MikuSharp.Entities;
 
 public class Durl2
 {

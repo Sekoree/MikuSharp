@@ -1,4 +1,6 @@
-﻿using DisCatSharp.ApplicationCommands;
+﻿using System.Text;
+
+using DisCatSharp.ApplicationCommands;
 using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
@@ -13,12 +15,6 @@ using MikuSharp.Entities;
 using MikuSharp.Enums;
 using MikuSharp.Events;
 using MikuSharp.Utilities;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Commands;
 
@@ -131,8 +127,8 @@ public class Music : ApplicationCommandsModule
 
 		[SlashCommand("play", "Play or queue a song")]
 		[RequireUserVoicechatConnection]
-		public static async Task PlayAsync(InteractionContext ctx, 
-			[Option("song", "Song name or url to play")] string name_or_url = null, 
+		public static async Task PlayAsync(InteractionContext ctx,
+			[Option("song", "Song name or url to play")] string name_or_url = null,
 			[Option("music_file", "Music file to play")] DiscordAttachment music_file = null
 		)
 		{
@@ -174,7 +170,7 @@ public class Music : ApplicationCommandsModule
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Cleared").AddComponents(buttons));
 				}
 			}
-			
+
 			await g.ConditionalConnect(ctx);
 
 			if (music_file == null && name_or_url == null)
@@ -212,7 +208,7 @@ public class Music : ApplicationCommandsModule
 				await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(emb.WithTitle("Playing").Build()).AsEphemeral());
 			}
 		}
-		
+
 		[SlashCommand("insert", "Queue a song at a specific position!")]
 		[RequireUserVoicechatConnection]
 		public static async Task InsertToQueueAsync(InteractionContext ctx,
@@ -266,7 +262,7 @@ public class Music : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
 			}
 		}
-		
+
 		[SlashCommand("skip", "Skip the current song")]
 		[RequireUserAndBotVoicechatConnection]
 		public static async Task SkipSongAsync(InteractionContext ctx)
@@ -320,7 +316,7 @@ public class Music : ApplicationCommandsModule
 
 		[SlashCommand("volume", "Change the music volume")]
 		[RequireUserAndBotVoicechatConnection]
-		public static async Task ModifyVolumeAsync(InteractionContext ctx, 
+		public static async Task ModifyVolumeAsync(InteractionContext ctx,
 			[Option("volume", "Level of volume to set (Percentage)"), MinimumValue(0), MaximumValue(150)] int vol = 100
 		)
 		{
@@ -329,7 +325,8 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.musicInstance.usedChannel = ctx.Channel;
-			if (vol > 150) vol = 150;
+			if (vol > 150)
+				vol = 150;
 			await g.musicInstance.guildConnection.SetVolumeAsync(vol);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Set volume to {vol}**").Build()));
 		}
@@ -643,7 +640,8 @@ public class Music : ApplicationCommandsModule
 				int currentPage = 1;
 				int songAmount = 0;
 				int totalP = lastPlayedSongs.Count / 10;
-				if ((lastPlayedSongs.Count % 10) != 0) totalP++;
+				if ((lastPlayedSongs.Count % 10) != 0)
+					totalP++;
 				var emb = new DiscordEmbedBuilder();
 				List<Page> Pages = new();
 				foreach (var Track in lastPlayedSongs)

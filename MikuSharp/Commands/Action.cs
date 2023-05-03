@@ -8,9 +8,6 @@ using HeyRed.Mime;
 
 using MikuSharp.Utilities;
 
-using System.IO;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Commands;
 
 [SlashCommandGroup("action", "Actions", dmPermission: false)]

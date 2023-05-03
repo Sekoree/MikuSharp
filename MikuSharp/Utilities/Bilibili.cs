@@ -5,10 +5,6 @@ using Microsoft.Extensions.Logging;
 
 using NYoutubeDL;
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Utilities;
 
 public static class Bilibili

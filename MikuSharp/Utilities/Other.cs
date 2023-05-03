@@ -2,8 +2,6 @@
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 
-using System.Threading.Tasks;
-
 namespace MikuSharp.Utilities;
 
 public static class Other
