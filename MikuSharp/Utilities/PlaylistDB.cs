@@ -484,7 +484,7 @@ public class PlaylistDB
 							var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder()
 								.WithTitle("Playlist link detected!")
 								.WithDescription("Choose how to handle the playlist link")
-								.WithAuthor($"Requested by {ctx.Member.Username}#{ctx.Member.Discriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl)
+								.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl)
 								.Build()).AddComponents(buttons));
 							var resp = await inter.WaitForButtonAsync(msg, ctx.User, TimeSpan.FromSeconds(30));
 							if (resp.TimedOut)
@@ -517,7 +517,7 @@ public class PlaylistDB
 							var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder()
 								.WithTitle("Link with Playlist detected!")
 								.WithDescription("Please choose how to handle the playlist link")
-								.WithAuthor($"Requested by {ctx.Member.Username}#{ctx.Member.Discriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl)
+								.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl)
 								.Build()).AddComponents(buttons));
 							var resp = await inter.WaitForButtonAsync(msg, ctx.User, TimeSpan.FromSeconds(30));
 							if (resp.TimedOut)
@@ -582,7 +582,7 @@ public class PlaylistDB
 						var em = new DiscordEmbedBuilder()
 							.WithTitle("Results!")
 							.WithDescription("Please select a track:\n")
-							.WithAuthor($"Requested by {ctx.Member.Username}#{ctx.Member.Discriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl);
+							.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl);
 						for (int i = 0; i < leng; i++)
 						{
 							em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));

@@ -46,14 +46,18 @@
 
 	<ItemGroup>
     <PackageReference Include="AlbumArtExtraction" Version="1.0.2" />
-    <PackageReference Include="AngleSharp" Version="1.0.2-alpha-278" />
+    <PackageReference Include="AngleSharp" Version="1.0.2-alpha-281" />
+    <PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="5.4.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
 	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
 	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.5.0" />
-	<PackageReference Include="DisCatSharp" Version="10.3.3-nightly-036" />
-	<PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.3.3-nightly-036" />
-	<PackageReference Include="DisCatSharp.CommandsNext" Version="10.3.3-nightly-036" />
-	<PackageReference Include="DisCatSharp.Interactivity" Version="10.3.3-nightly-036" />
-	<PackageReference Include="DisCatSharp.Lavalink" Version="10.3.3-nightly-036" />
+	<PackageReference Include="DisCatSharp" Version="10.3.3-nightly-041" />
+	<PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.3.3-nightly-041" />
+	<PackageReference Include="DisCatSharp.CommandsNext" Version="10.3.3-nightly-041" />
+	<PackageReference Include="DisCatSharp.Interactivity" Version="10.3.3-nightly-041" />
+	<PackageReference Include="DisCatSharp.Lavalink" Version="10.3.3-nightly-041" />
 	<!--<ProjectReference Include="..\..\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
@@ -62,7 +66,7 @@
 	<PackageReference Include="DiscordBotsList.Api" Version="1.5.0" />
 	<PackageReference Include="FluentFTP" Version="46.0.2" />
 	<PackageReference Include="Google.Apis" Version="1.60.0" />
-	<PackageReference Include="Google.Apis.YouTube.v3" Version="1.60.0.2945" />
+	<PackageReference Include="Google.Apis.YouTube.v3" Version="1.60.0.3043" />
 	<PackageReference Include="Kitsu" Version="1.4.2" />
 	<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
 	<PackageReference Include="Mime" Version="3.5.2" />
