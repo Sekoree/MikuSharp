@@ -135,11 +135,21 @@ internal class MikuBot : IDisposable
 			TokenType = DisCatSharp.Enums.TokenType.Bot,
 			MinimumLogLevel = LogLevel.Debug,
 			AutoReconnect = true,
-			UseCanary = true,
+			ApiChannel = ApiChannel.Canary,
 			HttpTimeout = TimeSpan.FromMinutes(2),
 			Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
 			MessageCacheSize = 2048,
-			LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger)
+			LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger),
+			EnableSentry = true,
+			ReportMissingFields = true,
+			EnableLibraryDeveloperMode = true,
+			DeveloperUserId = 856780995629154305,
+			FeedbackEmail = "aiko@aitsys.dev",
+			AttachUserInfo = true,
+#if DEBUG
+			SentryDebug = true,
+			DisableExceptionFilter = true
+#endif
 		});
 	}
 
