@@ -1,367 +1,452 @@
 ﻿using MikuSharp.Entities;
 
+using NpgsqlTypes;
+
 namespace MikuSharp.Utilities;
 
 public class Database
 {
-	public static async Task AddToLastPlayingListAsync(ulong g, string ts)
+	public static async Task AddToLastPlayingListAsync(ulong guildId, string ts)
 	{
 		int position = 0;
 		var connString = MikuBot.Config.DbConnectString;
-		var conn = new NpgsqlConnection(connString);
+
+		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand("SELECT Count(*) FROM lastplayedsongs WHERE guildId = @guild;", conn);
-		var para4 = cmd2.CreateParameter();
-		para4.ParameterName = "guild";
-		para4.Value = g;
-		cmd2.Parameters.Add(para4);
-		var reader = await cmd2.ExecuteReaderAsync();
+
+		var countCmd = new NpgsqlCommand("SELECT Count(*) FROM lastplayedsongs WHERE guildId = @guild;", conn);
+		var guildParam = countCmd.CreateParameter();
+		guildParam.ParameterName = "guild";
+		guildParam.Value = guildId;
+		countCmd.Parameters.Add(guildParam);
+
+		var reader = await countCmd.ExecuteReaderAsync();
+
 		while (await reader.ReadAsync())
 		{
 			position = reader.GetInt32(0);
 		}
+
 		reader.Close();
-		cmd2.Dispose();
-		var cmd = new NpgsqlCommand("INSERT INTO lastplayedsongs VALUES (@pos,@guild,@ts)", conn);
-		var para = cmd.CreateParameter();
-		para.ParameterName = "guild";
-		para.Value = g;
-		cmd.Parameters.Add(para);
-		var para2 = cmd.CreateParameter();
-		para2.ParameterName = "ts";
-		para2.Value = ts;
-		cmd.Parameters.Add(para2);
-		var para3 = cmd.CreateParameter();
-		para3.ParameterName = "pos";
-		para3.Value = position;
-		cmd.Parameters.Add(para3);
-		await cmd.ExecuteNonQueryAsync();
-		cmd.Dispose();
+		countCmd.Dispose();
+
+		var insertCmd = new NpgsqlCommand("INSERT INTO lastplayedsongs VALUES (@pos, @guild, @ts)", conn);
+		var guildParam2 = insertCmd.CreateParameter();
+		guildParam2.ParameterName = "guild";
+		guildParam2.Value = guildId;
+		insertCmd.Parameters.Add(guildParam2);
+
+		var tsParam = insertCmd.CreateParameter();
+		tsParam.ParameterName = "ts";
+		tsParam.Value = ts;
+		insertCmd.Parameters.Add(tsParam);
+
+		var posParam = insertCmd.CreateParameter();
+		posParam.ParameterName = "pos";
+		posParam.Value = position;
+		insertCmd.Parameters.Add(posParam);
+
+		await insertCmd.ExecuteNonQueryAsync();
+		insertCmd.Dispose();
+
 		conn.Close();
 		conn.Dispose();
 	}
 
-	public static async Task ReorderQueueAsync(DiscordGuild g)
+	public static async Task ReorderQueueAsync(DiscordGuild guild)
 	{
 		var connString = MikuBot.Config.DbConnectString;
-		var conn = new NpgsqlConnection(connString);
+
+		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var queueNow = await GetQueueAsync(g);
-		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
-		var para4 = cmd.CreateParameter();
-		para4.ParameterName = "guild";
-		para4.Value = g.Id;
-		cmd.Parameters.Add(para4);
-		await cmd.ExecuteNonQueryAsync();
-		cmd.Dispose();
-		int i = 0;
-		string longcmd = "";
-		foreach (var qi in queueNow)
-		{
-			longcmd += $"INSERT INTO queues VALUES ({i},@guild,'{qi.addedBy}','{qi.track.TrackString}',@adddate{i});";
-			i++;
-		}
-		var cmd2 = new NpgsqlCommand();
-		if (string.IsNullOrEmpty(longcmd))
+
+		var queueNow = await GetQueueAsync(guild);
+
+		var deleteCmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
+		var guildParam = deleteCmd.CreateParameter();
+		guildParam.ParameterName = "guild";
+		guildParam.Value = guild.Id;
+		deleteCmd.Parameters.Add(guildParam);
+
+		await deleteCmd.ExecuteNonQueryAsync();
+		deleteCmd.Dispose();
+
+		if (queueNow.Count == 0)
 			return;
-		cmd2.CommandText = longcmd;
-		cmd2.Connection = conn;
-		var para = cmd2.CreateParameter();
-		para.ParameterName = "guild";
-		para.Value = g.Id;
-		cmd2.Parameters.Add(para);
-		i = 0;
+
+		int i = 0;
+		var insertCmdBuilder = new StringBuilder();
+
 		foreach (var qi in queueNow)
 		{
-			var para2 = cmd2.CreateParameter();
-			para2.ParameterName = $"adddate{i}";
-			para2.Value = qi.additionDate.UtcDateTime;
-			cmd2.Parameters.Add(para2);
+			var addDateParamName = $"adddate{i}";
+			insertCmdBuilder.Append($"INSERT INTO queues VALUES ({i}, @guild, '{qi.addedBy}', '{qi.track.TrackString}', @{addDateParamName});");
+
+			var addDateParam = new NpgsqlParameter(addDateParamName, NpgsqlDbType.Timestamp)
+			{
+				Value = qi.additionDate.UtcDateTime
+			};
+			insertCmdBuilder.Append('@').Append(addDateParamName);
+			insertCmdBuilder.Append(';');
+
 			i++;
 		}
-		await cmd2.ExecuteNonQueryAsync();
-		cmd2.Dispose();
+
+		var insertCmd = new NpgsqlCommand(insertCmdBuilder.ToString(), conn);
+		var guildParam2 = insertCmd.CreateParameter();
+		guildParam2.ParameterName = "guild";
+		guildParam2.Value = guild.Id;
+		insertCmd.Parameters.Add(guildParam2);
+
+		foreach (var qi in queueNow)
+		{
+			var addDateParamName = $"adddate{i}";
+			var addDateParam = new NpgsqlParameter(addDateParamName, NpgsqlDbType.Timestamp)
+			{
+				Value = qi.additionDate.UtcDateTime
+			};
+			insertCmd.Parameters.Add(addDateParam);
+			i++;
+		}
+
+		await insertCmd.ExecuteNonQueryAsync();
+		insertCmd.Dispose();
+
 		conn.Close();
 		conn.Dispose();
 	}
 
-	public static async Task RebuildQueueAsync(DiscordGuild g, List<QueueEntry> q)
+	public static async Task RebuildQueueAsync(DiscordGuild guild, List<QueueEntry> queueEntries)
 	{
 		var connString = MikuBot.Config.DbConnectString;
-		var conn = new NpgsqlConnection(connString);
+
+		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var queueNow = q;
+
 		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
-		var para4 = cmd.CreateParameter();
-		para4.ParameterName = "guild";
-		para4.Value = g.Id;
-		cmd.Parameters.Add(para4);
+		var guildParam = cmd.CreateParameter();
+		guildParam.ParameterName = "guild";
+		guildParam.Value = guild.Id;
+		cmd.Parameters.Add(guildParam);
+
 		await cmd.ExecuteNonQueryAsync();
 		cmd.Dispose();
-		int i = 0;
-		string longcmd = "";
-		foreach (var qi in queueNow)
-		{
-			longcmd += $"INSERT INTO queues VALUES ({i},@guild,'{qi.addedBy}','{qi.track.TrackString}',@adddate{i});";
-			i++;
-		}
-		var cmd2 = new NpgsqlCommand();
-		if (string.IsNullOrEmpty(longcmd))
+
+		if (queueEntries.Count == 0)
 			return;
-		cmd2.CommandText = longcmd;
-		cmd2.Connection = conn;
-		var para = cmd2.CreateParameter();
-		para.ParameterName = "guild";
-		para.Value = g.Id;
-		cmd2.Parameters.Add(para);
-		i = 0;
-		foreach (var qi in queueNow)
+
+		int i = 0;
+		var insertCmdBuilder = new StringBuilder();
+
+		foreach (var qi in queueEntries)
 		{
-			var para2 = cmd2.CreateParameter();
-			para2.ParameterName = $"adddate{i}";
-			para2.Value = qi.additionDate.UtcDateTime;
-			cmd2.Parameters.Add(para2);
+			var addDateParamName = $"adddate{i}";
+			insertCmdBuilder.Append($"INSERT INTO queues VALUES ({i}, @guild, '{qi.addedBy}', '{qi.track.TrackString}', @{addDateParamName});");
+
+			var addDateParam = new NpgsqlParameter(addDateParamName, NpgsqlDbType.Timestamp)
+			{
+				Value = qi.additionDate.UtcDateTime
+			};
+			insertCmdBuilder.Append('@').Append(addDateParamName);
+			insertCmdBuilder.Append(';');
+
 			i++;
 		}
-		await cmd2.ExecuteNonQueryAsync();
-		cmd2.Dispose();
+
+		var insertCmd = new NpgsqlCommand(insertCmdBuilder.ToString(), conn);
+		var guildParam2 = insertCmd.CreateParameter();
+		guildParam2.ParameterName = "guild";
+		guildParam2.Value = guild.Id;
+		insertCmd.Parameters.Add(guildParam2);
+
+		foreach (var qi in queueEntries)
+		{
+			var addDateParamName = $"adddate{i}";
+			var addDateParam = new NpgsqlParameter(addDateParamName, NpgsqlDbType.Timestamp)
+			{
+				Value = qi.additionDate.UtcDateTime
+			};
+			insertCmd.Parameters.Add(addDateParam);
+			i++;
+		}
+
+		await insertCmd.ExecuteNonQueryAsync();
+		insertCmd.Dispose();
+
 		conn.Close();
 		conn.Dispose();
 	}
 
-	public static async Task<List<QueueEntry>> GetQueueAsync(DiscordGuild g)
+	public static async Task<List<QueueEntry>> GetQueueAsync(DiscordGuild guild)
 	{
 		var connString = MikuBot.Config.DbConnectString;
-		var conn = new NpgsqlConnection(connString);
+
+		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand("SELECT * FROM queues WHERE guildId = @guild ORDER BY position ASC;", conn);
-		var para4 = cmd2.CreateParameter();
-		para4.ParameterName = "guild";
-		para4.Value = g.Id;
-		cmd2.Parameters.Add(para4);
-		var reader = await cmd2.ExecuteReaderAsync();
-		List<QueueEntry> queue = new();
+
+		var cmd = new NpgsqlCommand("SELECT * FROM queues WHERE guildId = @guild ORDER BY position ASC;", conn);
+		var guildParam = cmd.CreateParameter();
+		guildParam.ParameterName = "guild";
+		guildParam.Value = guild.Id;
+		cmd.Parameters.Add(guildParam);
+
+		var reader = await cmd.ExecuteReaderAsync();
+		var queue = new List<QueueEntry>();
+
 		while (await reader.ReadAsync())
 		{
-			queue.Add(new QueueEntry(LavalinkUtilities.DecodeTrack(Convert.ToString(reader["trackstring"])), Convert.ToUInt64(reader["userid"]), DateTimeOffset.Parse(reader["addtime"].ToString()), Convert.ToInt32(reader["position"])));
+			var trackString = Convert.ToString(reader["trackstring"]);
+			var userId = Convert.ToUInt64(reader["userid"]);
+			var addTime = DateTimeOffset.Parse(reader["addtime"].ToString());
+			var position = Convert.ToInt32(reader["position"]);
+
+			var queueEntry = new QueueEntry(LavalinkUtilities.DecodeTrack(trackString), userId, addTime, position);
+			queue.Add(queueEntry);
 		}
+
 		reader.Close();
-		cmd2.Dispose();
+		cmd.Dispose();
+
 		conn.Close();
 		conn.Dispose();
+
 		return queue;
 	}
 
-	public static async Task AddToQueueAsync(DiscordGuild g, ulong u, string ts)
+	public static async Task AddToQueueAsync(DiscordGuild guild, ulong userId, string trackString)
 	{
-		int position = 0;
 		var connString = MikuBot.Config.DbConnectString;
-		var conn = new NpgsqlConnection(connString);
+
+		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
-		var para6 = cmd2.CreateParameter();
-		para6.ParameterName = "guild";
-		para6.Value = g.Id;
-		cmd2.Parameters.Add(para6);
-		var reader = await cmd2.ExecuteReaderAsync();
-		while (await reader.ReadAsync())
+
+		var position = 0;
+		var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
+		var guildParam = countCmd.CreateParameter();
+		guildParam.ParameterName = "guild";
+		guildParam.Value = guild.Id;
+		countCmd.Parameters.Add(guildParam);
+
+		var countReader = await countCmd.ExecuteReaderAsync();
+		while (await countReader.ReadAsync())
 		{
-			position = reader.GetInt32(0);
+			position = countReader.GetInt32(0);
 		}
-		reader.Close();
-		cmd2.Dispose();
-		var cmd = new NpgsqlCommand("INSERT INTO queues VALUES (@pos,@guild,@user,@ts,@time)", conn);
-		var para = cmd.CreateParameter();
-		para.ParameterName = "guild";
-		para.Value = g.Id;
-		cmd.Parameters.Add(para);
-		var para2 = cmd.CreateParameter();
-		para2.ParameterName = "user";
-		para2.Value = u;
-		cmd.Parameters.Add(para2);
-		var para3 = cmd.CreateParameter();
-		para3.ParameterName = "ts";
-		para3.Value = ts;
-		cmd.Parameters.Add(para3);
-		var para4 = cmd.CreateParameter();
-		para4.ParameterName = "pos";
-		para4.Value = position;
-		cmd.Parameters.Add(para4);
-		var para5 = cmd.CreateParameter();
-		para5.ParameterName = "time";
-		para5.Value = DateTime.UtcNow;
-		cmd.Parameters.Add(para5);
-		await cmd.ExecuteNonQueryAsync();
-		cmd.Dispose();
+
+		countReader.Close();
+		countCmd.Dispose();
+
+		var insertCmd = new NpgsqlCommand("INSERT INTO queues VALUES (@pos, @guild, @user, @ts, @time)", conn);
+		var guildParam2 = insertCmd.CreateParameter();
+		guildParam2.ParameterName = "guild";
+		guildParam2.Value = guild.Id;
+		insertCmd.Parameters.Add(guildParam2);
+
+		var userParam = insertCmd.CreateParameter();
+		userParam.ParameterName = "user";
+		userParam.Value = userId;
+		insertCmd.Parameters.Add(userParam);
+
+		var tsParam = insertCmd.CreateParameter();
+		tsParam.ParameterName = "ts";
+		tsParam.Value = trackString;
+		insertCmd.Parameters.Add(tsParam);
+
+		var posParam = insertCmd.CreateParameter();
+		posParam.ParameterName = "pos";
+		posParam.Value = position;
+		insertCmd.Parameters.Add(posParam);
+
+		var timeParam = insertCmd.CreateParameter();
+		timeParam.ParameterName = "time";
+		timeParam.Value = DateTime.UtcNow;
+		insertCmd.Parameters.Add(timeParam);
+
+		await insertCmd.ExecuteNonQueryAsync();
+		insertCmd.Dispose();
+
 		conn.Close();
 		conn.Dispose();
 	}
 
-	public static async Task AddToQueueAsync(DiscordGuild g, ulong u, List<LavalinkTrack> ts)
+	public static async Task AddToQueueAsync(DiscordGuild guild, ulong userId, List<LavalinkTrack> tracks)
 	{
-		int position = 0;
 		var connString = MikuBot.Config.DbConnectString;
-		var conn = new NpgsqlConnection(connString);
+
+		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
-		var para4 = cmd2.CreateParameter();
-		para4.ParameterName = "guild";
-		para4.Value = g.Id;
-		cmd2.Parameters.Add(para4);
-		var reader = await cmd2.ExecuteReaderAsync();
-		while (await reader.ReadAsync())
+
+		var position = 0;
+		var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
+		var guildParam = countCmd.CreateParameter();
+		guildParam.ParameterName = "guild";
+		guildParam.Value = guild.Id;
+		countCmd.Parameters.Add(guildParam);
+
+		var countReader = await countCmd.ExecuteReaderAsync();
+		while (await countReader.ReadAsync())
 		{
-			position = reader.GetInt32(0);
+			position = countReader.GetInt32(0);
 		}
-		reader.Close();
-		cmd2.Dispose();
-		string longcmd = "";
-		foreach (var tt in ts)
+
+		countReader.Close();
+		countCmd.Dispose();
+
+		var longcmd = new StringBuilder();
+
+		foreach (var track in tracks)
 		{
-			longcmd += $"INSERT INTO queues VALUES ({position},@guild,@user,'{tt.TrackString}',@time);";
+			longcmd.AppendLine($"INSERT INTO queues VALUES (@pos, @guild, @user, '{track.TrackString}', @time);");
 			position++;
 		}
-		var cmd = new NpgsqlCommand(longcmd, conn);
-		var para = cmd.CreateParameter();
-		para.ParameterName = "guild";
-		para.Value = g.Id;
-		cmd.Parameters.Add(para);
-		var para2 = cmd.CreateParameter();
-		para2.ParameterName = "user";
-		para2.Value = u;
-		cmd.Parameters.Add(para2);
-		var para3 = cmd.CreateParameter();
-		para3.ParameterName = "time";
-		para3.Value = DateTime.UtcNow;
-		cmd.Parameters.Add(para3);
-		await cmd.ExecuteNonQueryAsync();
-		cmd.Dispose();
+
+		var insertCmd = new NpgsqlCommand(longcmd.ToString(), conn);
+
+		var guildParam2 = insertCmd.CreateParameter();
+		guildParam2.ParameterName = "guild";
+		guildParam2.Value = guild.Id;
+		insertCmd.Parameters.Add(guildParam2);
+
+		var userParam = insertCmd.CreateParameter();
+		userParam.ParameterName = "user";
+		userParam.Value = userId;
+		insertCmd.Parameters.Add(userParam);
+
+		var timeParam = insertCmd.CreateParameter();
+		timeParam.ParameterName = "time";
+		timeParam.Value = DateTime.UtcNow;
+		insertCmd.Parameters.Add(timeParam);
+
+		await insertCmd.ExecuteNonQueryAsync();
+		insertCmd.Dispose();
+
 		conn.Close();
 		conn.Dispose();
 	}
 
-	public static async Task AddToQueueAsync(DiscordGuild g, ulong u, List<PlaylistEntry> ts)
+	public static async Task AddToQueueAsync(DiscordGuild guild, ulong userId, List<PlaylistEntry> entries)
 	{
-		int position = 0;
 		var connString = MikuBot.Config.DbConnectString;
-		var conn = new NpgsqlConnection(connString);
+
+		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
-		var para4 = cmd2.CreateParameter();
-		para4.ParameterName = "guild";
-		para4.Value = g.Id;
-		cmd2.Parameters.Add(para4);
-		var reader = await cmd2.ExecuteReaderAsync();
-		while (await reader.ReadAsync())
+
+		var position = 0;
+		var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
+		var guildParam = countCmd.CreateParameter();
+		guildParam.ParameterName = "guild";
+		guildParam.Value = guild.Id;
+		countCmd.Parameters.Add(guildParam);
+
+		var countReader = await countCmd.ExecuteReaderAsync();
+		while (await countReader.ReadAsync())
 		{
-			position = reader.GetInt32(0);
+			position = countReader.GetInt32(0);
 		}
-		reader.Close();
-		cmd2.Dispose();
-		string longcmd = "";
-		foreach (var tt in ts)
+
+		countReader.Close();
+		countCmd.Dispose();
+
+		var longcmd = new StringBuilder();
+
+		foreach (var entry in entries)
 		{
-			longcmd += $"INSERT INTO queues VALUES ({position},@guild,@user,'{tt.track.TrackString}',@time);";
+			longcmd.AppendLine($"INSERT INTO queues VALUES (@pos, @guild, @user, '{entry.track.TrackString}', @time);");
 			position++;
 		}
-		var cmd = new NpgsqlCommand(longcmd, conn);
-		var para = cmd.CreateParameter();
-		para.ParameterName = "guild";
-		para.Value = g.Id;
-		cmd.Parameters.Add(para);
-		var para2 = cmd.CreateParameter();
-		para2.ParameterName = "user";
-		para2.Value = u;
-		cmd.Parameters.Add(para2);
-		var para3 = cmd.CreateParameter();
-		para3.ParameterName = "time";
-		para3.Value = DateTime.UtcNow;
-		cmd.Parameters.Add(para3);
-		await cmd.ExecuteNonQueryAsync();
-		cmd.Dispose();
+
+		var insertCmd = new NpgsqlCommand(longcmd.ToString(), conn);
+
+		var guildParam2 = insertCmd.CreateParameter();
+		guildParam2.ParameterName = "guild";
+		guildParam2.Value = guild.Id;
+		insertCmd.Parameters.Add(guildParam2);
+
+		var userParam = insertCmd.CreateParameter();
+		userParam.ParameterName = "user";
+		userParam.Value = userId;
+		insertCmd.Parameters.Add(userParam);
+
+		var timeParam = insertCmd.CreateParameter();
+		timeParam.ParameterName = "time";
+		timeParam.Value = DateTime.UtcNow;
+		insertCmd.Parameters.Add(timeParam);
+
+		await insertCmd.ExecuteNonQueryAsync();
+		insertCmd.Dispose();
+
 		conn.Close();
 		conn.Dispose();
 	}
 
-	public static async Task InsertToQueueAsync(DiscordGuild g, ulong u, string ts, int pos)
+	public static async Task InsertToQueueAsync(DiscordGuild guild, ulong userId, string trackString, int position)
 	{
-		var qnow = await GetQueueAsync(g);
-		qnow.Insert(pos, new QueueEntry(LavalinkUtilities.DecodeTrack(ts), u, DateTimeOffset.UtcNow, pos));
-		await RebuildQueueAsync(g, qnow);
+		var queueNow = await GetQueueAsync(guild);
+		queueNow.Insert(position, new QueueEntry(LavalinkUtilities.DecodeTrack(trackString), userId, DateTimeOffset.UtcNow, position));
+		await RebuildQueueAsync(guild, queueNow);
 	}
 
-	public static async Task InsertToQueue(DiscordGuild g, ulong u, List<LavalinkTrack> ts, int pos)
+	public static async Task InsertToQueueAsync(DiscordGuild guild, ulong userId, List<LavalinkTrack> tracks, int position)
 	{
-		var qnow = await GetQueueAsync(g);
-		foreach (var tt in ts)
+		var queueNow = await GetQueueAsync(guild);
+		foreach (var track in tracks)
 		{
-			qnow.Insert(pos, new QueueEntry(LavalinkUtilities.DecodeTrack(tt.TrackString), u, DateTimeOffset.UtcNow, pos));
+			queueNow.Insert(position, new QueueEntry(LavalinkUtilities.DecodeTrack(track.TrackString), userId, DateTimeOffset.UtcNow, position));
 		}
-		await RebuildQueueAsync(g, qnow);
+		await RebuildQueueAsync(guild, queueNow);
 	}
 
-	public static async Task RemoveFromQueueAsync(int position, DiscordGuild g)
+	public static async Task RemoveFromQueueAsync(int position, DiscordGuild guild)
 	{
 		var connString = MikuBot.Config.DbConnectString;
-		var conn = new NpgsqlConnection(connString);
+		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
 		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE position = @pos AND guildid = @guild;", conn);
-		var para = cmd.CreateParameter();
-		para.ParameterName = "guild";
-		para.Value = g.Id;
-		cmd.Parameters.Add(para);
-		var para2 = cmd.CreateParameter();
-		para2.ParameterName = "pos";
-		para2.Value = g.Id;
-		cmd.Parameters.Add(para2);
+		cmd.Parameters.AddWithValue("guild", guild.Id);
+		cmd.Parameters.AddWithValue("pos", position);
 		await cmd.ExecuteNonQueryAsync();
 		cmd.Dispose();
-		await ReorderQueueAsync(g);
-		conn.Close();
-		conn.Dispose();
+		await ReorderQueueAsync(guild);
 	}
 
-	public static async Task ClearQueueAsync(DiscordGuild g)
+	public static async Task ClearQueueAsync(DiscordGuild guild)
 	{
 		var connString = MikuBot.Config.DbConnectString;
-		var conn = new NpgsqlConnection(connString);
+		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
 		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
-		var para = cmd.CreateParameter();
-		para.ParameterName = "guild";
-		para.Value = g.Id;
-		cmd.Parameters.Add(para);
+		cmd.Parameters.AddWithValue("guild", guild.Id);
 		await cmd.ExecuteNonQueryAsync();
 		cmd.Dispose();
-		conn.Close();
-		conn.Dispose();
 	}
 
-	public static async Task MoveQueueItemsAsync(DiscordGuild g, int oldpos, int newpos)
+	public static async Task MoveQueueItemsAsync(DiscordGuild guild, int oldPos, int newPos)
 	{
-		var qnow = await GetQueueAsync(g);
-		var temp = qnow[oldpos];
-		qnow.RemoveAt(oldpos);
-		qnow.Insert(newpos, temp);
-		await RebuildQueueAsync(g, qnow);
+		var queueNow = await GetQueueAsync(guild);
+		var temp = queueNow[oldPos];
+		queueNow.RemoveAt(oldPos);
+		queueNow.Insert(newPos, temp);
+		await RebuildQueueAsync(guild, queueNow);
 	}
 
-	public static async Task<List<Entry>> GetLastPlayingListAsync(DiscordGuild g)
+	public static async Task<List<Entry>> GetLastPlayingListAsync(DiscordGuild guild)
 	{
 		var connString = MikuBot.Config.DbConnectString;
-		var conn = new NpgsqlConnection(connString);
+		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand("SELECT * FROM lastplayedsongs WHERE guildId = @guild ORDER BY lastplayedsongs.trackposition DESC LIMIT 1000", conn);
-		var para = cmd2.CreateParameter();
-		para.ParameterName = "guild";
-		para.Value = g.Id;
-		cmd2.Parameters.Add(para);
-		var reader = await cmd2.ExecuteReaderAsync();
+		var cmd = new NpgsqlCommand("SELECT * FROM lastplayedsongs WHERE guildId = @guild ORDER BY lastplayedsongs.trackposition DESC LIMIT 1000", conn);
+		cmd.Parameters.AddWithValue("guild", guild.Id);
+		var reader = await cmd.ExecuteReaderAsync();
 		List<Entry> queue = new();
 		while (await reader.ReadAsync())
-			queue.Add(new Entry(LavalinkUtilities.DecodeTrack((string)reader["trackstring"]), DateTimeOffset.UtcNow));
+		{
+			var trackString = reader.GetString(reader.GetOrdinal("trackstring"));
+			var track = LavalinkUtilities.DecodeTrack(trackString);
+			var entry = new Entry(track, DateTimeOffset.UtcNow);
+			queue.Add(entry);
+		}
 		reader.Close();
-		cmd2.Dispose();
+		cmd.Dispose();
 		conn.Close();
 		conn.Dispose();
 		return queue;
