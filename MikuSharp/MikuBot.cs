@@ -344,14 +344,14 @@ internal class MikuBot : IDisposable
 			DiscordActivity test2 = new()
 			{
 				Name = "Mention me with help for nsfw commands!",
-				ActivityType = ActivityType.Playing
+				ActivityType = ActivityType.Watching
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test2, userStatus: UserStatus.Online);
 			await Task.Delay(TimeSpan.FromMinutes(20));
 			DiscordActivity test3 = new()
 			{
 				Name = "Full NND support!",
-				ActivityType = ActivityType.Playing
+				ActivityType = ActivityType.ListeningTo
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test3, userStatus: UserStatus.Online);
 			await Task.Delay(TimeSpan.FromMinutes(20));
