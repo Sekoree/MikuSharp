@@ -1,4 +1,6 @@
-﻿using MikuSharp.Entities;
+﻿using System.Net.Http.Json;
+
+using MikuSharp.Entities;
 using MikuSharp.Events;
 
 using Serilog.Sinks.SystemConsole.Themes;
@@ -301,13 +303,26 @@ internal class MikuBot : IDisposable
 			try
 			{
 				var rest = ShardedClient.ShardClients.First().Value.RestClient;
-				rest.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-				rest.DefaultRequestHeaders.TryAddWithoutValidation("key", Config.MotionBotListToken);
-				await rest.PostAsync($"https://motiondevelopment.top/api/v1.2/bots/{ShardedClient.CurrentApplication.Id}/stats", new StringContent($"{{\"guilds\": ${manCount}}}"), _cts.Token);
+				HttpRequestMessage msg = new(HttpMethod.Post, $"https://motiondevelopment.top/api/v1.2/bots/{ShardedClient.CurrentApplication.Id}/stats");
+				msg.Headers.TryAddWithoutValidation("Content-Type", "application/json");
+				msg.Headers.TryAddWithoutValidation("key", Config.MotionBotListToken);
+				msg.Content = new StringContent(JsonConvert.SerializeObject(new MotionGuildCount(manCount), Formatting.Indented), Encoding.UTF8);
+				await rest.SendAsync(msg, _cts.Token);
 			}
 			catch (Exception)
 			{ }
 			await Task.Delay(TimeSpan.FromMinutes(15));
+		}
+	}
+
+	internal class MotionGuildCount
+	{
+		[JsonProperty("guilds")]
+		internal int Guilds { get; set; }
+
+		internal MotionGuildCount(int count)
+		{
+			Guilds = count;
 		}
 	}
 
