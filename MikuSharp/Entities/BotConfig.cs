@@ -34,6 +34,9 @@ public partial class BotConfig
 
 	[JsonProperty("nndConfig")]
 	public NndConfig NndConfig { get; set; }
+
+	[JsonProperty("sentryDsn")]
+	public string SentryDsn { get; set; }
 }
 
 public partial class DatabaseConfig

@@ -147,7 +147,8 @@ internal class MikuBot : IDisposable
 			DeveloperUserId = 856780995629154305,
 			FeedbackEmail = "aiko@aitsys.dev",
 			AttachUserInfo = true,
-			DisableExceptionFilter = true
+			DisableExceptionFilter = true,
+			CustomSentryDsn = Config.SentryDsn
 		});
 	}
 

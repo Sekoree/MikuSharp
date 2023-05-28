@@ -53,11 +53,11 @@
     </PackageReference>
 	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
 	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.6.0" />
-	<PackageReference Include="DisCatSharp" Version="10.4.1-sentry-013" />
-	<PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.1-sentry-013" />
-	<PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.1-sentry-013" />
-	<PackageReference Include="DisCatSharp.Interactivity" Version="10.4.1-sentry-013" />
-	<PackageReference Include="DisCatSharp.Lavalink" Version="10.4.1-sentry-013" />
+	<PackageReference Include="DisCatSharp" Version="10.4.1-sentry-014" />
+	<PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.1-sentry-014" />
+	<PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.1-sentry-014" />
+	<PackageReference Include="DisCatSharp.Interactivity" Version="10.4.1-sentry-014" />
+	<PackageReference Include="DisCatSharp.Lavalink" Version="10.4.1-sentry-014" />
 	<!--<ProjectReference Include="..\..\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />

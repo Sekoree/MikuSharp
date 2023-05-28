@@ -6,6 +6,7 @@
   "weebShToken": "",
   "youtubeApiToken": "",
   "ksoftSiToken": "",
+  "sentryDsn": "",
   "dbConfig": {
     "hostname": "",
     "user": "",
