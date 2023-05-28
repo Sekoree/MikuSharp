@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Json;
-
-using MikuSharp.Entities;
+﻿using MikuSharp.Entities;
 using MikuSharp.Events;
 
 using Serilog.Sinks.SystemConsole.Themes;
