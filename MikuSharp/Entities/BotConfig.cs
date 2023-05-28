@@ -11,6 +11,9 @@ public partial class BotConfig
 	[JsonProperty("discordBotListToken")]
 	public string DiscordBotListToken { get; set; }
 
+	[JsonProperty("motionBotListToken")]
+	public string MotionBotListToken { get; set; }
+
 	[JsonProperty("weebShToken")]
 	public string WeebShToken { get; set; }
 

@@ -289,11 +289,24 @@ internal class MikuBot : IDisposable
 		while (true)
 		{
 			var me = await DiscordBotListApi.GetMeAsync();
+			var manCount = 0;
 			int[] count = Array.Empty<int>();
 			var clients = ShardedClient.ShardClients.Values;
 			foreach (var client in clients)
+			{
 				count = count.Append(client.Guilds.Count).ToArray();
+				manCount += client.Guilds.Count;
+			}
 			await me.UpdateStatsAsync(0, ShardedClient.ShardClients.Count, count);
+			try
+			{
+				var rest = ShardedClient.ShardClients.First().Value.RestClient;
+				rest.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+				rest.DefaultRequestHeaders.TryAddWithoutValidation("key", Config.MotionBotListToken);
+				await rest.PostAsync($"https://motiondevelopment.top/api/v1.2/bots/{ShardedClient.CurrentApplication.Id}/stats", new StringContent($"{{\"guilds\": ${manCount}}}"), _cts.Token);
+			}
+			catch (Exception)
+			{ }
 			await Task.Delay(TimeSpan.FromMinutes(15));
 		}
 	}
