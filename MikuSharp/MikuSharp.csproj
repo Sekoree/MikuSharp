@@ -66,14 +66,11 @@
 	<PackageReference Include="DiscordBotsList.Api" Version="1.5.0" />
 	<PackageReference Include="FluentFTP" Version="46.0.2" />
 	<PackageReference Include="Google.Apis" Version="1.60.0" />
-	<PackageReference Include="Google.Apis.YouTube.v3" Version="1.60.0.3043" />
+	<PackageReference Include="Google.Apis.YouTube.v3" Version="1.60.0.3064" />
 	<PackageReference Include="Kitsu" Version="1.4.2" />
 	<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
 	<PackageReference Include="Mime" Version="3.5.2" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-	<PackageReference Include="Sentry" Version="3.33.0" />
-	<PackageReference Include="Sentry.Extensions.Logging" Version="3.33.0" />
-	<PackageReference Include="Sentry.Serilog" Version="3.33.0" />
 	<ProjectReference Include="..\NicoNicoNii\NicoNicoNii\NicoNicoNii.csproj" />
 	<PackageReference Include="Npgsql" Version="7.0.4" />
     	<PackageReference Include="NYoutubeDL" Version="0.11.2" />
@@ -82,7 +79,7 @@
 	<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
 	<PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00947" />
 	<PackageReference Include="Weeb.net" Version="1.0.7" />
-	<PackageReference Include="YoutubeExplode" Version="6.2.14" />
+	<PackageReference Include="YoutubeExplode" Version="6.2.15" />
   </ItemGroup>
 
   <ItemGroup>
@@ -163,7 +160,6 @@
     <Using Include="Newtonsoft.Json" />
     <Using Include="Npgsql" />
     <Using Include="Npgsql" />
-    <Using Include="Sentry" />
     <Using Include="Serilog" />
     <Using Include="Serilog.Events" />
     <Using Include="System.Diagnostics" />
