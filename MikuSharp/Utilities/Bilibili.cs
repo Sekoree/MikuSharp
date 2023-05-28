@@ -9,10 +9,10 @@ public static class Bilibili
 		try
 		{
 			await ctx.EditFollowupAsync(msg_id, new DiscordWebhookBuilder().WithContent("Downloading video(this may take up to 5 min)"));
-			var youtubeDl = new YoutubeDL(@"youtube-dl.exe");
+			YoutubeDL youtubeDl = OperatingSystem.IsLinux() ? new() : new(@"youtube-dl.exe");
 			youtubeDl.Options.FilesystemOptions.Output = $@"{s}.mp4";
 			youtubeDl.Options.PostProcessingOptions.ExtractAudio = true;
-			youtubeDl.Options.PostProcessingOptions.FfmpegLocation = @"ffmpeg.exe";
+			youtubeDl.Options.PostProcessingOptions.FfmpegLocation = OperatingSystem.IsLinux() ? @"ffmpeg" : @"ffmpeg.exe";
 			youtubeDl.Options.PostProcessingOptions.AudioFormat = NYoutubeDL.Helpers.Enums.AudioFormat.mp3;
 			youtubeDl.Options.PostProcessingOptions.AddMetadata = true;
 			youtubeDl.Options.PostProcessingOptions.KeepVideo = false;
