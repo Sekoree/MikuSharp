@@ -10,7 +10,11 @@ public class Database
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM lastplayedsongs WHERE guildId = {g};", conn);
+		var cmd2 = new NpgsqlCommand("SELECT Count(*) FROM lastplayedsongs WHERE guildId = @guild;", conn);
+		var para4 = cmd2.CreateParameter();
+		para4.ParameterName = "guild";
+		para4.Value = g;
+		cmd2.Parameters.Add(para4);
 		var reader = await cmd2.ExecuteReaderAsync();
 		while (await reader.ReadAsync())
 		{
@@ -21,7 +25,7 @@ public class Database
 		var cmd = new NpgsqlCommand("INSERT INTO lastplayedsongs VALUES (@pos,@guild,@ts)", conn);
 		var para = cmd.CreateParameter();
 		para.ParameterName = "guild";
-		para.Value = Convert.ToInt64(g);
+		para.Value = g;
 		cmd.Parameters.Add(para);
 		var para2 = cmd.CreateParameter();
 		para2.ParameterName = "ts";
@@ -43,7 +47,11 @@ public class Database
 		var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
 		var queueNow = await GetQueueAsync(g);
-		var cmd = new NpgsqlCommand($"DELETE FROM queues WHERE guildid = {g.Id};", conn);
+		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
+		var para4 = cmd.CreateParameter();
+		para4.ParameterName = "guild";
+		para4.Value = g.Id;
+		cmd.Parameters.Add(para4);
 		await cmd.ExecuteNonQueryAsync();
 		cmd.Dispose();
 		int i = 0;
@@ -60,7 +68,7 @@ public class Database
 		cmd2.Connection = conn;
 		var para = cmd2.CreateParameter();
 		para.ParameterName = "guild";
-		para.Value = Convert.ToInt64(g.Id);
+		para.Value = g.Id;
 		cmd2.Parameters.Add(para);
 		i = 0;
 		foreach (var qi in queueNow)
@@ -83,7 +91,11 @@ public class Database
 		var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
 		var queueNow = q;
-		var cmd = new NpgsqlCommand($"DELETE FROM queues WHERE guildid = {g.Id};", conn);
+		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
+		var para4 = cmd.CreateParameter();
+		para4.ParameterName = "guild";
+		para4.Value = g.Id;
+		cmd.Parameters.Add(para4);
 		await cmd.ExecuteNonQueryAsync();
 		cmd.Dispose();
 		int i = 0;
@@ -100,7 +112,7 @@ public class Database
 		cmd2.Connection = conn;
 		var para = cmd2.CreateParameter();
 		para.ParameterName = "guild";
-		para.Value = Convert.ToInt64(g.Id);
+		para.Value = g.Id;
 		cmd2.Parameters.Add(para);
 		i = 0;
 		foreach (var qi in queueNow)
@@ -122,7 +134,11 @@ public class Database
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand($"SELECT * FROM queues WHERE guildId = {g.Id} ORDER BY position ASC;", conn);
+		var cmd2 = new NpgsqlCommand("SELECT * FROM queues WHERE guildId = @guild ORDER BY position ASC;", conn);
+		var para4 = cmd2.CreateParameter();
+		para4.ParameterName = "guild";
+		para4.Value = g.Id;
+		cmd2.Parameters.Add(para4);
 		var reader = await cmd2.ExecuteReaderAsync();
 		List<QueueEntry> queue = new();
 		while (await reader.ReadAsync())
@@ -142,7 +158,11 @@ public class Database
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM queues WHERE guildId = {g.Id};", conn);
+		var cmd2 = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
+		var para6 = cmd2.CreateParameter();
+		para6.ParameterName = "guild";
+		para6.Value = g.Id;
+		cmd2.Parameters.Add(para6);
 		var reader = await cmd2.ExecuteReaderAsync();
 		while (await reader.ReadAsync())
 		{
@@ -153,11 +173,11 @@ public class Database
 		var cmd = new NpgsqlCommand("INSERT INTO queues VALUES (@pos,@guild,@user,@ts,@time)", conn);
 		var para = cmd.CreateParameter();
 		para.ParameterName = "guild";
-		para.Value = Convert.ToInt64(g.Id);
+		para.Value = g.Id;
 		cmd.Parameters.Add(para);
 		var para2 = cmd.CreateParameter();
 		para2.ParameterName = "user";
-		para2.Value = Convert.ToInt64(u);
+		para2.Value = u;
 		cmd.Parameters.Add(para2);
 		var para3 = cmd.CreateParameter();
 		para3.ParameterName = "ts";
@@ -183,7 +203,11 @@ public class Database
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM queues WHERE guildId = {g.Id};", conn);
+		var cmd2 = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
+		var para4 = cmd2.CreateParameter();
+		para4.ParameterName = "guild";
+		para4.Value = g.Id;
+		cmd2.Parameters.Add(para4);
 		var reader = await cmd2.ExecuteReaderAsync();
 		while (await reader.ReadAsync())
 		{
@@ -200,11 +224,11 @@ public class Database
 		var cmd = new NpgsqlCommand(longcmd, conn);
 		var para = cmd.CreateParameter();
 		para.ParameterName = "guild";
-		para.Value = Convert.ToInt64(g.Id);
+		para.Value = g.Id;
 		cmd.Parameters.Add(para);
 		var para2 = cmd.CreateParameter();
 		para2.ParameterName = "user";
-		para2.Value = Convert.ToInt64(u);
+		para2.Value = u;
 		cmd.Parameters.Add(para2);
 		var para3 = cmd.CreateParameter();
 		para3.ParameterName = "time";
@@ -222,7 +246,11 @@ public class Database
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand($"SELECT Count(*) FROM queues WHERE guildId = {g.Id};", conn);
+		var cmd2 = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
+		var para4 = cmd2.CreateParameter();
+		para4.ParameterName = "guild";
+		para4.Value = g.Id;
+		cmd2.Parameters.Add(para4);
 		var reader = await cmd2.ExecuteReaderAsync();
 		while (await reader.ReadAsync())
 		{
@@ -239,11 +267,11 @@ public class Database
 		var cmd = new NpgsqlCommand(longcmd, conn);
 		var para = cmd.CreateParameter();
 		para.ParameterName = "guild";
-		para.Value = Convert.ToInt64(g.Id);
+		para.Value = g.Id;
 		cmd.Parameters.Add(para);
 		var para2 = cmd.CreateParameter();
 		para2.ParameterName = "user";
-		para2.Value = Convert.ToInt64(u);
+		para2.Value = u;
 		cmd.Parameters.Add(para2);
 		var para3 = cmd.CreateParameter();
 		para3.ParameterName = "time";
@@ -277,7 +305,15 @@ public class Database
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd = new NpgsqlCommand($"DELETE FROM queues WHERE position = {position} AND guildid = {g.Id};", conn);
+		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE position = @pos AND guildid = @guild;", conn);
+		var para = cmd.CreateParameter();
+		para.ParameterName = "guild";
+		para.Value = g.Id;
+		cmd.Parameters.Add(para);
+		var para2 = cmd.CreateParameter();
+		para2.ParameterName = "pos";
+		para2.Value = g.Id;
+		cmd.Parameters.Add(para2);
 		await cmd.ExecuteNonQueryAsync();
 		cmd.Dispose();
 		await ReorderQueueAsync(g);
@@ -290,7 +326,11 @@ public class Database
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd = new NpgsqlCommand($"DELETE FROM queues WHERE guildid = {g.Id};", conn);
+		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
+		var para = cmd.CreateParameter();
+		para.ParameterName = "guild";
+		para.Value = g.Id;
+		cmd.Parameters.Add(para);
 		await cmd.ExecuteNonQueryAsync();
 		cmd.Dispose();
 		conn.Close();
@@ -311,7 +351,11 @@ public class Database
 		var connString = MikuBot.Config.DbConnectString;
 		var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
-		var cmd2 = new NpgsqlCommand($"SELECT * FROM lastplayedsongs WHERE guildId = {g.Id} ORDER BY lastplayedsongs.trackposition DESC LIMIT 1000", conn);
+		var cmd2 = new NpgsqlCommand("SELECT * FROM lastplayedsongs WHERE guildId = @guild ORDER BY lastplayedsongs.trackposition DESC LIMIT 1000", conn);
+		var para = cmd2.CreateParameter();
+		para.ParameterName = "guild";
+		para.Value = g.Id;
+		cmd2.Parameters.Add(para);
 		var reader = await cmd2.ExecuteReaderAsync();
 		List<Entry> queue = new();
 		while (await reader.ReadAsync())
