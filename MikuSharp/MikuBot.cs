@@ -139,6 +139,7 @@ internal class MikuBot : IDisposable
 			Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
 			MessageCacheSize = 2048,
 			LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger),
+			Timezone = "Europe/Berlin",
 			EnableSentry = true,
 			ReportMissingFields = true,
 			EnableLibraryDeveloperMode = true,
