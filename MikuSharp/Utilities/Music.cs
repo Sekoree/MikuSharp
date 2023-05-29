@@ -24,34 +24,31 @@ public static class Music
 
 	public static string GetPlaybackOptions(this MusicInstance instance)
 	{
-		var opts = "";
+		var opts = string.Empty;
 		if (instance.repeatMode == RepeatMode.On)
 			opts += DiscordEmoji.FromUnicode("🔂");
 		if (instance.repeatMode == RepeatMode.All)
 			opts += DiscordEmoji.FromUnicode("🔁");
 		if (instance.shuffleMode == ShuffleMode.On)
 			opts += DiscordEmoji.FromUnicode("🔀");
-		if (opts == "")
-			return "None";
-		return opts;
+		return string.IsNullOrEmpty(opts) ? "None" : opts;
 	}
 
 	public static async Task ConditionalConnect(this Guild guild, InteractionContext ctx)
 	{
-		if (!guild.musicInstance.guildConnection?.IsConnected != null && !guild.musicInstance.guildConnection.IsConnected)
+		if (guild.musicInstance.guildConnection?.IsConnected != null && !guild.musicInstance.guildConnection.IsConnected)
 			return;
 		await guild.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
 	}
 
 	public static async Task<bool> IsNotConnected(this Guild guild, InteractionContext ctx)
 	{
-		if (guild.musicInstance == null || guild.musicInstance?.guildConnection?.IsConnected == false)
+		if (guild.musicInstance == null || guild.musicInstance.guildConnection?.IsConnected == false)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Error: Not connected!"));
 			return true;
 		}
-		else
-			return false;
+		return false;
 	}
 
 	public static string SearchUrlOrAttachment(this DiscordAttachment? attachment, string? search_or_url)
@@ -59,26 +56,21 @@ public static class Music
 
 	public static void GetPlayingState(this Guild guild, out string time1, out string time2)
 	{
-		switch (guild.musicInstance.currentSong.track.Length.Hours)
+		if (guild.musicInstance.currentSong.track.Length.Hours < 1)
 		{
-			case < 1:
-				time1 = guild.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"mm\:ss");
-				time2 = guild.musicInstance.currentSong.track.Length.ToString(@"mm\:ss");
-				break;
-			default:
-				time1 = guild.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"hh\:mm\:ss");
-				time2 = guild.musicInstance.currentSong.track.Length.ToString(@"hh\:mm\:ss");
-				break;
+			time1 = guild.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"mm\:ss");
+			time2 = guild.musicInstance.currentSong.track.Length.ToString(@"mm\:ss");
+		}
+		else
+		{
+			time1 = guild.musicInstance.guildConnection.CurrentState.PlaybackPosition.ToString(@"hh\:mm\:ss");
+			time2 = guild.musicInstance.currentSong.track.Length.ToString(@"hh\:mm\:ss");
 		}
 	}
 
 	public static void GetPlayingState(this Entry entry, out string time)
 	{
-		time = entry.track.Length.Hours switch
-		{
-			< 1 => entry.track.Length.ToString(@"mm\:ss"),
-			_ => entry.track.Length.ToString(@"hh\:mm\:ss"),
-		};
+		time = entry.track.Length.Hours < 1 ? entry.track.Length.ToString(@"mm\:ss") : entry.track.Length.ToString(@"hh\:mm\:ss");
 	}
 
 	public static async Task<DiscordEmbedBuilder> GetYoutubePlayingInformationAsync(this DiscordEmbedBuilder builder, Guild guild, List<Entry>? lastPlayedSongs = null)
@@ -90,28 +82,37 @@ public static class Music
 				ApiKey = MikuBot.Config.YoutubeApiToken,
 				ApplicationName = typeof(MikuBot).ToString()
 			});
+
+			var searchQuery = lastPlayedSongs != null ?
+				$"{lastPlayedSongs[0].track.Title} {lastPlayedSongs[0].track.Author}" :
+				$"{guild.musicInstance.currentSong.track.Title} {guild.musicInstance.currentSong.track.Author}";
+
 			var searchListRequest = youtubeService.Search.List("snippet");
-			searchListRequest.Q = lastPlayedSongs != null ? lastPlayedSongs[0].track.Title + " " + lastPlayedSongs[0].track.Author : guild.musicInstance.currentSong.track.Title + " " + guild.musicInstance.currentSong.track.Author;
+			searchListRequest.Q = searchQuery;
 			searchListRequest.MaxResults = 1;
 			searchListRequest.Type = "video";
 			var searchListResponse = await searchListRequest.ExecuteAsync();
 
 			if (lastPlayedSongs == null)
 			{
+				var currentSong = guild.musicInstance.currentSong;
 				guild.GetPlayingState(out var time1, out var time2);
-				builder.AddField(new DiscordEmbedField($"{guild.musicInstance.currentSong.track.Title} ({time1}/{time2})", $"[Video Link]({guild.musicInstance.currentSong.track.Uri})\n" +
-			$"[{guild.musicInstance.currentSong.track.Author}](https://www.youtube.com/channel/" + searchListResponse.Items[0].Snippet.ChannelId + ")"));
+				builder.AddField(new DiscordEmbedField($"{currentSong.track.Title} ({time1}/{time2})", $"[Video Link]({currentSong.track.Uri})\n" +
+					$"[{currentSong.track.Author}](https://www.youtube.com/channel/{searchListResponse.Items[0].Snippet.ChannelId})"));
 			}
 			else
 			{
-				lastPlayedSongs[0].GetPlayingState(out var time);
-				builder.AddField(new DiscordEmbedField($"{lastPlayedSongs[0].track.Title} ({time})", $"[Video Link]({lastPlayedSongs[0].track.Uri})\n" +
-						$"[{lastPlayedSongs[0].track.Author}](https://www.youtube.com/channel/" + searchListResponse.Items[0].Snippet.ChannelId + ")"));
+				var currentSong = lastPlayedSongs[0];
+				currentSong.GetPlayingState(out var time);
+				builder.AddField(new DiscordEmbedField($"{currentSong.track.Title} ({time})", $"[Video Link]({currentSong.track.Uri})\n" +
+					$"[{currentSong.track.Author}](https://www.youtube.com/channel/{searchListResponse.Items[0].Snippet.ChannelId})"));
 			}
-			builder.AddField(new DiscordEmbedField("Description", searchListResponse.Items[0].Snippet.Description.Length > 1000 ?
+
+			var description = searchListResponse.Items[0].Snippet.Description.Length > 1000 ?
 				string.Concat(searchListResponse.Items[0].Snippet.Description.AsSpan(0, 1000), "...") :
-				searchListResponse.Items[0].Snippet.Description
-			));
+				searchListResponse.Items[0].Snippet.Description;
+
+			builder.AddField(new DiscordEmbedField("Description", description));
 			builder.WithImageUrl(searchListResponse.Items[0].Snippet.Thumbnails.High.Url);
 			builder.AddField(new DiscordEmbedField("Playback options", guild.musicInstance.GetPlaybackOptions()));
 		}
@@ -120,44 +121,65 @@ public static class Music
 			if (builder.Fields.Count != 1)
 			{
 				if (lastPlayedSongs == null)
-					builder.AddField(new DiscordEmbedField($"{guild.musicInstance.currentSong.track.Title} ({guild.musicInstance.currentSong.track.Length})", $"By {guild.musicInstance.currentSong.track.Author}\n[Link]({guild.musicInstance.currentSong.track.Uri})\nRequested by <@{guild.musicInstance.currentSong.addedBy}>"));
+				{
+					var currentSong = guild.musicInstance.currentSong;
+					guild.GetPlayingState(out var time1, out var time2);
+					builder.AddField(new DiscordEmbedField($"{currentSong.track.Title} ({time1}/{time2})", $"By {currentSong.track.Author}\n[Link]({currentSong.track.Uri})\nRequested by <@{currentSong.addedBy}>"));
+				}
 				else
-					builder.AddField(new DiscordEmbedField($"{lastPlayedSongs[0].track.Title} ({lastPlayedSongs[0].track.Length})", $"By {lastPlayedSongs[0].track.Author}\n[Link]({lastPlayedSongs[0].track.Uri})"));
+				{
+					var currentSong = lastPlayedSongs[0];
+					currentSong.GetPlayingState(out var time);
+					builder.AddField(new DiscordEmbedField($"{currentSong.track.Title} ({time})", $"By {currentSong.track.Author}\n[Link]({currentSong.track.Uri})"));
+				}
 				builder.AddField(new DiscordEmbedField("Playback options", guild.musicInstance.GetPlaybackOptions()));
 			}
 		}
 		return builder;
 	}
 
-	public static async Task<DiscordEmbedBuilder> GetUrlPlayingInformationAsync(this DiscordEmbedBuilder builder, DiscordClient client, Guild guild, List<Entry>? lastPlayedSongs)
+	public static async Task<(DiscordEmbedBuilder Embed, Stream? File, string? FileName)> GetUrlPlayingInformationAsync(this DiscordEmbedBuilder builder, DiscordClient client, Guild guild, List<Entry>? lastPlayedSongs)
 	{
 		Stream? img = null;
 		Entry entry = lastPlayedSongs != null ? lastPlayedSongs[0] : guild.musicInstance.currentSong;
+
 		try
 		{
-			MemoryStream d = new(await client.RestClient.GetByteArrayAsync(entry.track.Uri))
+			var uriSegments = entry.track.Uri.Segments;
+			var filename = $"{uriSegments[uriSegments.Length - 2]}.{uriSegments[^1]}";
+
+			using (MemoryStream d = new(await client.RestClient.GetByteArrayAsync(entry.track.Uri)))
+			using (FileStream e = File.Create(filename))
 			{
-				Position = 0
-			};
-			FileStream e = File.Create($@"{entry.track.Uri.ToString().Split('/')[^2]}.{entry.track.Uri.ToString().Split('/').Last()}");
-			await d.CopyToAsync(e);
-			e.Close();
+				d.Position = 0;
+				await d.CopyToAsync(e);
+			}
+
 			var selector = new Selector();
-			var extractor = selector.SelectAlbumArtExtractor($@"{entry.track.Uri.ToString().Split('/')[^2]}.{entry.track.Uri.ToString().Split('/').Last()}");
-			img = extractor.Extract($@"{entry.track.Uri.ToString().Split('/')[^2]}.{entry.track.Uri.ToString().Split('/').Last()}");
+			var extractor = selector.SelectAlbumArtExtractor(filename);
+			img = extractor.Extract(filename);
+			File.Delete(filename);
 		}
 		catch (Exception ex)
 		{
-			client.Logger.LogDebug(ex.Message);
-			client.Logger.LogDebug(ex.StackTrace);
+			client.Logger.LogDebug("{ex}", ex.Message);
+			client.Logger.LogDebug("{ex}", ex.StackTrace);
 			img = null;
-			File.Delete($@"{entry.track.Uri.ToString().Split('/')[^2]}.{entry.track.Uri.ToString().Split('/').Last()}");
 		}
+
 		builder.AddField(new DiscordEmbedField($"{entry.track.Title} ({guild.GetDynamicPlayingState(lastPlayedSongs)})", $"By {entry.track.Author}\n[Link]({entry.track.Uri})\n{(lastPlayedSongs == null ? $"Requested by <@{guild.musicInstance.currentSong.addedBy}>" : "")}"));
 		builder.AddField(new DiscordEmbedField("Playback options", guild.musicInstance.GetPlaybackOptions()));
+
+		string attachmentName = string.Empty;
+
 		if (img != null)
-			builder.WithImageUrl($"attachment://{entry.track.Uri.ToString().Split('/')[^2]}.{MimeGuesser.GuessExtension(img)}");
-		return builder;
+		{
+			var extension = MimeGuesser.GuessExtension(img);
+			attachmentName = $"{entry.track.Uri.Segments[^2]}.{extension}";
+			builder.WithImageUrl($"attachment://{attachmentName}");
+		}
+
+		return (builder, img, attachmentName);
 	}
 
 	public static DiscordEmbedBuilder GetOtherPlayingInformationAsync(this DiscordEmbedBuilder builder, Guild guild, List<Entry>? lastPlayedSongs = null)
@@ -170,36 +192,50 @@ public static class Music
 
 	public static string GetDynamicPlayingState(this Guild guild, List<Entry>? lastPlayedSongs = null)
 	{
-		switch (lastPlayedSongs)
+		if (lastPlayedSongs == null)
 		{
-			case null:
-				{
-					guild.GetPlayingState(out var time1, out var time2);
-					return $"{time1}/{time2}";
-				}
-
-			default:
-				{
-					lastPlayedSongs[0].GetPlayingState(out var time);
-					return $"{time}";
-				}
+			guild.GetPlayingState(out var time1, out var time2);
+			return $"{time1}/{time2}";
+		}
+		else
+		{
+			lastPlayedSongs[0].GetPlayingState(out var time);
+			return $"{time}";
 		}
 	}
 
 	public static async Task SendPlayingInformationAsync(this InteractionContext ctx, DiscordEmbedBuilder builder, Guild guild, List<Entry>? lastPlayedSongs = null)
 	{
+		DiscordWebhookBuilder webhookBuilder = new();
 		Entry entry = lastPlayedSongs != null ? lastPlayedSongs[0] : guild.musicInstance.currentSong;
+
 		if (entry == null)
 		{
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("I don't play anything right now"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("I'm not playing anything right now"));
 			return;
 		}
-		builder = entry.track.Uri.ToString().Contains("youtu")
-			? await builder.GetYoutubePlayingInformationAsync(guild)
-			: entry.track.Uri.ToString().StartsWith("https://media.discordapp.net/attachments/") || entry.track.Uri.ToString().StartsWith("https://cdn.discordapp.com/attachments/")
-				? await builder.GetUrlPlayingInformationAsync(ctx.Client, guild, lastPlayedSongs)
-				: builder.GetOtherPlayingInformationAsync(guild, lastPlayedSongs);
 
-		await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(builder.Build()));
+		DiscordEmbedBuilder lBuilder;
+
+		if (entry.track.Uri.ToString().Contains("youtu"))
+		{
+			lBuilder = await builder.GetYoutubePlayingInformationAsync(guild, lastPlayedSongs);
+		}
+		else if (!entry.track.Uri.ToString().StartsWith("https://media.discordapp.net/attachments/") && !entry.track.Uri.ToString().StartsWith("https://cdn.discordapp.com/attachments/"))
+		{
+			lBuilder = builder.GetOtherPlayingInformationAsync(guild, lastPlayedSongs);
+		}
+		else
+		{
+			var info = await builder.GetUrlPlayingInformationAsync(ctx.Client, guild, lastPlayedSongs);
+			lBuilder = info.Embed;
+			if (info.File != null)
+			{
+				webhookBuilder.AddFile(info.FileName, info.File, true);
+			}
+		}
+
+		await ctx.EditResponseAsync(webhookBuilder.AddEmbed(lBuilder.Build()));
 	}
+
 }
