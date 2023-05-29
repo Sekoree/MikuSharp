@@ -69,9 +69,7 @@ public static class Music
 	}
 
 	public static void GetPlayingState(this Entry entry, out string time)
-	{
-		time = entry.Track.Length.Hours < 1 ? entry.Track.Length.ToString(@"mm\:ss") : entry.Track.Length.ToString(@"hh\:mm\:ss");
-	}
+		=> time = entry.Track.Length.Hours < 1 ? entry.Track.Length.ToString(@"mm\:ss") : entry.Track.Length.ToString(@"hh\:mm\:ss");
 
 	public static async Task<DiscordEmbedBuilder> GetYoutubePlayingInformationAsync(this DiscordEmbedBuilder builder, Guild guild, List<Entry>? lastPlayedSongs = null)
 	{

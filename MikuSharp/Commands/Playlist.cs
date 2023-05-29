@@ -474,10 +474,5 @@ public class Playlists : ApplicationCommandsModule
 	}
 
 	public static bool CheckError(string playlist)
-	{
-		if (playlist == "error")
-			return true;
-		else
-			return false;
-	}
+		=> playlist == "error";
 }

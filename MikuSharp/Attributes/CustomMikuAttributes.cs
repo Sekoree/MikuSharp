@@ -1,4 +1,4 @@
-﻿namespace MikuSharp.Attributes;
+namespace MikuSharp.Attributes;
 
 /// <summary>
 /// Defines that usage of this command is restricted to users in a vc.
@@ -7,12 +7,7 @@
 public sealed class RequireUserVoicechatConnection : ApplicationCommandCheckBaseAttribute
 {
 	public override Task<bool> ExecuteChecksAsync(BaseContext ctx)
-	{
-		if (ctx.Member.VoiceState?.Channel != null)
-			return Task.FromResult(true);
-
-		return Task.FromResult(false);
-	}
+		=> ctx.Member.VoiceState?.Channel != null ? Task.FromResult(true) : Task.FromResult(false);
 }
 
 /// <summary>
@@ -24,18 +19,18 @@ public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandChe
 	public override async Task<bool> ExecuteChecksAsync(BaseContext ctx)
 	{
 		var bot = await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id);
-		if (ctx.Member.VoiceState?.Channel != null && bot.VoiceState?.Channel != null)
-			return await Task.FromResult(true);
-
-		return await Task.FromResult(false);
+		return ctx.Member.VoiceState?.Channel != null && bot.VoiceState?.Channel != null
+			? await Task.FromResult(true)
+			: await Task.FromResult(false);
 	}
 }
 
+/// <summary>
+/// Defines that the usage is restricted to non staffs.
+/// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Class, AllowMultiple = false)]
 public sealed class NotStaffAttribute : CheckBaseAttribute
 {
 	public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
-	{
-		return Task.FromResult(!ctx.User.IsStaff);
-	}
+		=> Task.FromResult(!ctx.User.IsStaff);
 }

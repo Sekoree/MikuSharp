@@ -100,10 +100,7 @@ public class PlaylistDB
 		conn.Close();
 		conn.Dispose();
 
-		if (playlist == null)
-			throw new Exception("The playlist " + playlistName + " could not be found.");
-
-		return playlist;
+		return playlist == null ? throw new Exception("The playlist " + playlistName + " could not be found.") : playlist;
 	}
 
 	public static async Task ReorderList(DiscordGuild guild, string playlistName, ulong userId)

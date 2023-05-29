@@ -1,4 +1,4 @@
-﻿using MikuSharp.Entities;
+using MikuSharp.Entities;
 using MikuSharp.Events;
 
 using Serilog.Sinks.SystemConsole.Themes;
@@ -410,7 +410,5 @@ internal class MikuBot : IDisposable
 	/// Disposes the bot.
 	/// </summary>
 	public void Dispose()
-	{
-		GC.SuppressFinalize(this);
-	}
+		=> GC.SuppressFinalize(this);
 }
