@@ -12,7 +12,7 @@ internal class WeebCommands : ApplicationCommandsModule
 	{
 		await ctx.DeferAsync(false);
 		var url = (await (user ?? ctx.User).ConvertToMember(ctx.Guild)).GuildAvatarUrl;
-		var e = JsonConvert.DeserializeObject<Entities.NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=awooify&url={url}"));
+		var e = JsonConvert.DeserializeObject<Entities.NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=awooify&url={url}", MikuBot._canellationTokenSource.Token));
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithImageUrl(e.Message).Build()));
 	}
 
@@ -20,8 +20,8 @@ internal class WeebCommands : ApplicationCommandsModule
 	public static async Task DivaPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
-		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/diva"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/diva", MikuBot._canellationTokenSource.Token));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url), MikuBot._canellationTokenSource.Token))
 		{
 			Position = 0
 		};
@@ -44,8 +44,8 @@ internal class WeebCommands : ApplicationCommandsModule
 	public static async Task GumiPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
-		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/gumi"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/gumi", MikuBot._canellationTokenSource.Token));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url), MikuBot._canellationTokenSource.Token))
 		{
 			Position = 0
 		};
@@ -71,8 +71,8 @@ internal class WeebCommands : ApplicationCommandsModule
 	public static async Task KaitoPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
-		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/kaito"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/kaito", MikuBot._canellationTokenSource.Token));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url), MikuBot._canellationTokenSource.Token))
 		{
 			Position = 0
 		};
@@ -98,8 +98,8 @@ internal class WeebCommands : ApplicationCommandsModule
 	public static async Task KLenPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
-		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/len"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/len", MikuBot._canellationTokenSource.Token));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url), MikuBot._canellationTokenSource.Token))
 		{
 			Position = 0
 		};
@@ -125,8 +125,8 @@ internal class WeebCommands : ApplicationCommandsModule
 	public static async Task LukaPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
-		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/luka"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/luka", MikuBot._canellationTokenSource.Token));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url), MikuBot._canellationTokenSource.Token))
 		{
 			Position = 0
 		};
@@ -152,8 +152,8 @@ internal class WeebCommands : ApplicationCommandsModule
 	public static async Task MeikoPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
-		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/meiko"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/meiko", MikuBot._canellationTokenSource.Token));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url), MikuBot._canellationTokenSource.Token))
 		{
 			Position = 0
 		};
@@ -179,8 +179,8 @@ internal class WeebCommands : ApplicationCommandsModule
 	public static async Task HMikuPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
-		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/miku"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/miku", MikuBot._canellationTokenSource.Token));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url), MikuBot._canellationTokenSource.Token))
 		{
 			Position = 0
 		};
@@ -207,7 +207,7 @@ internal class WeebCommands : ApplicationCommandsModule
 	{
 		await ctx.DeferAsync(false);
 		var ImgURL = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/v2/img/neko");
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgURL.Url)));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgURL.Url), MikuBot._canellationTokenSource.Token));
 		var em = new DiscordEmbedBuilder();
 		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
 		em.WithFooter("by nekos.life");
@@ -222,8 +222,8 @@ internal class WeebCommands : ApplicationCommandsModule
 	public static async Task KRinPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
-		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/rin"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/rin", MikuBot._canellationTokenSource.Token));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url), MikuBot._canellationTokenSource.Token))
 		{
 			Position = 0
 		};
@@ -249,8 +249,8 @@ internal class WeebCommands : ApplicationCommandsModule
 	public static async Task KTetoPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
-		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/teto"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/teto", MikuBot._canellationTokenSource.Token));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(res.Url), MikuBot._canellationTokenSource.Token))
 		{
 			Position = 0
 		};

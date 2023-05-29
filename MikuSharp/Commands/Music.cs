@@ -480,7 +480,7 @@ public class Music : ApplicationCommandsModule
 				}
 				foreach (var eP in Pages.Where(x => !x.Embed.Fields.Any(y => y.Name != "Playback keep")).ToList())
 					Pages.Remove(eP);
-				await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages);
+				await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages, token: MikuBot._canellationTokenSource.Token);
 			}
 			catch (Exception ex)
 			{
@@ -668,7 +668,7 @@ public class Music : ApplicationCommandsModule
 				}
 				foreach (var eP in Pages.Where(x => x.Embed.Fields.Count == 0).ToList())
 					Pages.Remove(eP);
-				await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages);
+				await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages, token: MikuBot._canellationTokenSource.Token);
 			}
 			catch (Exception ex)
 			{

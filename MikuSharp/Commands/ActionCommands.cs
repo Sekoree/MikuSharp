@@ -51,7 +51,7 @@ internal class ActionCommands : ApplicationCommandsModule
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
 		var weeurl = await MikuBot.WeebClient.GetRandomAsync("pat", new[] { "" });
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url), MikuBot._canellationTokenSource.Token));
 		var em = new DiscordEmbedBuilder();
 		em.WithDescription($"{ctx.User.Mention} pats {user.Mention} #w#");
 		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
@@ -68,7 +68,7 @@ internal class ActionCommands : ApplicationCommandsModule
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
 		var weeurl = await MikuBot.WeebClient.GetRandomAsync("poke", new[] { "" });
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url), MikuBot._canellationTokenSource.Token));
 		var em = new DiscordEmbedBuilder();
 		em.WithDescription($"{ctx.User.Mention} pokes {user.Mention} ÓwÒ");
 		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
@@ -85,7 +85,7 @@ internal class ActionCommands : ApplicationCommandsModule
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
 		var weeurl = await MikuBot.WeebClient.GetRandomAsync("slap", new[] { "" });
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url), MikuBot._canellationTokenSource.Token));
 		var em = new DiscordEmbedBuilder();
 		em.WithDescription($"{ctx.User.Mention} slaps {user.Mention} ÒwÓ");
 		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");

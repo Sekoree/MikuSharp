@@ -162,7 +162,7 @@ public class Playlists : ApplicationCommandsModule
 			{
 				Pages.Remove(eP);
 			}
-			await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages);
+			await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages, token: MikuBot._canellationTokenSource.Token);
 		}
 
 		[SlashCommand("show", "Show the contents of a playlist")]
@@ -235,7 +235,7 @@ public class Playlists : ApplicationCommandsModule
 			{
 				Pages.Remove(eP);
 			}
-			await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages);
+			await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages, token: MikuBot._canellationTokenSource.Token);
 		}
 
 		[SlashCommand("delete", "Delete a playlist")]

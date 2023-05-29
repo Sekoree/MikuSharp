@@ -54,7 +54,7 @@ internal class Utility : ApplicationCommandsModule
 					ress.Add(new Page(embed: aa));
 					i++;
 				}
-				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable);
+				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable, token: MikuBot._canellationTokenSource.Token);
 			}
 			catch (Exception ex)
 			{
@@ -105,7 +105,7 @@ internal class Utility : ApplicationCommandsModule
 					ress.Add(new Page(embed: aa));
 					i++;
 				}
-				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable);
+				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable, token: MikuBot._canellationTokenSource.Token);
 			}
 			catch (Exception ex)
 			{

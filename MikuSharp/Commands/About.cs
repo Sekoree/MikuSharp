@@ -1,4 +1,4 @@
-﻿namespace MikuSharp.Commands;
+namespace MikuSharp.Commands;
 
 [SlashCommandGroup("about", "About")]
 internal class About : ApplicationCommandsModule
@@ -53,9 +53,9 @@ internal class About : ApplicationCommandsModule
 		var webhooks = await channel.GetWebhooksAsync();
 		var webhook = webhooks.First(x => x.Id == f.WebhookId);
 		var selfAvatarUrl = ctx.Client.CurrentUser.AvatarUrl;
-		var stream = await ctx.Client.RestClient.GetStreamAsync(selfAvatarUrl);
-		var memoryStream = new System.IO.MemoryStream();
-		await stream.CopyToAsync(memoryStream);
+		var stream = await ctx.Client.RestClient.GetStreamAsync(selfAvatarUrl, MikuBot._canellationTokenSource.Token);
+		var memoryStream = new MemoryStream();
+		await stream.CopyToAsync(memoryStream, MikuBot._canellationTokenSource.Token);
 		memoryStream.Position = 0;
 		await webhook.ModifyAsync(name, memoryStream, reason: "Dev update follow");
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"News setup complete {DiscordEmoji.FromGuildEmote(client: MikuBot.ShardedClient.GetShard(483279257431441410), id: 623933340520546306)}\n\nYou'll get the newest news about the bot in your server in {channel.Mention}!"));

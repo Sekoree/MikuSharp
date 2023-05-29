@@ -32,8 +32,8 @@ internal class Fun : ApplicationCommandsModule
 	public static async Task ClydeAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
-		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}"));
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.Message));
+		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}", MikuBot._canellationTokenSource.Token));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.Message, MikuBot._canellationTokenSource.Token));
 
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"clyde.png", img);
@@ -52,8 +52,8 @@ internal class Fun : ApplicationCommandsModule
 	public static async Task DogAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
-		var dc = JsonConvert.DeserializeObject<DogCeo>(await ctx.Client.RestClient.GetStringAsync("https://dog.ceo/api/breeds/image/random"));
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(dc.Message)));
+		var dc = JsonConvert.DeserializeObject<DogCeo>(await ctx.Client.RestClient.GetStringAsync("https://dog.ceo/api/breeds/image/random", MikuBot._canellationTokenSource.Token));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(dc.Message), MikuBot._canellationTokenSource.Token));
 		var em = new DiscordEmbedBuilder();
 		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
 		em.WithFooter("by dog.ceo", "https://dog.ceo/img/favicon.png");
@@ -68,8 +68,8 @@ internal class Fun : ApplicationCommandsModule
     [SlashCommand("duck", "Random duck image")]
     public static async Task DuckAsync(InteractionContext ctx)
     {
-        var dc = JsonConvert.DeserializeObject<Random_D>(await ctx.Client.RestClient.GetStringAsync("https://random-d.uk/api/v1/random"));
-        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(dc.message)));
+        var dc = JsonConvert.DeserializeObject<Random_D>(await ctx.Client.RestClient.GetStringAsync("https://random-d.uk/api/v1/random", MikuBot._canellationTokenSource.Token));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(dc.message), MikuBot._canellationTokenSource.Token));
         var em = new DiscordEmbedBuilder();
         em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
         em.WithFooter("by random-d.uk", "https://random-d.uk/favicon.png");
@@ -84,8 +84,8 @@ internal class Fun : ApplicationCommandsModule
     [SlashCommand("lion", "Get a random lion image")]
     public static async Task Lion(InteractionContext ctx)
     {
-        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/lion"));
-        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
+        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/lion", MikuBot._canellationTokenSource.Token));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link), MikuBot._canellationTokenSource.Token));
 
         DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
         builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
@@ -97,7 +97,7 @@ internal class Fun : ApplicationCommandsModule
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
 		var get = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/lizard");
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(get.Url)));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(get.Url), MikuBot._canellationTokenSource.Token));
 
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
@@ -107,8 +107,8 @@ internal class Fun : ApplicationCommandsModule
     [SlashCommand("panda", "Random panda image")]
     public static async Task PandaAsync(InteractionContext ctx)
     {
-        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/panda"));
-        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
+        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/panda", MikuBot._canellationTokenSource.Token));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link), MikuBot._canellationTokenSource.Token));
 
         DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
         builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
@@ -118,8 +118,8 @@ internal class Fun : ApplicationCommandsModule
     [SlashCommand("penguin", "Radnom penguin image")]
     public static async Task PenguinAsync(InteractionContext ctx)
     {
-        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/penguin"));
-        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
+        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/penguin", MikuBot._canellationTokenSource.Token));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link), MikuBot._canellationTokenSource.Token));
 
         DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
         builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
@@ -130,8 +130,8 @@ internal class Fun : ApplicationCommandsModule
     [SlashCommand("redpanda", "Random red panda image")]
     public static async Task RedPandaAsync(InteractionContext ctx)
     {
-        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/red_panda"));
-        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
+        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/red_panda", MikuBot._canellationTokenSource.Token));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link), MikuBot._canellationTokenSource.Token));
 
         DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
         builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
@@ -149,8 +149,8 @@ internal class Fun : ApplicationCommandsModule
     [SlashCommand("tiger", "Random tiger image")]
     public static async Task TigerAsync(InteractionContext ctx)
     {
-        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/tiger"));
-        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link)));
+        var ImgLink = JsonConvert.DeserializeObject<AnIdiotsGuide>(await ctx.Client.RestClient.GetStringAsync("https://animals.anidiots.guide/tiger", MikuBot._canellationTokenSource.Token));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(ImgLink.link), MikuBot._canellationTokenSource.Token));
 
         DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
         builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
@@ -162,8 +162,8 @@ internal class Fun : ApplicationCommandsModule
     public static async Task TrumpTweetAsync(InteractionContext ctx, [RemainingText]string text)
     {
         //https://nekobot.xyz/api/imagegen?type=trumptweet&text=
-        var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=trumptweet&text={text}"));
-        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.message));
+        var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=trumptweet&text={text}", MikuBot._canellationTokenSource.Token));
+        Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.message, MikuBot._canellationTokenSource.Token));
 
         DiscordWebhookBuilder builder = new DiscordWebhookBuilder();
         builder.AddFile($"trump.png", img);
