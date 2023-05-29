@@ -1,3 +1,5 @@
+using DisCatSharp.Lavalink;
+
 using MikuSharp.Attributes;
 using MikuSharp.Commands;
 using MikuSharp.Entities;
@@ -13,9 +15,14 @@ namespace MikuSharp;
 internal class MikuBot : IDisposable
 {
 	/// <summary>
-	/// Gets the global canellation token source.
+	/// Gets the cancellation token source.
 	/// </summary>
 	internal static CancellationTokenSource _canellationTokenSource { get; set; }
+
+	/// <summary>
+	/// Gets the global cancellation token source.
+	/// </summary>
+	internal static CancellationTokenSource _globalCancellationTokenSource { get; set; }
 
 	/// <summary>
 	/// Gets the bot config.
@@ -86,14 +93,15 @@ internal class MikuBot : IDisposable
 	/// Constructs a new instance of <see cref="MikuBot"/>.
 	/// </summary>
 	/// <exception cref="ArgumentNullException">Thrown when the config.json was not found or null.</exception>
-	internal MikuBot()
+	internal MikuBot(CancellationTokenSource globalCts)
 	{
-		var fileData = File.ReadAllText(@"config.json") ?? throw new ArgumentNullException("config.json is null or missing");
+		_globalCancellationTokenSource = globalCts;
+		var fileData = File.ReadAllText(@"config.json") ?? throw new Exception("config.json is null or missing");
 
-		Config = JsonConvert.DeserializeObject<BotConfig>(fileData) ?? throw new ArgumentNullException("config.json is null");
+		Config = JsonConvert.DeserializeObject<BotConfig>(fileData) ?? throw new Exception("config.json is null");
 		Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database={Config.DbConfig.Database}";
 
-		_canellationTokenSource = new CancellationTokenSource();
+		_canellationTokenSource = new();
 
 		var level = LogEventLevel.Information;
 #if DEBUG
@@ -127,7 +135,7 @@ internal class MikuBot : IDisposable
 
 		var token = Config.DiscordToken;
 #if DEBUG
-		token = Config.DiscordToken;
+		token = Config.DiscordTokenDev;
 #endif
 
 		ShardedClient = new DiscordShardedClient(new()
@@ -149,9 +157,7 @@ internal class MikuBot : IDisposable
 			FeedbackEmail = "aiko@aitsys.dev",
 			AttachUserInfo = true,
 			DisableExceptionFilter = true,
-			CustomSentryDsn = Config.SentryDsn,
-			ShardId = 3,
-			ShardCount = 4
+			CustomSentryDsn = Config.SentryDsn
 		});
 	}
 
@@ -278,11 +284,11 @@ internal class MikuBot : IDisposable
 	/// </summary>
 	internal async Task ShowConnections()
 	{
-		while (true)
+		while (!_canellationTokenSource.IsCancellationRequested)
 		{
 			var al = Guilds.Where(x => x.Value?.MusicInstance != null);
 			ShardedClient.Logger.LogInformation("Voice Connections: {count}", al.Where(x => x.Value.MusicInstance.GuildConnection?.IsConnected == true).Count());
-			await Task.Delay(TimeSpan.FromMinutes(15));
+			await Task.Delay(TimeSpan.FromMinutes(15), _canellationTokenSource.Token);
 		}
 	}
 
@@ -291,8 +297,8 @@ internal class MikuBot : IDisposable
 	/// </summary>
 	internal async Task UpdateBotList()
 	{
-		await Task.Delay(TimeSpan.FromMinutes(15));
-		while (true)
+		await Task.Delay(TimeSpan.FromMinutes(15), _canellationTokenSource.Token);
+		while (!_canellationTokenSource.IsCancellationRequested)
 		{
 			var me = await this.DiscordBotListApi.GetMeAsync();
 			var manCount = 0;
@@ -315,7 +321,7 @@ internal class MikuBot : IDisposable
 			}
 			catch (Exception)
 			{ }
-			await Task.Delay(TimeSpan.FromMinutes(15));
+			await Task.Delay(TimeSpan.FromMinutes(15), _canellationTokenSource.Token);
 		}
 	}
 
@@ -325,7 +331,7 @@ internal class MikuBot : IDisposable
 	/// </summary>
 	internal async Task SetActivity()
 	{
-		while (true)
+		while (!_canellationTokenSource.IsCancellationRequested)
 		{
 			DiscordActivity test = new()
 			{
@@ -333,21 +339,21 @@ internal class MikuBot : IDisposable
 				ActivityType = ActivityType.Playing
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test, userStatus: UserStatus.Online);
-			await Task.Delay(TimeSpan.FromMinutes(20));
+			await Task.Delay(TimeSpan.FromMinutes(20), _canellationTokenSource.Token);
 			DiscordActivity test2 = new()
 			{
 				Name = "Mention me with help for nsfw commands!",
 				ActivityType = ActivityType.Watching
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test2, userStatus: UserStatus.Online);
-			await Task.Delay(TimeSpan.FromMinutes(20));
+			await Task.Delay(TimeSpan.FromMinutes(20), _canellationTokenSource.Token);
 			DiscordActivity test3 = new()
 			{
 				Name = "Full NND support!",
 				ActivityType = ActivityType.ListeningTo
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test3, userStatus: UserStatus.Online);
-			await Task.Delay(TimeSpan.FromMinutes(20));
+			await Task.Delay(TimeSpan.FromMinutes(20), _canellationTokenSource.Token);
 		}
 	}
 
@@ -378,30 +384,46 @@ internal class MikuBot : IDisposable
 	/// </summary>
 	internal async Task RunAsync()
 	{
-
 		await WeebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
 		await ShardedClient.StartAsync();
 		await Task.Delay(5000);
 		foreach (var lavalinkShard in this.LavalinkModules)
-		{
-			var LCon = await lavalinkShard.Value.ConnectAsync(LavalinkConfig);
-			LavalinkNodeConnections.Add(lavalinkShard.Key, LCon);
-		}
+			LavalinkNodeConnections.Add(lavalinkShard.Key, await lavalinkShard.Value.ConnectAsync(LavalinkConfig));
 		this.SetActivityThread = Task.Run(this.SetActivity, _canellationTokenSource.Token);
 		this.ConnectionThread = Task.Run(this.ShowConnections, _canellationTokenSource.Token);
 #if !DEBUG
 		this.DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
 		this.BotlistThread = Task.Run(this.UpdateBotList, _canellationTokenSource.Token);
 #endif
-		while (!_canellationTokenSource.IsCancellationRequested)
+		while (!_canellationTokenSource.IsCancellationRequested && !_globalCancellationTokenSource.IsCancellationRequested)
 			await Task.Delay(1000);
+		foreach (var lavalinkShard in this.LavalinkModules.Values)
+			foreach (var node in lavalinkShard.ConnectedNodes.Values)
+				await node.StopAsync();
+		LavalinkNodeConnections.Clear();
+		foreach (var appModule in await ShardedClient.GetApplicationCommandsAsync())
+			appModule.Value.CleanModule();
+		if (_globalCancellationTokenSource.IsCancellationRequested)
+			_canellationTokenSource.Cancel();
 		await ShardedClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
+		await Task.Delay(4000);
 		await ShardedClient.StopAsync();
 	}
+
+	~MikuBot()
+		=> this.Dispose();
 
 	/// <summary>
 	/// Disposes the bot.
 	/// </summary>
 	public void Dispose()
-		=> GC.SuppressFinalize(this);
+	{
+		this.DiscordBotListApi = null;
+		this.ApplicationCommandsModules = null;
+		this.CommandsNextModules = null;
+		this.LavalinkModules = null;
+		Guilds.Clear();
+		ShardedClient = null;
+		GC.SuppressFinalize(this);
+	}
 }

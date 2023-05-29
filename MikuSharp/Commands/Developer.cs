@@ -225,7 +225,7 @@ public class Developer : ApplicationCommandsModule
 		msg = await ctx.GetOriginalResponseAsync();
 		try
 		{
-			var globals = new EvaluationVariables(ctx.TargetMessage, ctx.Client, ctx);
+			var globals = new EvaluationVariables(ctx.TargetMessage, ctx.Client, ctx, MikuBot._canellationTokenSource, MikuBot._globalCancellationTokenSource);
 
 			var sopts = ScriptOptions.Default;
 			sopts = sopts.WithImports("System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "DisCatSharp", "DisCatSharp.Entities", "DisCatSharp.CommandsNext", "DisCatSharp.CommandsNext.Attributes", "DisCatSharp.Interactivity", "DisCatSharp.Interactivity.Extensions", "DisCatSharp.Enums", "Microsoft.Extensions.Logging", "MikuSharp.Entities", "DisCatSharp.Lavalink");
@@ -298,7 +298,7 @@ public class EvaluationVariables
 	/// <param name="msg">The message.</param>
 	/// <param name="client">The client.</param>
 	/// <param name="ctx">The context menu context.</param>
-	public EvaluationVariables(DiscordMessage msg, DiscordClient client, ContextMenuContext ctx)
+	public EvaluationVariables(DiscordMessage msg, DiscordClient client, ContextMenuContext ctx, CancellationTokenSource cts, CancellationTokenSource globalCts)
 	{
 		this.Client = client;
 		this.Message = msg;
@@ -307,6 +307,8 @@ public class EvaluationVariables
 		this.User = ctx.User;
 		this.Member = ctx.Member;
 		this.Context = ctx;
+		this.Cts = cts;
+		this.GlobalCts = globalCts;
 	}
 
 	/// <summary>
@@ -318,4 +320,14 @@ public class EvaluationVariables
 	/// Gets or sets the client.
 	/// </summary>
 	public DiscordClient Client { get; set; }
+
+	/// <summary>
+	/// Gets the cancellation token source.
+	/// </summary>
+	public CancellationTokenSource Cts { get; set; }
+
+	/// <summary>
+	/// Gets the global cancellation token source.
+	/// </summary>
+	public CancellationTokenSource GlobalCts { get; set; }
 }
