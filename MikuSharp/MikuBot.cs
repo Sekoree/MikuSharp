@@ -260,7 +260,7 @@ internal class MikuBot : IDisposable
 			discordClientKvp.Value.GuildMemberUpdated += async (sender, args) =>
 			{
 				if (args.Guild.Id == 483279257431441410)
-					_ = Task.Run(async () => await MikuGuild.OnUpdateAsync(sender, args), _cts.Token);
+					_ = Task.Run(async () => await MikuGuild.OnGuildMemberUpdateAsync(sender, args), _cts.Token);
 				else
 					await Task.FromResult(true);
 			};

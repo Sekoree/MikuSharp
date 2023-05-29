@@ -1,4 +1,4 @@
-﻿using MikuSharp.Enums;
+using MikuSharp.Enums;
 
 namespace MikuSharp.Events;
 
@@ -41,7 +41,7 @@ public class VoiceChat
 					catch { }
 				}
 				g.MusicInstance.AloneTime = DateTime.UtcNow;
-				g.MusicInstance.AloneCheckCancellationToken = new CancellationTokenSource();
+				g.MusicInstance.AloneCheckCancellationToken = new();
 				g.AloneCheckThread = Task.Run(g.CheckAlone, MikuBot._cts.Token);
 			}
 			else if (e.After?.Channel?.Users.Where(x => !x.IsBot).Count() != 0 && e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
@@ -54,8 +54,8 @@ public class VoiceChat
 		}
 		catch (Exception ex)
 		{
-			client.Logger.LogError(ex.Message);
-			client.Logger.LogError(ex.StackTrace);
+			client.Logger.LogError("{msg}", ex.Message);
+			client.Logger.LogError("{stack}", ex.StackTrace);
 		}
 	}
 }

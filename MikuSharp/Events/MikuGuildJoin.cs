@@ -1,4 +1,4 @@
-﻿namespace MikuSharp.Events;
+namespace MikuSharp.Events;
 
 /// <summary>
 /// Event handler for the miku guild.
@@ -10,7 +10,7 @@ public class MikuGuild
 	/// </summary>
 	/// <param name="sender">The discord client.</param>
 	/// <param name="args">The event args.</param>
-	public static async Task OnUpdateAsync(DiscordClient sender, GuildMemberUpdateEventArgs args)
+	public static async Task OnGuildMemberUpdateAsync(DiscordClient sender, GuildMemberUpdateEventArgs args)
 	{
 		if (args.PendingBefore.HasValue && args.PendingBefore == true)
 		{
