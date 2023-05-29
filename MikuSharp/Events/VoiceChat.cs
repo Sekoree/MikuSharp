@@ -8,27 +8,37 @@ public class VoiceChat
 	{
 		try
 		{
-			if (!MikuBot.Guilds.Any(x => x.Key == e.Guild.Id))
+			if (!MikuBot.Guilds.ContainsKey(e.Guild.Id))
 				return;
-			var g = MikuBot.Guilds[e.Guild.Id];
-			if (g.MusicInstance == null
-				|| g.MusicInstance?.GuildConnection?.IsConnected == false)
+
+			var guild = MikuBot.Guilds[e.Guild.Id];
+			var musicInstance = guild.MusicInstance;
+
+			if (musicInstance == null || musicInstance.GuildConnection?.IsConnected == false)
 				return;
-			if ((e.After?.Channel?.Users.Where(x => !x.IsBot).Count() == 0
-			|| e.Before?.Channel?.Users.Where(x => !x.IsBot).Count() == 0
-			|| e.Channel?.Users.Where(x => !x.IsBot).Count() == 0)
-			&& (e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true
-			|| e.Before?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true
-			|| e.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
-			&& g.MusicInstance?.GuildConnection?.Channel?.Users.Where(x => !x.IsBot).Count() == 0)
+
+			var currentUser = e.Guild.Members[client.CurrentUser.Id];
+
+			var beforeChannelUserCount = e.Before?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
+			var afterChannelUserCount = e.After?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
+			var currentChannelUserCount = e.Channel?.Users.Count(x => !x.IsBot) ?? 0;
+			var guildConnectionUserCount = musicInstance.GuildConnection?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
+
+			var isCurrentUserInChannel = currentUser?.VoiceState.ChannelId == e.Channel?.Id;
+
+			if ((beforeChannelUserCount == 0 || afterChannelUserCount == 0 || currentChannelUserCount == 0)
+				&& isCurrentUserInChannel && guildConnectionUserCount == 0)
 			{
-				if (g.MusicInstance.Playstate == PlayState.Playing)
+				if (musicInstance.Playstate == PlayState.Playing)
 				{
-					await g.MusicInstance.GuildConnection.PauseAsync();
-					g.MusicInstance.Playstate = PlayState.Paused;
+					await musicInstance.GuildConnection.PauseAsync();
+					musicInstance.Playstate = PlayState.Paused;
+
 					try
 					{
-						await g.MusicInstance.CommandChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("**Paused** since everyone left the VC, connect back and use m%resume to continue playback otherwise I will disconnect in 5 min").Build());
+						await musicInstance.CommandChannel.SendMessageAsync(new DiscordEmbedBuilder()
+							.WithDescription("**Paused** since everyone left the VC, connect back and use m%resume to continue playback otherwise I will disconnect in 5 min")
+							.Build());
 					}
 					catch { }
 				}
@@ -36,19 +46,22 @@ public class VoiceChat
 				{
 					try
 					{
-						await g.MusicInstance.CommandChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("Since everyone left the VC I will disconnect too in 5 min").Build());
+						await musicInstance.CommandChannel.SendMessageAsync(new DiscordEmbedBuilder()
+							.WithDescription("Since everyone left the VC I will disconnect too in 5 min")
+							.Build());
 					}
 					catch { }
 				}
-				g.MusicInstance.AloneTime = DateTime.UtcNow;
-				g.MusicInstance.AloneCheckCancellationToken = new();
-				g.AloneCheckThread = Task.Run(g.CheckAlone, MikuBot._cts.Token);
+
+				musicInstance.AloneTime = DateTime.UtcNow;
+				musicInstance.AloneCheckCancellationToken = new();
+				guild.AloneCheckThread = Task.Run(guild.CheckAlone, MikuBot._cts.Token);
 			}
-			else if (e.After?.Channel?.Users.Where(x => !x.IsBot).Count() != 0 && e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
+			else if (afterChannelUserCount != 0 && isCurrentUserInChannel)
 			{
-				if (g.MusicInstance != null && g.MusicInstance?.AloneCheckCancellationToken != null)
+				if (musicInstance != null && musicInstance.AloneCheckCancellationToken != null)
 				{
-					g.MusicInstance.AloneCheckCancellationToken.Cancel();
+					musicInstance.AloneCheckCancellationToken.Cancel();
 				}
 			}
 		}
