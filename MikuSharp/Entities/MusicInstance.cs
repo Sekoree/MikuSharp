@@ -223,7 +223,7 @@ public class MusicInstance
 									else
 									{
 										s.Tracks.Reverse();
-										await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, s.Tracks, pos);
+										await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks, pos);
 									}
 									if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped))
 										await PlaySong();
