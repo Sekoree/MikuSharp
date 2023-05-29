@@ -47,7 +47,7 @@ internal class Utility : ApplicationCommandsModule
 					emb = new DiscordEmbedBuilder();
 				}
 				res.Sort((x, y) => x.Title.CompareTo(y.Title));
-				int i = 1;
+				var i = 1;
 				foreach (var aa in res)
 				{
 					aa.WithFooter($"via Kitsu.io -- Page {i}/{a.Data.Count}", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
@@ -98,7 +98,7 @@ internal class Utility : ApplicationCommandsModule
 					emb = new DiscordEmbedBuilder();
 				}
 				res.Sort((x, y) => x.Title.CompareTo(y.Title));
-				int i = 1;
+				var i = 1;
 				foreach (var aa in res)
 				{
 					aa.WithFooter($"via Kitsu.io -- Page {i}/{a.Data.Count}", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
@@ -188,7 +188,7 @@ internal class Utility : ApplicationCommandsModule
 		public static async Task EmojiListAsync(InteractionContext ctx)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-			string wat = "You have to execute this command in a server!";
+			var wat = "You have to execute this command in a server!";
 			if (ctx.Guild != null && ctx.Guild.Emojis.Any())
 			{
 				wat = "**Emojies:** ";

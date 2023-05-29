@@ -297,7 +297,7 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			await Task.Run(g.MusicInstance.GuildConnection.StopAsync, MikuBot._cts.Token);
+			await Task.Run(g.MusicInstance.GuildConnection.StopAsync, MikuBot._canellationTokenSource.Token);
 			var cmd_id = ctx.Client.GetApplicationCommands().GlobalCommands.First(x => x.Name == "music").Id;
 			await ctx.EditResponseAsync(builder: new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Stopped** (use </music playback resume:{cmd_id}> to start playback again)").Build()));
 		}
@@ -380,11 +380,11 @@ public class Music : ApplicationCommandsModule
 				}
 
 				var inter = ctx.Client.GetInteractivity();
-				int songsPerPage = 0;
-				int currentPage = 1;
-				int songAmount = 0;
-				int totalP = queue.Count / 5;
-				if ((queue.Count % 5) != 0)
+				var songsPerPage = 0;
+				var currentPage = 1;
+				var songAmount = 0;
+				var totalP = queue.Count / 5;
+				if (queue.Count % 5 != 0)
 					totalP++;
 				var emb = new DiscordEmbedBuilder();
 				List<Page> Pages = new();
@@ -624,11 +624,11 @@ public class Music : ApplicationCommandsModule
 					return;
 				}
 				var inter = ctx.Client.GetInteractivity();
-				int songsPerPage = 0;
-				int currentPage = 1;
-				int songAmount = 0;
-				int totalP = lastPlayedSongs.Count / 10;
-				if ((lastPlayedSongs.Count % 10) != 0)
+				var songsPerPage = 0;
+				var currentPage = 1;
+				var songAmount = 0;
+				var totalP = lastPlayedSongs.Count / 10;
+				if (lastPlayedSongs.Count % 10 != 0)
 					totalP++;
 				var emb = new DiscordEmbedBuilder();
 				List<Page> Pages = new();

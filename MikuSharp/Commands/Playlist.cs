@@ -109,11 +109,11 @@ public class Playlists : ApplicationCommandsModule
 			}
 			//ctx.Client.Logger.LogDebug(pls.Count.ToString());
 			var inter = ctx.Client.GetInteractivity();
-			int songsPerPage = 0;
-			int currentPage = 1;
-			int songAmount = 0;
-			int totalP = pls.Count / 5;
-			if ((pls.Count % 5) != 0)
+			var songsPerPage = 0;
+			var currentPage = 1;
+			var songAmount = 0;
+			var totalP = pls.Count / 5;
+			if (pls.Count % 5 != 0)
 				totalP++;
 			var emb = new DiscordEmbedBuilder();
 			List<Page> Pages = new();
@@ -121,20 +121,14 @@ public class Playlists : ApplicationCommandsModule
 			{
 				//ctx.Client.Logger.LogDebug(Track.Value == null);
 				//ctx.Client.Logger.LogDebug(Track.Key);
-				int songam = 0;
+				var songam = 0;
 				var ent = await Track.Value.GetEntries();
 				songam = ent.Count;
-				string sub = "";
-				if (Track.Value.ExternalService == ExtService.None)
-				{
-					sub = $"Created on: {Track.Value.Creation}\n" +
-						$"Last modified on: {Track.Value.Modify}";
-				}
-				else
-				{
-					sub = $"Created on: {Track.Value.Creation}\n" +
+				var sub = Track.Value.ExternalService == ExtService.None
+					? $"Created on: {Track.Value.Creation}\n" +
+						$"Last modified on: {Track.Value.Modify}"
+					: $"Created on: {Track.Value.Creation}\n" +
 						$"{Track.Value.ExternalService} [Link]({Track.Value.Url})";
-				}
 				emb.AddField(new DiscordEmbedField($"**{songAmount + 1}.{Track.Key}** ({songam} Songs)", sub));
 				songsPerPage++;
 				songAmount++;
@@ -196,21 +190,17 @@ public class Playlists : ApplicationCommandsModule
 				return;
 			}
 			var inter = ctx.Client.GetInteractivity();
-			int songsPerPage = 0;
-			int currentPage = 1;
-			int songAmount = 0;
-			int totalP = queue.Count / 5;
-			if ((queue.Count % 5) != 0)
+			var songsPerPage = 0;
+			var currentPage = 1;
+			var songAmount = 0;
+			var totalP = queue.Count / 5;
+			if (queue.Count % 5 != 0)
 				totalP++;
 			var emb = new DiscordEmbedBuilder();
 			List<Page> Pages = new();
 			foreach (var Track in queue)
 			{
-				string time = "";
-				if (Track.Track.Length.Hours < 1)
-					time = Track.Track.Length.ToString(@"mm\:ss");
-				else
-					time = Track.Track.Length.ToString(@"hh\:mm\:ss");
+				var time = Track.Track.Length.Hours < 1 ? Track.Track.Length.ToString(@"mm\:ss") : Track.Track.Length.ToString(@"hh\:mm\:ss");
 				emb.AddField(new DiscordEmbedField($"**{songAmount + 1}.{Track.Track.Title.Replace("*", "").Replace("|", "")}** by {Track.Track.Author.Replace("*", "").Replace("|", "")} [{time}]",
 					$"Added on {Track.AdditionDate} [Link]({Track.Track.Uri.AbsoluteUri})"));
 				songsPerPage++;
@@ -372,7 +362,7 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Add Song").WithDescription("**Error** This playlist is a fixed one, you cant add songs to this!").Build()));
 				return;
 			}
-			TrackResult got = await PlaylistDB.GetSong(song, ctx);
+			var got = await PlaylistDB.GetSong(song, ctx);
 			if (got == null)
 				return;
 			await PlaylistDB.AddEntry(playlist, ctx.Member.Id, got.Tracks);
@@ -405,7 +395,7 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Insert Song").WithDescription("**Error** This playlist is a fixed one, you cant add songs to this!").Build()));
 				return;
 			}
-			TrackResult got = await PlaylistDB.GetSong(song, ctx);
+			var got = await PlaylistDB.GetSong(song, ctx);
 			if (got == null)
 				return;
 			got.Tracks.Reverse();

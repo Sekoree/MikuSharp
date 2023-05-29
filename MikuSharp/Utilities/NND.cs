@@ -13,7 +13,7 @@ public static class NND
 			var videoPage = await videoClient.GetWatchPageInfoAsync(s);
 			var download_exe = "nnd.exe";
 			var linux_exe = "nndownload.py";
-			string cmd = download_exe;
+			var cmd = download_exe;
 			await ctx.EditFollowupAsync(msg_id, new DiscordWebhookBuilder().WithContent("Downloading video (this may take up to 10 min)"));
 
 			if (OperatingSystem.IsLinux())
@@ -23,10 +23,7 @@ public static class NND
 			{
 				downloadProcess.StartInfo.FileName = cmd;
 				downloadProcess.StartInfo.Arguments = $"-g -o {$@"{s}"}.mp4 {$@"{n}"}";
-				downloadProcess.OutputDataReceived += (d, f) =>
-				{
-					ctx.Client.Logger.LogDebug("{data}", $"\n{f.Data}\n");
-				};
+				downloadProcess.OutputDataReceived += (sender, receiveArgs) => ctx.Client.Logger.LogDebug("{data}", $"\n{receiveArgs.Data}\n");
 
 				downloadProcess.Start();
 				await downloadProcess.WaitForExitAsync();
@@ -40,10 +37,7 @@ public static class NND
 			{
 				convertProcess.StartInfo.FileName = "ffmpeg";
 				convertProcess.StartInfo.Arguments = $"-i {$@"{s}"}.mp4 -metadata title=\"{songTitle}\" -metadata artist=\"{songArtist}\" {$@"{s}"}.mp3";
-				convertProcess.OutputDataReceived += (d, f) =>
-				{
-					ctx.Client.Logger.LogDebug("{data}", f.Data);
-				};
+				convertProcess.OutputDataReceived += (sender, receiveArgs) => ctx.Client.Logger.LogDebug("{data}", receiveArgs.Data);
 
 				convertProcess.Start();
 				await convertProcess.WaitForExitAsync();

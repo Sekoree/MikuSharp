@@ -315,7 +315,7 @@ public class MusicInstance
 				default:
 				{
 					ctx.Client.Logger.LogDebug("Found something");
-					int leng = s.Tracks.Count;
+					var leng = s.Tracks.Count;
 					if (leng > 5)
 						leng = 5;
 					List<DiscordStringSelectComponentOption> selectOptions = new(leng);
@@ -323,7 +323,7 @@ public class MusicInstance
 							.WithTitle("Results!")
 							.WithDescription("Please select a track:\name_or_url")
 							.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl);
-					for (int i = 0; i < leng; i++)
+					for (var i = 0; i < leng; i++)
 					{
 						em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));
 						selectOptions.Add(new DiscordStringSelectComponentOption(s.Tracks.ElementAt(i).Title, i.ToString(), $"by {s.Tracks.ElementAt(i).Author}. Length: {s.Tracks.ElementAt(i).Length}"));
@@ -367,10 +367,10 @@ public class MusicInstance
 			this.CurrentSong = queue[this.RepeatAllPosition];
 		if (this.RepeatMode == RepeatMode.On)
 			this.CurrentSong = cur;
-		MikuBot.ShardedClient.Logger.LogDebug(this.CurrentSong?.Track.TrackString);
+		MikuBot.ShardedClient.Logger.LogDebug("PlaySong(): {track}", this.CurrentSong?.Track.TrackString);
 		this.GuildConnection.PlaybackFinished += Lavalink.LavalinkTrackFinished;
 		this.Playstate = PlayState.Playing;
-		await Task.Run(async () => await this.GuildConnection.PlayAsync(this.CurrentSong.Track), MikuBot._cts.Token);
+		await Task.Run(async () => await this.GuildConnection.PlayAsync(this.CurrentSong.Track), MikuBot._canellationTokenSource.Token);
 		return this.CurrentSong;
 	}
 }

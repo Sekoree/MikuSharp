@@ -109,7 +109,7 @@ public class Developer : ApplicationCommandsModule
 
 			await guildConnection.Value.StopAsync();
 			if (clearQueues)
-				_ = Task.Run(async () => await Database.ClearQueueAsync(guildConnection.Value.Guild), MikuBot._cts.Token);
+				_ = Task.Run(async () => await Database.ClearQueueAsync(guildConnection.Value.Guild), MikuBot._canellationTokenSource.Token);
 			await guildConnection.Value.DisconnectAsync(true);
 			connection.Discord.Logger.LogInformation("Forcefully disconnected lavalink voice from {guild}", guildConnection.Key);
 		}
@@ -157,7 +157,7 @@ public class Developer : ApplicationCommandsModule
 		}
 
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Trying to get log"));
-		DateTime now = DateTime.Now;
+		var now = DateTime.Now;
 		var target_file = $"miku_log{now.ToString("yyyy/MM/dd").Replace("/", "")}.txt";
 		if (!File.Exists(target_file))
 		{
@@ -216,7 +216,7 @@ public class Developer : ApplicationCommandsModule
 			return;
 		}
 
-		string cs = code[cs1..cs2];
+		var cs = code[cs1..cs2];
 
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder()
 			.WithColor(new DiscordColor("#FF007F"))

@@ -46,7 +46,7 @@ public class Playlist
 		else
 		{
 			var trs = await MikuBot.LavalinkNodeConnections.First().Value.ConnectedGuilds.First().Value.GetTracksAsync(new Uri(this.Url));
-			int i = 0;
+			var i = 0;
 			foreach (var t in trs.Tracks)
 			{
 				Entries.Add(new PlaylistEntry(t, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, i));

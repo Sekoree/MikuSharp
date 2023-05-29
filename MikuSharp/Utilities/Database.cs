@@ -8,7 +8,7 @@ public class Database
 {
 	public static async Task AddToLastPlayingListAsync(ulong guildId, string ts)
 	{
-		int position = 0;
+		var position = 0;
 		var connString = MikuBot.Config.DbConnectString;
 
 		using var conn = new NpgsqlConnection(connString);
@@ -74,7 +74,7 @@ public class Database
 		if (queueNow.Count == 0)
 			return;
 
-		int i = 0;
+		var i = 0;
 		var insertCmdBuilder = new StringBuilder();
 
 		foreach (var qi in queueNow)
@@ -135,7 +135,7 @@ public class Database
 		if (queueEntries.Count == 0)
 			return;
 
-		int i = 0;
+		var i = 0;
 		var insertCmdBuilder = new StringBuilder();
 
 		foreach (var qi in queueEntries)

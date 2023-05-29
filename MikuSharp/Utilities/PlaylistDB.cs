@@ -1,4 +1,4 @@
-﻿using MikuSharp.Entities;
+using MikuSharp.Entities;
 using MikuSharp.Enums;
 
 namespace MikuSharp.Utilities;
@@ -53,7 +53,7 @@ public class PlaylistDB
 		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
 
-		int entryCount = 0;
+		var entryCount = 0;
 		var countCmd = new NpgsqlCommand("SELECT COUNT(*) FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName;", conn);
 		countCmd.Parameters.AddWithValue("userId", userId);
 		countCmd.Parameters.AddWithValue("playlistName", playlistName);
@@ -100,7 +100,7 @@ public class PlaylistDB
 		conn.Close();
 		conn.Dispose();
 
-		return playlist == null ? throw new Exception("The playlist " + playlistName + " could not be found.") : playlist;
+		return playlist ?? throw new Exception("The playlist " + playlistName + " could not be found.");
 	}
 
 	public static async Task ReorderList(DiscordGuild guild, string playlistName, ulong userId)
@@ -118,12 +118,12 @@ public class PlaylistDB
 		await deleteCmd.ExecuteNonQueryAsync();
 		deleteCmd.Dispose();
 
-		int position = 0;
-		string insertCmdText = "";
+		var position = 0;
+		var insertCmdText = "";
 		foreach (var entry in entries)
 		{
-			string additionDate = entry.AdditionDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
-			string modifyDate = entry.ModifyDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+			var additionDate = entry.AdditionDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+			var modifyDate = entry.ModifyDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
 			insertCmdText += $"INSERT INTO playlistentries VALUES ({position}, @playlistName, @userId, '{entry.Track.TrackString}', '{additionDate}', '{modifyDate}');";
 			position++;
 		}
@@ -150,11 +150,11 @@ public class PlaylistDB
 		await cmdDelete.ExecuteNonQueryAsync();
 		cmdDelete.Dispose();
 
-		string insertCmdText = "";
+		var insertCmdText = "";
 		foreach (var entry in entries)
 		{
-			string additionDate = entry.AdditionDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
-			string modifyDate = entry.ModifyDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+			var additionDate = entry.AdditionDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+			var modifyDate = entry.ModifyDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
 			insertCmdText += $"INSERT INTO playlistentries VALUES ({entry.Position}, @playlistName, @userId, '{entry.Track.TrackString}', '{additionDate}', '{modifyDate}');";
 		}
 
@@ -208,7 +208,7 @@ public class PlaylistDB
 
 	public static async Task AddEntry(string playlistName, ulong userId, string trackString)
 	{
-		int position = 0;
+		var position = 0;
 		var connString = MikuBot.Config.DbConnectString;
 		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
@@ -241,7 +241,7 @@ public class PlaylistDB
 
 	public static async Task AddEntry(string playlistName, ulong userId, List<LavalinkTrack> tracks)
 	{
-		int position = 0;
+		var position = 0;
 		var connString = MikuBot.Config.DbConnectString;
 		using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync();
@@ -257,7 +257,7 @@ public class PlaylistDB
 		reader.Close();
 		cmd2.Dispose();
 
-		string longcmd = "UPDATE playlists SET changed = @modifyDate WHERE userid = @userId AND playlistname = @playlistName;";
+		var longcmd = "UPDATE playlists SET changed = @modifyDate WHERE userid = @userId AND playlistname = @playlistName;";
 		foreach (var track in tracks)
 		{
 			longcmd += $"INSERT INTO playlistentries VALUES (@position, @playlistName, @userId, '{track.TrackString}', @additionDate, @modifyDate);";
@@ -317,8 +317,8 @@ public class PlaylistDB
 		var playlist = await GetPlaylist(guild, userId, playlistName);
 		var entries = await playlist.GetEntries();
 
-		List<PlaylistEntry> tempEntries = new List<PlaylistEntry>(entries.Count);
-		List<PlaylistEntry> newEntries = new List<PlaylistEntry>(entries.Count);
+		var tempEntries = new List<PlaylistEntry>(entries.Count);
+		var newEntries = new List<PlaylistEntry>(entries.Count);
 
 		foreach (var entry in entries)
 		{
@@ -526,7 +526,7 @@ public class PlaylistDB
 				};
 				default:
 				{
-					int leng = s.Tracks.Count;
+					var leng = s.Tracks.Count;
 					if (leng > 5)
 						leng = 5;
 					List<DiscordStringSelectComponentOption> selectOptions = new(leng)
@@ -538,7 +538,7 @@ public class PlaylistDB
 							.WithTitle("Results!")
 							.WithDescription("Please select a track:\n")
 							.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl);
-					for (int i = 0; i < leng; i++)
+					for (var i = 0; i < leng; i++)
 					{
 						em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));
 					}

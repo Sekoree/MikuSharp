@@ -13,7 +13,7 @@ internal class MikuBot : IDisposable
 	/// <summary>
 	/// Gets the global canellation token source.
 	/// </summary>
-	internal static CancellationTokenSource _cts { get; set; }
+	internal static CancellationTokenSource _canellationTokenSource { get; set; }
 
 	/// <summary>
 	/// Gets the bot config.
@@ -91,9 +91,9 @@ internal class MikuBot : IDisposable
 		Config = JsonConvert.DeserializeObject<BotConfig>(fileData) ?? throw new ArgumentNullException("config.json is null");
 		Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database={Config.DbConfig.Database}";
 
-		_cts = new CancellationTokenSource();
+		_canellationTokenSource = new CancellationTokenSource();
 
-		LogEventLevel level = LogEventLevel.Information;
+		var level = LogEventLevel.Information;
 #if DEBUG
 		level = LogEventLevel.Debug;
 #endif
@@ -123,7 +123,7 @@ internal class MikuBot : IDisposable
 			.CreateLogger();
 		Log.Logger.Information("Starting up!");
 
-		string token = Config.DiscordToken;
+		var token = Config.DiscordToken;
 #if DEBUG
 		token = Config.DiscordToken;
 #endif
@@ -254,13 +254,13 @@ internal class MikuBot : IDisposable
 					}
 					else
 						await Task.FromResult(true);
-				}, _cts.Token);
+				}, _canellationTokenSource.Token);
 				await Task.FromResult(true);
 			};
 			discordClientKvp.Value.GuildMemberUpdated += async (sender, args) =>
 			{
 				if (args.Guild.Id == 483279257431441410)
-					_ = Task.Run(async () => await MikuGuild.OnGuildMemberUpdateAsync(sender, args), _cts.Token);
+					_ = Task.Run(async () => await MikuGuild.OnGuildMemberUpdateAsync(sender, args), _canellationTokenSource.Token);
 				else
 					await Task.FromResult(true);
 			};
@@ -277,7 +277,7 @@ internal class MikuBot : IDisposable
 		while (true)
 		{
 			var al = Guilds.Where(x => x.Value?.MusicInstance != null);
-			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.MusicInstance.GuildConnection?.IsConnected == true).Count());
+			ShardedClient.Logger.LogInformation("Voice Connections: {count}", al.Where(x => x.Value.MusicInstance.GuildConnection?.IsConnected == true).Count());
 			await Task.Delay(TimeSpan.FromMinutes(15));
 		}
 	}
@@ -292,7 +292,7 @@ internal class MikuBot : IDisposable
 		{
 			var me = await DiscordBotListApi.GetMeAsync();
 			var manCount = 0;
-			int[] count = Array.Empty<int>();
+			var count = Array.Empty<int>();
 			var clients = ShardedClient.ShardClients.Values;
 			foreach (var client in clients)
 			{
@@ -307,22 +307,11 @@ internal class MikuBot : IDisposable
 				msg.Headers.TryAddWithoutValidation("Content-Type", "application/json");
 				msg.Headers.TryAddWithoutValidation("key", Config.MotionBotListToken);
 				msg.Content = new StringContent(JsonConvert.SerializeObject(new MotionGuildCount(manCount), Formatting.Indented), Encoding.UTF8);
-				await rest.SendAsync(msg, _cts.Token);
+				await rest.SendAsync(msg, _canellationTokenSource.Token);
 			}
 			catch (Exception)
 			{ }
 			await Task.Delay(TimeSpan.FromMinutes(15));
-		}
-	}
-
-	internal class MotionGuildCount
-	{
-		[JsonProperty("guilds")]
-		internal int Guilds { get; set; }
-
-		internal MotionGuildCount(int count)
-		{
-			this.Guilds = count;
 		}
 	}
 
@@ -394,13 +383,13 @@ internal class MikuBot : IDisposable
 			var LCon = await lavalinkShard.Value.ConnectAsync(LavalinkConfig);
 			LavalinkNodeConnections.Add(lavalinkShard.Key, LCon);
 		}
-		this.SetActivityThread = Task.Run(this.SetActivity, _cts.Token);
-		this.ConnectionThread = Task.Run(this.ShowConnections, _cts.Token);
+		this.SetActivityThread = Task.Run(this.SetActivity, _canellationTokenSource.Token);
+		this.ConnectionThread = Task.Run(this.ShowConnections, _canellationTokenSource.Token);
 #if !DEBUG
 		DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
 		BotlistThread = Task.Run(UpdateBotList, _cts.Token);
 #endif
-		while (!_cts.IsCancellationRequested)
+		while (!_canellationTokenSource.IsCancellationRequested)
 			await Task.Delay(1000);
 		await ShardedClient.UpdateStatusAsync(userStatus: UserStatus.Offline);
 		await ShardedClient.StopAsync();

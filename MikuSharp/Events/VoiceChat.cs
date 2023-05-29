@@ -55,7 +55,7 @@ public class VoiceChat
 
 				musicInstance.AloneTime = DateTime.UtcNow;
 				musicInstance.AloneCheckCancellationToken = new();
-				guild.AloneCheckThread = Task.Run(guild.CheckAlone, MikuBot._cts.Token);
+				guild.AloneCheckThread = Task.Run(guild.CheckAlone, MikuBot._canellationTokenSource.Token);
 			}
 			else if (afterChannelUserCount != 0 && isCurrentUserInChannel)
 			{

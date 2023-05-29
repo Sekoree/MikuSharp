@@ -139,15 +139,15 @@ public static class Music
 	public static async Task<(DiscordEmbedBuilder Embed, Stream? File, string? FileName)> GetUrlPlayingInformationAsync(this DiscordEmbedBuilder builder, DiscordClient client, Guild guild, List<Entry>? lastPlayedSongs)
 	{
 		Stream? img = null;
-		Entry entry = lastPlayedSongs != null ? lastPlayedSongs[0] : guild.MusicInstance.CurrentSong;
+		var entry = lastPlayedSongs != null ? lastPlayedSongs[0] : guild.MusicInstance.CurrentSong;
 
 		try
 		{
 			var uriSegments = entry.Track.Uri.Segments;
-			var filename = $"{uriSegments[uriSegments.Length - 2]}.{uriSegments[^1]}";
+			var filename = $"{uriSegments[^2]}.{uriSegments[^1]}";
 
 			using (MemoryStream d = new(await client.RestClient.GetByteArrayAsync(entry.Track.Uri)))
-			using (FileStream e = File.Create(filename))
+			using (var e = File.Create(filename))
 			{
 				d.Position = 0;
 				await d.CopyToAsync(e);
@@ -168,7 +168,7 @@ public static class Music
 		builder.AddField(new DiscordEmbedField($"{entry.Track.Title} ({guild.GetDynamicPlayingState(lastPlayedSongs)})", $"By {entry.Track.Author}\n[Link]({entry.Track.Uri})\n{(lastPlayedSongs == null ? $"Requested by <@{guild.MusicInstance.CurrentSong.AddedBy}>" : "")}"));
 		builder.AddField(new DiscordEmbedField("Playback options", guild.MusicInstance.GetPlaybackOptions()));
 
-		string attachmentName = string.Empty;
+		var attachmentName = string.Empty;
 
 		if (img != null)
 		{
@@ -182,7 +182,7 @@ public static class Music
 
 	public static DiscordEmbedBuilder GetOtherPlayingInformationAsync(this DiscordEmbedBuilder builder, Guild guild, List<Entry>? lastPlayedSongs = null)
 	{
-		Entry entry = lastPlayedSongs != null ? lastPlayedSongs[0] : guild.MusicInstance.CurrentSong;
+		var entry = lastPlayedSongs != null ? lastPlayedSongs[0] : guild.MusicInstance.CurrentSong;
 		builder.AddField(new DiscordEmbedField($"{entry.Track.Title} ({guild.GetDynamicPlayingState(lastPlayedSongs)})", $"By {entry.Track.Author}\n[Link]({entry.Track.Uri})\n{(lastPlayedSongs == null ? $"Requested by <@{guild.MusicInstance.CurrentSong.AddedBy}>" : "")}"));
 		builder.AddField(new DiscordEmbedField("Playback options", guild.MusicInstance.GetPlaybackOptions()));
 		return builder;
@@ -205,7 +205,7 @@ public static class Music
 	public static async Task SendPlayingInformationAsync(this InteractionContext ctx, DiscordEmbedBuilder builder, Guild guild, List<Entry>? lastPlayedSongs = null)
 	{
 		DiscordWebhookBuilder webhookBuilder = new();
-		Entry entry = lastPlayedSongs != null ? lastPlayedSongs[0] : guild.MusicInstance.CurrentSong;
+		var entry = lastPlayedSongs != null ? lastPlayedSongs[0] : guild.MusicInstance.CurrentSong;
 
 		if (entry == null)
 		{

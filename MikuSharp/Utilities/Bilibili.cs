@@ -10,10 +10,10 @@ public static class Bilibili
 		{
 			await ctx.EditFollowupAsync(messageId, new DiscordWebhookBuilder().WithContent("Downloading video (this may take up to 5 minutes)"));
 
-			string youtubeDlPath = OperatingSystem.IsLinux() ? "youtube-dl" : "youtube-dl.exe";
-			string ffmpegPath = OperatingSystem.IsLinux() ? "ffmpeg" : "ffmpeg.exe";
-			string outputFilePath = $@"{songId}.mp4";
-			string audioFilePath = $@"{songId}.mp3";
+			var youtubeDlPath = OperatingSystem.IsLinux() ? "youtube-dl" : "youtube-dl.exe";
+			var ffmpegPath = OperatingSystem.IsLinux() ? "ffmpeg" : "ffmpeg.exe";
+			var outputFilePath = $@"{songId}.mp4";
+			var audioFilePath = $@"{songId}.mp3";
 
 			var youtubeDl = new YoutubeDL(youtubeDlPath);
 			youtubeDl.Options.FilesystemOptions.Output = outputFilePath;
@@ -23,15 +23,9 @@ public static class Bilibili
 			youtubeDl.Options.PostProcessingOptions.AddMetadata = true;
 			youtubeDl.Options.PostProcessingOptions.KeepVideo = false;
 
-			youtubeDl.StandardOutputEvent += (sender, output) =>
-			{
-				ctx.Client.Logger.LogDebug("{data}", output);
-			};
+			youtubeDl.StandardOutputEvent += (sender, output) => ctx.Client.Logger.LogDebug("{data}", output);
 
-			youtubeDl.StandardErrorEvent += (sender, error) =>
-			{
-				ctx.Client.Logger.LogDebug("{data}", error);
-			};
+			youtubeDl.StandardErrorEvent += (sender, error) => ctx.Client.Logger.LogDebug("{data}", error);
 
 			youtubeDl.VideoUrl = "https://www.bilibili.com/video/" + songId;
 			await youtubeDl.DownloadAsync();

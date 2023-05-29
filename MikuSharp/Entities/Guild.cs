@@ -26,7 +26,7 @@ public class Guild
 
 			if (DateTime.UtcNow.Subtract(this.MusicInstance.AloneTime).Minutes == 5 && !this.MusicInstance.AloneCheckCancellationToken.IsCancellationRequested)
 			{
-				await Task.Run(async () => await this.MusicInstance.GuildConnection.DisconnectAsync(), MikuBot._cts.Token);
+				await Task.Run(async () => await this.MusicInstance.GuildConnection.DisconnectAsync(), MikuBot._canellationTokenSource.Token);
 				await Task.Delay(500);
 				this.MusicInstance = null;
 			}

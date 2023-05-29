@@ -113,9 +113,9 @@ internal class About : ApplicationCommandsModule
 	public static async Task StatsAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-		int GuildCount = 0;
-		int UserCount = 0;
-		int ChannelCount = 0;
+		var GuildCount = 0;
+		var UserCount = 0;
+		var ChannelCount = 0;
 		foreach (var client in MikuBot.ShardedClient.ShardClients)
 		{
 			GuildCount += client.Value.Guilds.Count;
