@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 
 using MikuSharp.Entities;
@@ -27,7 +27,7 @@ public class Developer : ApplicationCommandsModule
 
 	[SlashCommand("which_shard", "Which shard are we on?")]
 	public static async Task TestAsync(InteractionContext ctx)
-		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
+		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Meep meep Secret. Shard {ctx.Client.ShardId}"));
 
 	[SlashCommand("global_ll_stats", "Global lavalink stats")]
 	public static async Task GetGlobalLavalinkStatsAsync(InteractionContext ctx)

@@ -1,4 +1,5 @@
 using MikuSharp.Attributes;
+using MikuSharp.Commands;
 using MikuSharp.Entities;
 using MikuSharp.Events;
 
@@ -49,7 +50,7 @@ internal class MikuBot : IDisposable
 	/// <summary>
 	/// Gets the discord bot list api client.
 	/// </summary>
-	internal static AuthDiscordBotListApi DiscordBotListApi { get; set; }
+	internal AuthDiscordBotListApi DiscordBotListApi { get; set; }
 
 	/// <summary>
 	/// Gets the discord sharded client.
@@ -148,7 +149,9 @@ internal class MikuBot : IDisposable
 			FeedbackEmail = "aiko@aitsys.dev",
 			AttachUserInfo = true,
 			DisableExceptionFilter = true,
-			CustomSentryDsn = Config.SentryDsn
+			CustomSentryDsn = Config.SentryDsn,
+			ShardId = 3,
+			ShardCount = 4
 		});
 	}
 
@@ -203,14 +206,14 @@ internal class MikuBot : IDisposable
 
 		this.LavalinkModules = await ShardedClient.UseLavalinkAsync();
 
-		RegisterEvents();
+		this.RegisterEvents();
 		this.RegisterCommands();
 	}
 
 	/// <summary>
 	/// Registers all events.
 	/// </summary>
-	internal static void RegisterEvents()
+	internal void RegisterEvents()
 	{
 		ShardedClient.ClientErrored += (sender, args) =>
 		{
@@ -261,7 +264,7 @@ internal class MikuBot : IDisposable
 			discordClientKvp.Value.GuildMemberUpdated += async (sender, args) =>
 			{
 				if (args.Guild.Id == 483279257431441410)
-					_ = Task.Run(async () => await MikuGuild.OnGuildMemberUpdateAsync(sender, args), _canellationTokenSource.Token);
+					_ = Task.Run(async () => await MikuGuildEvents.OnGuildMemberUpdateAsync(sender, args), _canellationTokenSource.Token);
 				else
 					await Task.FromResult(true);
 			};
@@ -286,12 +289,12 @@ internal class MikuBot : IDisposable
 	/// <summary>
 	/// Updates the bot list stats every 15 minutes.
 	/// </summary>
-	internal static async Task UpdateBotList()
+	internal async Task UpdateBotList()
 	{
 		await Task.Delay(TimeSpan.FromMinutes(15));
 		while (true)
 		{
-			var me = await DiscordBotListApi.GetMeAsync();
+			var me = await this.DiscordBotListApi.GetMeAsync();
 			var manCount = 0;
 			var count = Array.Empty<int>();
 			var clients = ShardedClient.ShardClients.Values;
@@ -354,20 +357,20 @@ internal class MikuBot : IDisposable
 	internal void RegisterCommands()
 	{
 		// Nsfw stuff needs to be hidden, that's why we use commands next
-		this.CommandsNextModules.RegisterCommands<Commands.NSFW>();
+		this.CommandsNextModules.RegisterCommands<NSFW>();
 
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Action>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Developer>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Fun>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.About>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Moderation>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Music>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Playlists>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Utility>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Weeb>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<ActionCommands>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Developer>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Fun>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<About>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Moderation>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Music>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Playlists>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Utility>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<WeebCommands>();
 
 		// Smolcar command, only guild command
-		this.ApplicationCommandsModules.RegisterGuildCommands<Commands.MikuGuild>(483279257431441410);
+		this.ApplicationCommandsModules.RegisterGuildCommands<MikuGuild>(483279257431441410);
 	}
 
 	/// <summary>
@@ -387,8 +390,8 @@ internal class MikuBot : IDisposable
 		this.SetActivityThread = Task.Run(this.SetActivity, _canellationTokenSource.Token);
 		this.ConnectionThread = Task.Run(this.ShowConnections, _canellationTokenSource.Token);
 #if !DEBUG
-		DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
-		BotlistThread = Task.Run(UpdateBotList, _cts.Token);
+		this.DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
+		this.BotlistThread = Task.Run(this.UpdateBotList, _canellationTokenSource.Token);
 #endif
 		while (!_canellationTokenSource.IsCancellationRequested)
 			await Task.Delay(1000);

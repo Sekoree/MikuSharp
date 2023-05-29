@@ -1,11 +1,11 @@
-﻿using HeyRed.Mime;
+using HeyRed.Mime;
 
 using MikuSharp.Utilities;
 
 namespace MikuSharp.Commands;
 
 [SlashCommandGroup("action", "Actions", dmPermission: false)]
-internal class Action : ApplicationCommandsModule
+internal class ActionCommands : ApplicationCommandsModule
 {
 	[SlashCommand("hug", "Hug someone!")]
 	public static async Task HugAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)

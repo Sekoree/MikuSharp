@@ -1,11 +1,11 @@
-﻿using HeyRed.Mime;
+using HeyRed.Mime;
 
 using MikuSharp.Utilities;
 
 namespace MikuSharp.Commands;
 
 [SlashCommandGroup("weeb", "Weeb Stuff!", dmPermission: false)]
-internal class Weeb : ApplicationCommandsModule
+internal class WeebCommands : ApplicationCommandsModule
 {
 	[SlashCommand("awooify", "Awooify your or someones avatar!")]
 	public static async Task AwooifyAsync(InteractionContext ctx, [Option("user", "User to awooify")] DiscordUser? user = null)

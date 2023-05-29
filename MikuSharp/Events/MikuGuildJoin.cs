@@ -3,7 +3,7 @@ namespace MikuSharp.Events;
 /// <summary>
 /// Event handler for the miku guild.
 /// </summary>
-public class MikuGuild
+public class MikuGuildEvents
 {
 	/// <summary>
 	/// Fired when a guild member is updated.
