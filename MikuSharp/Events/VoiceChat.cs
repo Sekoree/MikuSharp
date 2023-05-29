@@ -19,15 +19,14 @@ public class VoiceChat
 
 			var currentUser = e.Guild.Members[client.CurrentUser.Id];
 
-			var beforeChannelUserCount = e.Before?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
 			var afterChannelUserCount = e.After?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
 			var currentChannelUserCount = e.Channel?.Users.Count(x => !x.IsBot) ?? 0;
 			var guildConnectionUserCount = musicInstance.GuildConnection?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
 
-			var isCurrentUserInChannel = currentUser?.VoiceState.ChannelId == e.Channel?.Id;
+			var isCurrentUserInChannel = currentUser?.VoiceState?.ChannelId == e.Channel?.Id;
 
-			if ((beforeChannelUserCount == 0 || afterChannelUserCount == 0 || currentChannelUserCount == 0)
-				&& isCurrentUserInChannel && guildConnectionUserCount == 0)
+			if ((afterChannelUserCount == 0 || currentChannelUserCount == 0)
+				&& !isCurrentUserInChannel && guildConnectionUserCount == 0)
 			{
 				if (musicInstance.Playstate == PlayState.Playing)
 				{
@@ -61,7 +60,13 @@ public class VoiceChat
 			{
 				if (musicInstance != null && musicInstance.AloneCheckCancellationToken != null)
 				{
-					musicInstance.AloneCheckCancellationToken.Cancel();
+					musicInstance.AloneCheckCancellationToken.Cancel(); try
+					{
+						await musicInstance.CommandChannel.SendMessageAsync(new DiscordEmbedBuilder()
+							.WithDescription("Aborted the 5 minuten alone check :3")
+							.Build());
+					}
+					catch { }
 				}
 			}
 		}

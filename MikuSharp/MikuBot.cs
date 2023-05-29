@@ -149,7 +149,7 @@ internal class MikuBot : IDisposable
 			LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger),
 			Timezone = "Europe/Berlin",
 			EnableSentry = true,
-			ReportMissingFields = true,
+			ReportMissingFields = false,
 			EnableLibraryDeveloperMode = true,
 			DeveloperUserId = 856780995629154305,
 			FeedbackEmail = "aiko@aitsys.dev",
@@ -228,7 +228,11 @@ internal class MikuBot : IDisposable
 
 		foreach (var discordClientKvp in ShardedClient.ShardClients)
 		{
-			discordClientKvp.Value.VoiceStateUpdated += VoiceChat.LeftAlone;
+			/*discordClientKvp.Value.VoiceStateUpdated += (sender, args) =>
+			{
+				_ = Task.Run(async () => await VoiceChat.LeftAlone(sender, args));
+				return Task.CompletedTask;
+			};*/
 
 			discordClientKvp.Value.GetApplicationCommands().ApplicationCommandsModuleStartupFinished += (sender, args) =>
 			{

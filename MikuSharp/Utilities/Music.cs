@@ -36,7 +36,7 @@ public static class Music
 
 	public static async Task ConditionalConnect(this Guild guild, InteractionContext ctx)
 	{
-		if (guild.MusicInstance.GuildConnection?.IsConnected != null && !guild.MusicInstance.GuildConnection.IsConnected)
+		if (guild.MusicInstance.GuildConnection?.IsConnected != null && guild.MusicInstance.GuildConnection.IsConnected)
 			return;
 		await guild.MusicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
 	}

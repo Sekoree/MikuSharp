@@ -50,14 +50,19 @@ public class Playlists : ApplicationCommandsModule
 		)
 		{
 			await ctx.DeferAsync(true);
+			if (!name.TryNormalize(out var playlistName))
+			{
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Playlist").WithDescription("**Error**\n\nUnable to create a playlist with this name.\n\nAllowed chars:\n- `0-9`\n- `a-z`\n- `A-Z`\n- `-`\n- `_`\n- ` `!").Build()));
+				return;
+			}
 			var pls = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
-			if (pls.Any(x => x == name))
+			if (pls.Any(x => x == playlistName))
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Playlist").WithDescription("**Error** You already have a playlist with that playlist!").Build()));
 				return;
 			}
-			await PlaylistDB.AddPlaylist(name, ctx.Member.Id);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Playlist").WithDescription("New Playlist was created -> " + name).Build()));
+			await PlaylistDB.AddPlaylist(playlistName, ctx.Member.Id);
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Playlist").WithDescription("New Playlist was created -> " + playlistName).Build()));
 		}
 
 		[SlashCommand("create_fixed", "Create a fixed playlist (linked to a Youtube or Soundcloud playlist)")]
@@ -67,6 +72,11 @@ public class Playlists : ApplicationCommandsModule
 		)
 		{
 			await ctx.DeferAsync(true);
+			if (!name.TryNormalize(out var playlistName))
+			{
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription("**Error**\n\nUnable to create a playlist with this name.\n\nAllowed chars:\n- `0-9`\n- `a-z`\n- `A-Z`\n- `-`\n- `_`\n- ` `!").Build()));
+				return;
+			}
 			var pls = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
 			if (pls.Any(x => x == name))
 			{
@@ -90,13 +100,13 @@ public class Playlists : ApplicationCommandsModule
 			}
 			if (link.Contains("youtu") && !link.Contains("soundcloud"))
 			{
-				await PlaylistDB.AddPlaylist(name, ctx.Member.Id, ExtService.Youtube, link);
+				await PlaylistDB.AddPlaylist(playlistName, ctx.Member.Id, ExtService.Youtube, link);
 			}
 			else
 			{
-				await PlaylistDB.AddPlaylist(name, ctx.Member.Id, ExtService.Soundcloud, link);
+				await PlaylistDB.AddPlaylist(playlistName, ctx.Member.Id, ExtService.Soundcloud, link);
 			}
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription($"Fixed playlist created with playlist -> {name} and {s.Tracks.Count} Songs!").Build()));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription($"Fixed playlist created with playlist -> {playlistName} and {s.Tracks.Count} Songs!").Build()));
 		}
 	}
 
@@ -107,68 +117,76 @@ public class Playlists : ApplicationCommandsModule
 		public static async Task ListPlaylistsAsync(InteractionContext ctx)
 		{
 			await ctx.DeferAsync(true);
-			var pls = await PlaylistDB.GetPlaylists(ctx.Guild, ctx.Member.Id);
-			if (pls.Count == 0)
+			try
 			{
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You dont have any playlists"));
-				return;
-			}
-			//ctx.Client.Logger.LogDebug(pls.Count.ToString());
-			var inter = ctx.Client.GetInteractivity();
-			var songsPerPage = 0;
-			var currentPage = 1;
-			var songAmount = 0;
-			var totalP = pls.Count / 5;
-			if (pls.Count % 5 != 0)
-				totalP++;
-			var emb = new DiscordEmbedBuilder();
-			List<Page> Pages = new();
-			foreach (var Track in pls)
-			{
-				//ctx.Client.Logger.LogDebug(Track.Value == null);
-				//ctx.Client.Logger.LogDebug(Track.Key);
-				var songam = 0;
-				var ent = await Track.Value.GetEntries();
-				songam = ent.Count;
-				var sub = Track.Value.ExternalService == ExtService.None
-					? $"Created on: {Track.Value.Creation}\n" +
-						$"Last modified on: {Track.Value.Modify}"
-					: $"Created on: {Track.Value.Creation}\n" +
-						$"{Track.Value.ExternalService} [Link]({Track.Value.Url})";
-				emb.AddField(new DiscordEmbedField($"**{songAmount + 1}.{Track.Key}** ({songam} Songs)", sub));
-				songsPerPage++;
-				songAmount++;
-				emb.WithTitle($"List Playlists");
-				if (songsPerPage == 5)
+				var pls = await PlaylistDB.GetPlaylists(ctx.Guild, ctx.Member.Id);
+				ctx.Client.Logger.LogDebug(pls.Count.ToString());
+				if (pls.Count == 0)
 				{
-					songsPerPage = 0;
-					emb.WithFooter($"Page {currentPage}/{totalP}");
-					Pages.Add(new Page(embed: emb));
-					emb.ClearFields();
-					currentPage++;
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You dont have any playlists"));
+					return;
 				}
-				if (songAmount == pls.Count)
+				var inter = ctx.Client.GetInteractivity();
+				var songsPerPage = 0;
+				var currentPage = 1;
+				var songAmount = 0;
+				var totalP = pls.Count / 5;
+				if (pls.Count % 5 != 0)
+					totalP++;
+				var emb = new DiscordEmbedBuilder();
+				List<Page> Pages = new();
+				foreach (var track in pls)
 				{
-					emb.WithFooter($"Page {currentPage}/{totalP}");
-					Pages.Add(new Page(embed: emb));
-					emb.ClearFields();
+					//ctx.Client.Logger.LogDebug(Track.Value == null);
+					//ctx.Client.Logger.LogDebug(Track.Key);
+					var songCount = 0;
+					var ent = await track.Value.GetEntries();
+					songCount = ent.Count;
+					var sub = track.Value.ExternalService == ExtService.None
+		? $"Created on: {track.Value.Creation}\n" +
+			$"Last modified on: {track.Value.Modify}"
+		: $"Created on: {track.Value.Creation}\n" +
+			$"{track.Value.ExternalService} [Link]({track.Value.Url})";
+					emb.AddField(new DiscordEmbedField($"**{songAmount + 1}.{track.Key}** ({songCount} Songs)", sub));
+					songsPerPage++;
+					songAmount++;
+					emb.WithTitle($"List Playlists");
+					if (songsPerPage == 5)
+					{
+						songsPerPage = 0;
+						emb.WithFooter($"Page {currentPage}/{totalP}");
+						Pages.Add(new Page(embed: emb));
+						emb.ClearFields();
+						currentPage++;
+					}
+					if (songAmount == pls.Count)
+					{
+						emb.WithFooter($"Page {currentPage}/{totalP}");
+						Pages.Add(new Page(embed: emb));
+						emb.ClearFields();
+					}
 				}
+				if (currentPage == 1)
+				{
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(Pages.First().Embed));
+					return;
+				}
+				else if (currentPage == 2 && songsPerPage == 0)
+				{
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(Pages.First().Embed));
+					return;
+				}
+				foreach (var eP in Pages.Where(x => x.Embed.Fields.Count == 0).ToList())
+				{
+					Pages.Remove(eP);
+				}
+				await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages, token: MikuBot._canellationTokenSource.Token);
 			}
-			if (currentPage == 1)
+			catch (Exception ex)
 			{
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(Pages.First().Embed));
-				return;
+				ctx.Client.Logger.LogError("{msg}", ex.Message);
+				ctx.Client.Logger.LogError("{stack}", ex.StackTrace);
 			}
-			else if (currentPage == 2 && songsPerPage == 0)
-			{
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(Pages.First().Embed));
-				return;
-			}
-			foreach (var eP in Pages.Where(x => x.Embed.Fields.Count == 0).ToList())
-			{
-				Pages.Remove(eP);
-			}
-			await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages, token: MikuBot._canellationTokenSource.Token);
 		}
 
 		[SlashCommand("show", "Show the contents of a playlist")]

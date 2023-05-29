@@ -48,6 +48,7 @@ public class MusicInstance
 		switch (channel.Type)
 		{
 			case ChannelType.Voice:
+			case ChannelType.Stage:
 			{
 				this.GuildConnection = await this.NodeConnection.ConnectAsync(channel);
 				this.VoiceChannel = channel;
@@ -57,27 +58,22 @@ public class MusicInstance
 				return null;
 		}
 	}
-	public async Task<TrackResult> QueueSong(string name_or_url, InteractionContext ctx, int position = -1)
+	public async Task<TrackResult> QueueSong(string url_or_name, InteractionContext ctx, int position = -1)
 	{
 		var queue = await Database.GetQueueAsync(ctx.Guild);
 		var inter = ctx.Client.GetInteractivity();
 		// NicoNicoNii
-		if (name_or_url.ToLower().StartsWith("http://nicovideo.jp")
-			|| name_or_url.ToLower().StartsWith("http://sp.nicovideo.jp")
-			|| name_or_url.ToLower().StartsWith("https://nicovideo.jp")
-			|| name_or_url.ToLower().StartsWith("https://sp.nicovideo.jp")
-			|| name_or_url.ToLower().StartsWith("http://www.nicovideo.jp")
-			|| name_or_url.ToLower().StartsWith("https://www.nicovideo.jp"))
+		if (url_or_name.IsNndUrl())
 		{
 			var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Processing NND Video...").AsEphemeral());
-			var split = name_or_url.Split("/".ToCharArray());
+			var split = url_or_name.Split("/".ToCharArray());
 			var nico_nico_id = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
 			FtpClient client = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
 			client.Connect();
 			if (!client.FileExists($"{nico_nico_id}.mp3"))
 			{
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Preparing download..."));
-				var ex = await ctx.GetNNDAsync(name_or_url, nico_nico_id, msg.Id);
+				var ex = await ctx.GetNNDAsync(url_or_name, nico_nico_id, msg.Id);
 				if (ex == null)
 				{
 					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Please try again or verify the link"));
@@ -96,13 +92,13 @@ public class MusicInstance
 			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
 		}
 		// Bilibili
-		else if (name_or_url.ToLower().StartsWith("https://www.bilibili.com")
-			|| name_or_url.ToLower().StartsWith("http://www.bilibili.com"))
+		else if (url_or_name.ToLower().StartsWith("https://www.bilibili.com")
+			|| url_or_name.ToLower().StartsWith("http://www.bilibili.com"))
 		{
 			var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Processing Bilibili Video...").AsEphemeral());
-			name_or_url = name_or_url.Replace("https://www.bilibili.com/", "");
-			name_or_url = name_or_url.Replace("http://www.bilibili.com/", "");
-			var split = name_or_url.Split("/".ToCharArray());
+			url_or_name = url_or_name.Replace("https://www.bilibili.com/", "");
+			url_or_name = url_or_name.Replace("http://www.bilibili.com/", "");
+			var split = url_or_name.Split("/".ToCharArray());
 			if (!split.Contains("video"))
 			{
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Failure"));
@@ -133,11 +129,11 @@ public class MusicInstance
 			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
 		}
 		// Http(s) stream/file
-		else if (name_or_url.StartsWith("http://") | name_or_url.StartsWith("https://"))
+		else if (url_or_name.StartsWith("http://") | url_or_name.StartsWith("https://"))
 		{
 			try
 			{
-				var s = await this.NodeConnection.Rest.GetTracksAsync(new Uri(name_or_url));
+				var s = await this.NodeConnection.Rest.GetTracksAsync(new Uri(url_or_name));
 				switch (s.LoadResultType)
 				{
 					case LavalinkLoadResultType.LoadFailed:
@@ -275,28 +271,28 @@ public class MusicInstance
 		else
 		{
 			var type = LavalinkSearchType.Youtube;
-			if (name_or_url.StartsWith("ytsearch:"))
+			if (url_or_name.StartsWith("ytsearch:"))
 			{
-				name_or_url = name_or_url.Replace("ytsearch:", "");
+				url_or_name = url_or_name.Replace("ytsearch:", "");
 				type = LavalinkSearchType.Youtube;
 			}
-			else if (name_or_url.StartsWith("scsearch:"))
+			else if (url_or_name.StartsWith("scsearch:"))
 			{
-				name_or_url = name_or_url.Replace("ytsearch:", "");
+				url_or_name = url_or_name.Replace("ytsearch:", "");
 				type = LavalinkSearchType.SoundCloud;
 			}
-			else if (name_or_url.StartsWith("spsearch:"))
+			else if (url_or_name.StartsWith("spsearch:"))
 			{
-				name_or_url = name_or_url.Replace("spsearch:", "");
+				url_or_name = url_or_name.Replace("spsearch:", "");
 				type = LavalinkSearchType.Spotify;
 			}
-			else if (name_or_url.StartsWith("amsearch:"))
+			else if (url_or_name.StartsWith("amsearch:"))
 			{
-				name_or_url = name_or_url.Replace("amsearch:", "");
+				url_or_name = url_or_name.Replace("amsearch:", "");
 				type = LavalinkSearchType.AppleMusic;
 			}
 
-			var s = await this.NodeConnection.Rest.GetTracksAsync(name_or_url, type);
+			var s = await this.NodeConnection.Rest.GetTracksAsync(url_or_name, type);
 			switch (s.LoadResultType)
 			{
 				case LavalinkLoadResultType.LoadFailed:

@@ -1,4 +1,4 @@
-﻿using MikuSharp.Enums;
+using MikuSharp.Enums;
 
 namespace MikuSharp.Entities;
 
@@ -25,34 +25,44 @@ public class Playlist
 
 	public async Task<List<PlaylistEntry>> GetEntries()
 	{
-		var Entries = new List<PlaylistEntry>(this.SongCount);
-		if (this.ExternalService == ExtService.None)
+		var entries = new List<PlaylistEntry>();
+		if (this.SongCount > 0)
 		{
-			var connString = MikuBot.Config.DbConnectString;
-			var conn = new NpgsqlConnection(connString);
-			await conn.OpenAsync();
-			var cmd2 = new NpgsqlCommand($"SELECT * FROM playlistentries WHERE userid = {this.UserID} AND playlistname = @pl ORDER BY pos ASC;", conn);
-			cmd2.Parameters.AddWithValue("pl", this.Name);
-			var reader = await cmd2.ExecuteReaderAsync();
-			while (await reader.ReadAsync())
+			if (this.ExternalService == ExtService.None)
 			{
-				Entries.Add(new PlaylistEntry(LavalinkUtilities.DecodeTrack(Convert.ToString(reader["trackstring"])), DateTimeOffset.Parse(Convert.ToString(reader["addition"])), DateTimeOffset.Parse(Convert.ToString(reader["changed"])), Convert.ToInt32(reader["pos"])));
+				var connString = MikuBot.Config.DbConnectString;
+				var conn = new NpgsqlConnection(connString);
+				await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+				var cmd = new NpgsqlCommand("SELECT * FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName ORDER BY pos ASC;", conn);
+				cmd.Parameters.AddWithValue("userId", Convert.ToInt64(this.UserID));
+				cmd.Parameters.AddWithValue("playlistName", this.Name);
+				cmd.Prepare();
+				var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+				while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
+					entries.Add(new PlaylistEntry(LavalinkUtilities.DecodeTrack(Convert.ToString(reader["trackstring"])), DateTimeOffset.Parse(Convert.ToString(reader["addition"])), DateTimeOffset.Parse(Convert.ToString(reader["changed"])), Convert.ToInt32(reader["pos"])));
+				reader.Close();
+				cmd.Dispose();
+				conn.Close();
+				conn.Dispose();
 			}
-			reader.Close();
-			cmd2.Dispose();
-			conn.Close();
-			conn.Dispose();
-		}
-		else
-		{
-			var trs = await MikuBot.LavalinkNodeConnections.First().Value.ConnectedGuilds.First().Value.GetTracksAsync(new Uri(this.Url));
-			var i = 0;
-			foreach (var t in trs.Tracks)
+			else
 			{
-				Entries.Add(new PlaylistEntry(t, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, i));
-				i++;
+				var conn = MikuBot.LavalinkNodeConnections?.First().Value ?? null;
+				LavalinkGuildConnection? client = null;
+				if (conn.ConnectedGuilds.Any())
+					client = conn.ConnectedGuilds.First().Value;
+				if (client != null)
+				{
+					var trs = await client.GetTracksAsync(new Uri(this.Url));
+					var i = 0;
+					foreach (var t in trs.Tracks)
+					{
+						entries.Add(new PlaylistEntry(t, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, i));
+						i++;
+					}
+				}
 			}
 		}
-		return Entries;
+		return entries;
 	}
 }

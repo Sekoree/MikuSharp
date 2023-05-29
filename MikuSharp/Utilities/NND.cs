@@ -4,6 +4,14 @@ namespace MikuSharp.Utilities;
 
 public static class NND
 {
+	public static bool IsNndUrl(this string url_or_name)
+		=> url_or_name.ToLower().StartsWith("http://nicovideo.jp")
+			|| url_or_name.ToLower().StartsWith("http://sp.nicovideo.jp")
+			|| url_or_name.ToLower().StartsWith("https://nicovideo.jp")
+			|| url_or_name.ToLower().StartsWith("https://sp.nicovideo.jp")
+			|| url_or_name.ToLower().StartsWith("http://www.nicovideo.jp")
+			|| url_or_name.ToLower().StartsWith("https://www.nicovideo.jp");
+
 	public static async Task<MemoryStream> GetNNDAsync(this InteractionContext ctx, string url_or_name, string nico_nico_id, ulong messageId)
 	{
 		try
