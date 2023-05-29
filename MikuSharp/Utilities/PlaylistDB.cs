@@ -419,96 +419,96 @@ public class PlaylistDB
 			switch (s.LoadResultType)
 			{
 				case LavalinkLoadResultType.LoadFailed:
-					{
-						await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("Loading this song/playlist failed, please try again, reasons could be:\n" +
-							"> Playlist is set to private or unlisted\n" +
-							"> The song is unavailable/deleted").Build()));
-						return null;
-					};
+				{
+					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("Loading this song/playlist failed, please try again, reasons could be:\n" +
+						"> Playlist is set to private or unlisted\n" +
+						"> The song is unavailable/deleted").Build()));
+					return null;
+				};
 				case LavalinkLoadResultType.NoMatches:
-					{
-						await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("No song/playlist was found with this URL, please try again/a different one").Build()));
-						return null;
-					};
+				{
+					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("No song/playlist was found with this URL, please try again/a different one").Build()));
+					return null;
+				};
 				case LavalinkLoadResultType.PlaylistLoaded:
+				{
+					if (s.PlaylistInfo.SelectedTrack == -1)
 					{
-						if (s.PlaylistInfo.SelectedTrack == -1)
-						{
-							List<DiscordButtonComponent> buttons = new(2)
+						List<DiscordButtonComponent> buttons = new(2)
 							{
 								new DiscordButtonComponent(ButtonStyle.Success, "yes", "Add entire playlist"),
 								new DiscordButtonComponent(ButtonStyle.Primary, "no", "Don't add")
 							};
-							var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder()
+						var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder()
 								.WithTitle("Playlist link detected!")
 								.WithDescription("Choose how to handle the playlist link")
 								.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl)
 								.Build()).AddComponents(buttons));
-							var resp = await inter.WaitForButtonAsync(msg, ctx.User, TimeSpan.FromSeconds(30));
-							if (resp.TimedOut)
-							{
-								buttons.ForEach(x => x.Disable());
-								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Timed out!"));
-								return null;
-							}
-							else if (resp.Result.Id == "yes")
-							{
-								buttons.ForEach(x => x.Disable());
-								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Adding entire playlist"));
-								return new TrackResult(s.PlaylistInfo, s.Tracks);
-							}
-							else
-							{
-								buttons.ForEach(x => x.Disable());
-								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Canceled!"));
-								return null;
-							}
+						var resp = await inter.WaitForButtonAsync(msg, ctx.User, TimeSpan.FromSeconds(30));
+						if (resp.TimedOut)
+						{
+							buttons.ForEach(x => x.Disable());
+							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Timed out!"));
+							return null;
+						}
+						else if (resp.Result.Id == "yes")
+						{
+							buttons.ForEach(x => x.Disable());
+							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Adding entire playlist"));
+							return new TrackResult(s.PlaylistInfo, s.Tracks);
 						}
 						else
 						{
-							List<DiscordButtonComponent> buttons = new(3)
+							buttons.ForEach(x => x.Disable());
+							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Canceled!"));
+							return null;
+						}
+					}
+					else
+					{
+						List<DiscordButtonComponent> buttons = new(3)
 							{
 								new DiscordButtonComponent(ButtonStyle.Primary, "yes", "Add only referred song"),
 								new DiscordButtonComponent(ButtonStyle.Success, "yes", "Add the entire playlist"),
 								new DiscordButtonComponent(ButtonStyle.Danger, "no", "Cancel")
 							};
-							var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder()
+						var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder()
 								.WithTitle("Link with Playlist detected!")
 								.WithDescription("Please choose how to handle the playlist link")
 								.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl)
 								.Build()).AddComponents(buttons));
-							var resp = await inter.WaitForButtonAsync(msg, ctx.User, TimeSpan.FromSeconds(30));
-							if (resp.TimedOut)
-							{
-								buttons.ForEach(x => x.Disable());
-								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Timed out!"));
-								return null;
-							}
-							else if (resp.Result.Id == "yes")
-							{
-								buttons.ForEach(x => x.Disable());
-								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding single song: {s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).Title}"));
-								return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack));
-							}
-							else if (resp.Result.Id == "all")
-							{
-								buttons.ForEach(x => x.Disable());
-								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding entire playlist: {s.PlaylistInfo.Name}"));
-								return new TrackResult(s.PlaylistInfo, s.Tracks);
-							}
-							else
-							{
-								buttons.ForEach(x => x.Disable());
-								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Canceled!"));
-								return null;
-							}
+						var resp = await inter.WaitForButtonAsync(msg, ctx.User, TimeSpan.FromSeconds(30));
+						if (resp.TimedOut)
+						{
+							buttons.ForEach(x => x.Disable());
+							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Timed out!"));
+							return null;
 						}
-					};
+						else if (resp.Result.Id == "yes")
+						{
+							buttons.ForEach(x => x.Disable());
+							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding single song: {s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).Title}"));
+							return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack));
+						}
+						else if (resp.Result.Id == "all")
+						{
+							buttons.ForEach(x => x.Disable());
+							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding entire playlist: {s.PlaylistInfo.Name}"));
+							return new TrackResult(s.PlaylistInfo, s.Tracks);
+						}
+						else
+						{
+							buttons.ForEach(x => x.Disable());
+							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Canceled!"));
+							return null;
+						}
+					}
+				};
 				default:
-					{
-						await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {s.Tracks.First().Title}"));
-						return new TrackResult(s.PlaylistInfo, s.Tracks.First());
-					};
+				{
+					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {s.Tracks.First().Title}"));
+					return new TrackResult(s.PlaylistInfo, s.Tracks.First());
+				};
 			}
 		}
 		else
@@ -517,49 +517,49 @@ public class PlaylistDB
 			switch (s.LoadResultType)
 			{
 				case LavalinkLoadResultType.LoadFailed:
-					{
-						await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("Loading this song/playlist failed, please try again, reasons could be:\n" +
-							"> The song is unavailable/deleted").Build()));
-						return null;
-					};
+				{
+					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("Loading this song/playlist failed, please try again, reasons could be:\n" +
+						"> The song is unavailable/deleted").Build()));
+					return null;
+				};
 				case LavalinkLoadResultType.NoMatches:
-					{
-						await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("No song was found, please try again").Build()));
-						return null;
-					};
+				{
+					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("No song was found, please try again").Build()));
+					return null;
+				};
 				default:
+				{
+					int leng = s.Tracks.Count;
+					if (leng > 5)
+						leng = 5;
+					List<DiscordStringSelectComponentOption> selectOptions = new(leng)
 					{
-						int leng = s.Tracks.Count;
-						if (leng > 5)
-							leng = 5;
-						List<DiscordStringSelectComponentOption> selectOptions = new(leng)
-						{
 
-						};
-						DiscordStringSelectComponent select = new("Select song to play", selectOptions, minOptions: 1, maxOptions: 1);
-						var em = new DiscordEmbedBuilder()
+					};
+					DiscordStringSelectComponent select = new("Select song to play", selectOptions, minOptions: 1, maxOptions: 1);
+					var em = new DiscordEmbedBuilder()
 							.WithTitle("Results!")
 							.WithDescription("Please select a track:\n")
 							.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl);
-						for (int i = 0; i < leng; i++)
-						{
-							em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));
-						}
-						var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(em.Build()).AddComponents(select));
-						var resp = await inter.WaitForSelectAsync(msg, ctx.User, select.CustomId, ComponentType.StringSelect, TimeSpan.FromSeconds(30));
-						if (resp.TimedOut)
-						{
-							select.Disable();
-							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent("Timed out!"));
-							return null;
-						}
-						var trackSelect = Convert.ToInt32(resp.Result.Values.First());
-						var track = s.Tracks.ElementAt(trackSelect);
+					for (int i = 0; i < leng; i++)
+					{
+						em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));
+					}
+					var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(em.Build()).AddComponents(select));
+					var resp = await inter.WaitForSelectAsync(msg, ctx.User, select.CustomId, ComponentType.StringSelect, TimeSpan.FromSeconds(30));
+					if (resp.TimedOut)
+					{
 						select.Disable();
-						await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent($"Choosed {track.Title}"));
+						await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent("Timed out!"));
+						return null;
+					}
+					var trackSelect = Convert.ToInt32(resp.Result.Values.First());
+					var track = s.Tracks.ElementAt(trackSelect);
+					select.Disable();
+					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent($"Choosed {track.Title}"));
 
-						return new TrackResult(s.PlaylistInfo, track);
-					};
+					return new TrackResult(s.PlaylistInfo, track);
+				};
 			}
 		}
 	}

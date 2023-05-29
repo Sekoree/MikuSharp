@@ -12,18 +12,18 @@ namespace MikuSharp.Commands;
 [SlashCommandGroup("music", "Music commands", dmPermission: false)]
 public class Music : ApplicationCommandsModule
 {
-	private static readonly string[] Units = new[] { "", "ki", "Mi", "Gi" };
+	private static readonly string[] s_units = new[] { "", "ki", "Mi", "Gi" };
 	private static string SizeToString(long l)
 	{
 		double d = l;
 		var u = 0;
-		while (d >= 900 && u < Units.Length - 2)
+		while (d >= 900 && u < s_units.Length - 2)
 		{
 			u++;
 			d /= 1024;
 		}
 
-		return $"{d:#,##0.00} {Units[u]}B";
+		return $"{d:#,##0.00} {s_units[u]}B";
 	}
 
 	[SlashCommandGroup("base", "Base commands")]
