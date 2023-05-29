@@ -18,6 +18,12 @@ public class Playlists : ApplicationCommandsModule
 		)
 		{
 			await ctx.DeferAsync(true);
+			if (!name.TryNormalize(out var playlistName))
+			{
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Queue Copy").WithDescription("**Error**\n\nUnable to create a playlist with this name.\n\nAllowed chars:\n- `0-9`\n- `a-z`\n- `A-Z`\n- `-`\n- `_`\n- ` `!").Build()));
+				return;
+			}
+
 			var q = await Database.GetQueueAsync(ctx.Guild);
 			if (q.Count == 0)
 			{
@@ -25,17 +31,17 @@ public class Playlists : ApplicationCommandsModule
 				return;
 			}
 			var pls = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
-			if (pls.Any(x => x == name))
+			if (pls.Any(x => x == playlistName))
 			{
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Copy Queue").WithDescription("**Error** You already have a playlist with that playlist!").Build()));
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Queue Copy").WithDescription("**Error**\n\nYou already have a playlist with that playlist!").Build()));
 				return;
 			}
-			await PlaylistDB.AddPlaylist(name, ctx.Member.Id);
+			await PlaylistDB.AddPlaylist(playlistName, ctx.Member.Id);
 			foreach (var e in q)
 			{
-				await PlaylistDB.AddEntry(name, ctx.Member.Id, e.Track.TrackString);
+				await PlaylistDB.AddEntry(playlistName, ctx.Member.Id, e.Track.TrackString);
 			}
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Queue Copy").WithDescription("Queue was saved to new playlist -> " + name).Build()));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Queue Copy").WithDescription("Queue was saved to new playlist -> " + playlistName).Build()));
 		}
 
 		[SlashCommand("create", "Create a playlist")]

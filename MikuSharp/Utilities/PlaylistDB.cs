@@ -1,10 +1,15 @@
+using System.Text.RegularExpressions;
+
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 
 namespace MikuSharp.Utilities;
 
-public class PlaylistDB
+public static partial class PlaylistDB
 {
+	[GeneratedRegex("[^a-zA-Z0-9_\\- ]")]
+	private static partial Regex PlaylistNameRegex();
+
 	public static async Task<Dictionary<string, Playlist>> GetPlaylists(DiscordGuild guild, ulong userId)
 	{
 		var connString = MikuBot.Config.DbConnectString;
@@ -71,7 +76,6 @@ public class PlaylistDB
 		{
 			var extService = Convert.ToString(playlistReader["extservice"]);
 			if (Music.GetExtService(extService) != ExtService.None)
-			{
 				try
 				{
 					var url = new Uri(Convert.ToString(playlistReader["url"]));
@@ -79,7 +83,6 @@ public class PlaylistDB
 					entryCount = ss.Tracks.Count;
 				}
 				catch { }
-			}
 			playlist = new Playlist(
 				Music.GetExtService(extService),
 				Convert.ToString(playlistReader["url"]),
@@ -162,6 +165,19 @@ public class PlaylistDB
 
 		conn.Close();
 		conn.Dispose();
+	}
+
+	/// <summary>
+	/// Tries to normalize a playlist name.
+	/// </summary>
+	/// <param name="desiredPlaylistName">The desired name of the playlist the user wants to create or update.</param>
+	/// <param name="normalizedPlaylistName">Our normalized database compatible playlist name.</param>
+	/// <returns>Whether the playlist name could be normlized.</returns>
+	public static bool TryNormalize(this string desiredPlaylistName, out string normalizedPlaylistName)
+	{
+		normalizedPlaylistName = PlaylistNameRegex().Replace(desiredPlaylistName, "");
+
+		return !string.IsNullOrEmpty(normalizedPlaylistName);
 	}
 
 	public static async Task AddPlaylist(string playlistName, ulong userId, ExtService extService = ExtService.None, string url = "")
@@ -529,9 +545,7 @@ public class PlaylistDB
 							.WithDescription("Please select a track:\n")
 							.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl);
 					for (var i = 0; i < leng; i++)
-					{
 						em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));
-					}
 					var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(em.Build()).AddComponents(select));
 					var resp = await inter.WaitForSelectAsync(msg, ctx.User, select.CustomId, ComponentType.StringSelect, TimeSpan.FromSeconds(30));
 					if (resp.TimedOut)
