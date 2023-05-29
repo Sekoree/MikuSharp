@@ -177,7 +177,7 @@ public static partial class PlaylistDB
 	{
 		normalizedPlaylistName = PlaylistNameRegex().Replace(desiredPlaylistName, "");
 
-		return !string.IsNullOrEmpty(normalizedPlaylistName);
+		return !string.IsNullOrEmpty(normalizedPlaylistName) && !string.IsNullOrWhiteSpace(normalizedPlaylistName);
 	}
 
 	public static async Task AddPlaylist(string playlistName, ulong userId, ExtService extService = ExtService.None, string url = "")
