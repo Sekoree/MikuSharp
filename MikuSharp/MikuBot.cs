@@ -1,3 +1,4 @@
+using MikuSharp.Attributes;
 using MikuSharp.Entities;
 using MikuSharp.Events;
 
@@ -188,9 +189,9 @@ internal class MikuBot : IDisposable
 			DmHelp = false,
 			EnableDefaultHelp = true,
 			IgnoreExtraArguments = true,
-			StringPrefixes = new List<string>(),
+			StringPrefixes = new(),
 			UseDefaultCommandHandler = true,
-			DefaultHelpChecks = new List<CheckBaseAttribute>(1) { new Attributes.NotStaffAttribute() }
+			DefaultHelpChecks = new(1) { new NotStaffAttribute() }
 		});
 
 		LavalinkConfig = new()
