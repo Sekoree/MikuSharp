@@ -1,5 +1,3 @@
-using DisCatSharp.Lavalink;
-
 using MikuSharp.Attributes;
 using MikuSharp.Commands;
 using MikuSharp.Entities;
