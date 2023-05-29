@@ -19,15 +19,15 @@ public class Guild
 		{
 			while (DateTime.UtcNow.Subtract(this.MusicInstance.AloneTime).Minutes != 5 && !this.MusicInstance.AloneCheckCancellationToken.IsCancellationRequested)
 			{
-				await Task.Delay(1000);
+				await Task.Delay(1000, this.MusicInstance.AloneCheckCancellationToken.Token);
 				if (this.MusicInstance == null || this.MusicInstance.GuildConnection == null)
 					return;
 			}
 
 			if (DateTime.UtcNow.Subtract(this.MusicInstance.AloneTime).Minutes == 5 && !this.MusicInstance.AloneCheckCancellationToken.IsCancellationRequested)
 			{
-				await Task.Run(async () => await this.MusicInstance.GuildConnection.DisconnectAsync(), MikuBot._canellationTokenSource.Token);
-				await Task.Delay(500);
+				await Task.Run(async () => await this.MusicInstance.GuildConnection.DisconnectAsync(), this.MusicInstance.AloneCheckCancellationToken.Token);
+				await Task.Delay(500, this.MusicInstance.AloneCheckCancellationToken.Token);
 				this.MusicInstance = null;
 			}
 		}
