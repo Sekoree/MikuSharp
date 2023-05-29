@@ -1,4 +1,4 @@
-﻿using HeyRed.Mime;
+using HeyRed.Mime;
 
 using MikuSharp.Entities;
 using MikuSharp.Utilities;
@@ -33,7 +33,7 @@ internal class Fun : ApplicationCommandsModule
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
 		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}"));
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.message));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.Message));
 
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"clyde.png", img);
@@ -53,11 +53,11 @@ internal class Fun : ApplicationCommandsModule
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
 		var dc = JsonConvert.DeserializeObject<DogCeo>(await ctx.Client.RestClient.GetStringAsync("https://dog.ceo/api/breeds/image/random"));
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(dc.message)));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(dc.Message)));
 		var em = new DiscordEmbedBuilder();
 		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
 		em.WithFooter("by dog.ceo", "https://dog.ceo/img/favicon.png");
-		em.WithDescription($"[Full Image]({dc.message})");
+		em.WithDescription($"[Full Image]({dc.Message})");
 
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);

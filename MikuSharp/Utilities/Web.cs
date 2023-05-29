@@ -29,7 +29,7 @@ public static class Web
 	{
 		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", MikuBot.Config.KsoftSiToken);
 		var v = JsonConvert.DeserializeObject<KsoftSiRanImg>(await client.GetStringAsync("https://api.ksoft.si/images/random-image?tag=hentai_gif&nsfw=true"));
-		var imgBytes = await client.GetByteArrayAsync(Other.resizeLink(v.url));
+		var imgBytes = await client.GetByteArrayAsync(Other.resizeLink(v.Url));
 		var img = new MemoryStream(imgBytes)
 		{
 			Position = 0
@@ -48,7 +48,7 @@ public static class Web
 	public static async Task<NekoBot> GetNekobotAsync(this HttpClient client, string url)
 	{
 		var dl = JsonConvert.DeserializeObject<NekoBot>(await client.GetStringAsync(url));
-		var imgBytes = await client.GetByteArrayAsync(Other.resizeLink(dl.message));
+		var imgBytes = await client.GetByteArrayAsync(Other.resizeLink(dl.Message));
 		var str = new MemoryStream(imgBytes)
 		{
 			Position = 0

@@ -1,7 +1,10 @@
-﻿namespace MikuSharp.Entities;
+namespace MikuSharp.Entities;
 
 public class MeekMoe
 {
-	public string url { get; set; }
-	public string creator { get; set; }
+	[JsonProperty("url")]
+	public string Url { get; set; }
+
+	[JsonProperty("creator")]
+	public string Creator { get; set; }
 }

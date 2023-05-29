@@ -1,9 +1,16 @@
-﻿namespace MikuSharp.Entities;
+namespace MikuSharp.Entities;
 
 public class KsoftSiRanImg : Img_Data
 {
-	public string url { get; set; }
-	public string snowflake { get; set; }
-	public bool nsfw { get; set; }
-	public string tag { get; set; }
+	[JsonProperty("url")]
+	public string Url { get; set; }
+
+	[JsonProperty("snowflake")]
+	public string Snowflake { get; set; }
+
+	[JsonProperty("nsfw")]
+	public bool IsNsfw { get; set; }
+
+	[JsonProperty("tag")]
+	public string Tag { get; set; }
 }
