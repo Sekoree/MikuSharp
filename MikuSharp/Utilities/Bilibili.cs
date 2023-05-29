@@ -4,38 +4,49 @@ namespace MikuSharp.Utilities;
 
 public static class Bilibili
 {
-	public static async Task<MemoryStream> GetBilibiliAsync(this InteractionContext ctx, string s, ulong msg_id)
+	public static async Task<MemoryStream> GetBilibiliAsync(this InteractionContext ctx, string songId, ulong messageId)
 	{
 		try
 		{
-			await ctx.EditFollowupAsync(msg_id, new DiscordWebhookBuilder().WithContent("Downloading video(this may take up to 5 min)"));
-			YoutubeDL youtubeDl = OperatingSystem.IsLinux() ? new() : new(@"youtube-dl.exe");
-			youtubeDl.Options.FilesystemOptions.Output = $@"{s}.mp4";
+			await ctx.EditFollowupAsync(messageId, new DiscordWebhookBuilder().WithContent("Downloading video (this may take up to 5 minutes)"));
+
+			string youtubeDlPath = OperatingSystem.IsLinux() ? "youtube-dl" : "youtube-dl.exe";
+			string ffmpegPath = OperatingSystem.IsLinux() ? "ffmpeg" : "ffmpeg.exe";
+			string outputFilePath = $@"{songId}.mp4";
+			string audioFilePath = $@"{songId}.mp3";
+
+			var youtubeDl = new YoutubeDL(youtubeDlPath);
+			youtubeDl.Options.FilesystemOptions.Output = outputFilePath;
 			youtubeDl.Options.PostProcessingOptions.ExtractAudio = true;
-			youtubeDl.Options.PostProcessingOptions.FfmpegLocation = OperatingSystem.IsLinux() ? @"ffmpeg" : @"ffmpeg.exe";
+			youtubeDl.Options.PostProcessingOptions.FfmpegLocation = ffmpegPath;
 			youtubeDl.Options.PostProcessingOptions.AudioFormat = NYoutubeDL.Helpers.Enums.AudioFormat.mp3;
 			youtubeDl.Options.PostProcessingOptions.AddMetadata = true;
 			youtubeDl.Options.PostProcessingOptions.KeepVideo = false;
-			youtubeDl.StandardOutputEvent += (e, f) =>
+
+			youtubeDl.StandardOutputEvent += (sender, output) =>
 			{
-				ctx.Client.Logger.LogDebug("{data}", f);
+				ctx.Client.Logger.LogDebug("{data}", output);
 			};
-			youtubeDl.StandardErrorEvent += (e, f) =>
+
+			youtubeDl.StandardErrorEvent += (sender, error) =>
 			{
-				ctx.Client.Logger.LogDebug("{data}", f);
+				ctx.Client.Logger.LogDebug("{data}", error);
 			};
-			youtubeDl.VideoUrl = "https://www.bilibili.com/video/" + s;
+
+			youtubeDl.VideoUrl = "https://www.bilibili.com/video/" + songId;
 			await youtubeDl.DownloadAsync();
-			var ms = new MemoryStream();
-			if (File.Exists($@"{s}.mp3"))
+
+			if (File.Exists(audioFilePath))
 			{
-				var song = File.Open($@"{s}.mp3", FileMode.Open);
-				await song.CopyToAsync(ms);
+				using var audioFile = File.Open(audioFilePath, FileMode.Open);
+				var ms = new MemoryStream();
+				await audioFile.CopyToAsync(ms);
 				ms.Position = 0;
-				song.Close();
-				File.Delete($@"{s}.mp3");
+				File.Delete(audioFilePath);
+				return ms;
 			}
-			return ms;
+			else
+				return null;
 		}
 		catch (Exception ex)
 		{
