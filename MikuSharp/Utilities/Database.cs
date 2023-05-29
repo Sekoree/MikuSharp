@@ -80,11 +80,11 @@ public class Database
 		foreach (var qi in queueNow)
 		{
 			var addDateParamName = $"adddate{i}";
-			insertCmdBuilder.Append($"INSERT INTO queues VALUES ({i}, @guild, '{qi.addedBy}', '{qi.track.TrackString}', @{addDateParamName});");
+			insertCmdBuilder.Append($"INSERT INTO queues VALUES ({i}, @guild, '{qi.AddedBy}', '{qi.Track.TrackString}', @{addDateParamName});");
 
 			var addDateParam = new NpgsqlParameter(addDateParamName, NpgsqlDbType.Timestamp)
 			{
-				Value = qi.additionDate.UtcDateTime
+				Value = qi.AdditionDate.UtcDateTime
 			};
 			insertCmdBuilder.Append('@').Append(addDateParamName);
 			insertCmdBuilder.Append(';');
@@ -103,7 +103,7 @@ public class Database
 			var addDateParamName = $"adddate{i}";
 			var addDateParam = new NpgsqlParameter(addDateParamName, NpgsqlDbType.Timestamp)
 			{
-				Value = qi.additionDate.UtcDateTime
+				Value = qi.AdditionDate.UtcDateTime
 			};
 			insertCmd.Parameters.Add(addDateParam);
 			i++;
@@ -141,11 +141,11 @@ public class Database
 		foreach (var qi in queueEntries)
 		{
 			var addDateParamName = $"adddate{i}";
-			insertCmdBuilder.Append($"INSERT INTO queues VALUES ({i}, @guild, '{qi.addedBy}', '{qi.track.TrackString}', @{addDateParamName});");
+			insertCmdBuilder.Append($"INSERT INTO queues VALUES ({i}, @guild, '{qi.AddedBy}', '{qi.Track.TrackString}', @{addDateParamName});");
 
 			var addDateParam = new NpgsqlParameter(addDateParamName, NpgsqlDbType.Timestamp)
 			{
-				Value = qi.additionDate.UtcDateTime
+				Value = qi.AdditionDate.UtcDateTime
 			};
 			insertCmdBuilder.Append('@').Append(addDateParamName);
 			insertCmdBuilder.Append(';');
@@ -164,7 +164,7 @@ public class Database
 			var addDateParamName = $"adddate{i}";
 			var addDateParam = new NpgsqlParameter(addDateParamName, NpgsqlDbType.Timestamp)
 			{
-				Value = qi.additionDate.UtcDateTime
+				Value = qi.AdditionDate.UtcDateTime
 			};
 			insertCmd.Parameters.Add(addDateParam);
 			i++;
@@ -351,7 +351,7 @@ public class Database
 
 		foreach (var entry in entries)
 		{
-			longcmd.AppendLine($"INSERT INTO queues VALUES (@pos, @guild, @user, '{entry.track.TrackString}', @time);");
+			longcmd.AppendLine($"INSERT INTO queues VALUES (@pos, @guild, @user, '{entry.Track.TrackString}', @time);");
 			position++;
 		}
 

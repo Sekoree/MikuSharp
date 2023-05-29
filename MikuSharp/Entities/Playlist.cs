@@ -14,25 +14,25 @@ public class Playlist
 
 	public Playlist(ExtService e, string u, string n, ulong usr, int c, DateTimeOffset crea, DateTimeOffset mody)
 	{
-		ExternalService = e;
-		Url = u;
-		Name = n;
-		UserID = usr;
-		SongCount = c;
-		Creation = crea;
-		Modify = mody;
+		this.ExternalService = e;
+		this.Url = u;
+		this.Name = n;
+		this.UserID = usr;
+		this.SongCount = c;
+		this.Creation = crea;
+		this.Modify = mody;
 	}
 
 	public async Task<List<PlaylistEntry>> GetEntries()
 	{
-		var Entries = new List<PlaylistEntry>(SongCount);
-		if (ExternalService == ExtService.None)
+		var Entries = new List<PlaylistEntry>(this.SongCount);
+		if (this.ExternalService == ExtService.None)
 		{
 			var connString = MikuBot.Config.DbConnectString;
 			var conn = new NpgsqlConnection(connString);
 			await conn.OpenAsync();
-			var cmd2 = new NpgsqlCommand($"SELECT * FROM playlistentries WHERE userid = {UserID} AND playlistname = @pl ORDER BY pos ASC;", conn);
-			cmd2.Parameters.AddWithValue("pl", Name);
+			var cmd2 = new NpgsqlCommand($"SELECT * FROM playlistentries WHERE userid = {this.UserID} AND playlistname = @pl ORDER BY pos ASC;", conn);
+			cmd2.Parameters.AddWithValue("pl", this.Name);
 			var reader = await cmd2.ExecuteReaderAsync();
 			while (await reader.ReadAsync())
 			{
@@ -45,7 +45,7 @@ public class Playlist
 		}
 		else
 		{
-			var trs = await MikuBot.LavalinkNodeConnections.First().Value.ConnectedGuilds.First().Value.GetTracksAsync(new Uri(Url));
+			var trs = await MikuBot.LavalinkNodeConnections.First().Value.ConnectedGuilds.First().Value.GetTracksAsync(new Uri(this.Url));
 			int i = 0;
 			foreach (var t in trs.Tracks)
 			{

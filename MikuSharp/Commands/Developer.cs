@@ -102,7 +102,7 @@ public class Developer : ApplicationCommandsModule
 		{
 			try
 			{
-				await MikuBot.Guilds[guildConnection.Key].musicInstance.usedChannel.SendMessageAsync(new DiscordEmbedBuilder().WithAuthor(ctx.User.UsernameWithDiscriminator, ctx.User.ProfileUrl, ctx.User.AvatarUrl).WithTitle("Developer Notice").WithDescription("⚠️ This music instance was forcefully disconnected by the developers ⚠️\n\nReasons could be:\n- Maintenance\n- Fatal Errors").Build());
+				await MikuBot.Guilds[guildConnection.Key].MusicInstance.CommandChannel.SendMessageAsync(new DiscordEmbedBuilder().WithAuthor(ctx.User.UsernameWithDiscriminator, ctx.User.ProfileUrl, ctx.User.AvatarUrl).WithTitle("Developer Notice").WithDescription("⚠️ This music instance was forcefully disconnected by the developers ⚠️\n\nReasons could be:\n- Maintenance\n- Fatal Errors").Build());
 			}
 			catch (Exception)
 			{ }
@@ -300,13 +300,13 @@ public class EvaluationVariables
 	/// <param name="ctx">The context menu context.</param>
 	public EvaluationVariables(DiscordMessage msg, DiscordClient client, ContextMenuContext ctx)
 	{
-		Client = client;
-		Message = msg;
-		Channel = ctx.Channel;
-		Guild = ctx.Guild;
-		User = ctx.User;
-		Member = ctx.Member;
-		Context = ctx;
+		this.Client = client;
+		this.Message = msg;
+		this.Channel = ctx.Channel;
+		this.Guild = ctx.Guild;
+		this.User = ctx.User;
+		this.Member = ctx.Member;
+		this.Context = ctx;
 	}
 
 	/// <summary>

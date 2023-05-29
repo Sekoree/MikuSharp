@@ -37,9 +37,9 @@ public class Music : ApplicationCommandsModule
 			if (!MikuBot.Guilds.Any(x => x.Key == ctx.Guild.Id))
 				MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
 			var g = MikuBot.Guilds[ctx.Guild.Id];
-			g.musicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
+			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
 			await g.ConditionalConnect(ctx);
-			g.musicInstance.usedChannel = ctx.Channel;
+			g.MusicInstance.CommandChannel = ctx.Channel;
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Heya {ctx.Member.Mention}!"));
 		}
 
@@ -48,20 +48,20 @@ public class Music : ApplicationCommandsModule
 		{
 			await ctx.DeferAsync(true);
 			var g = MikuBot.Guilds[ctx.Guild.Id];
-			if (g.musicInstance == null)
+			if (g.MusicInstance == null)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("I'm not in a voice channel"));
 				return;
 			}
-			g.musicInstance.playstate = Playstate.NotPlaying;
+			g.MusicInstance.Playstate = Playstate.NotPlaying;
 			try
 			{
 				if (keep)
-					await g.musicInstance.guildConnection.StopAsync();
-				await g.musicInstance.guildConnection.DisconnectAsync();
+					await g.MusicInstance.GuildConnection.StopAsync();
+				await g.MusicInstance.GuildConnection.DisconnectAsync();
 				if (!keep)
 					await Database.ClearQueueAsync(ctx.Guild);
-				g.musicInstance = null;
+				g.MusicInstance = null;
 			}
 			catch (Exception)
 			{ }
@@ -101,16 +101,16 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (await g.IsNotConnected(ctx))
 				return;
-			if (g.musicInstance.playstate != Playstate.Playing && g.musicInstance.playstate != Playstate.Paused)
+			if (g.MusicInstance.Playstate != Playstate.Playing && g.MusicInstance.Playstate != Playstate.Paused)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("I don't play anything right now"));
 				return;
 			}
-			g.musicInstance.usedChannel = ctx.Channel;
+			g.MusicInstance.CommandChannel = ctx.Channel;
 			var ts = TimeSpan.FromSeconds(position);
-			await g.musicInstance.guildConnection.SeekAsync(ts);
+			await g.MusicInstance.GuildConnection.SeekAsync(ts);
 			var pos = ts.Hours < 1 ? ts.ToString(@"mm\:ss") : ts.ToString(@"hh\:mm\:ss");
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Seeked {g.musicInstance.currentSong.track.Title} to {pos}"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Seeked {g.MusicInstance.CurrentSong.Track.Title} to {pos}"));
 		}
 
 		[SlashCommand("play", "Play or queue a song")]
@@ -124,9 +124,9 @@ public class Music : ApplicationCommandsModule
 			if (!MikuBot.Guilds.Any(x => x.Key == ctx.Guild.Id))
 				MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
 			var g = MikuBot.Guilds[ctx.Guild.Id];
-			g.musicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
+			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
 			var curq = await Database.GetQueueAsync(ctx.Guild);
-			if (curq.Count != 0 && g.musicInstance.playstate == Playstate.NotPlaying)
+			if (curq.Count != 0 && g.MusicInstance.Playstate == Playstate.NotPlaying)
 			{
 				var inter = ctx.Client.GetInteractivity();
 				List<DiscordButtonComponent> buttons = new(2)
@@ -146,8 +146,8 @@ public class Music : ApplicationCommandsModule
 					await hmm.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 					buttons.ForEach(x => x.Disable());
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Restored").AddComponents(buttons));
-					await g.musicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
-					await g.musicInstance.PlaySong();
+					await g.MusicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
+					await g.MusicInstance.PlaySong();
 					return;
 				}
 				else
@@ -166,11 +166,11 @@ public class Music : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Error: No song or file choosen"));
 				return;
 			}
-			g.musicInstance.usedChannel = ctx.Channel;
+			g.MusicInstance.CommandChannel = ctx.Channel;
 			name_or_url = music_file.SearchUrlOrAttachment(name_or_url);
-			var oldState = g.musicInstance.playstate;
+			var oldState = g.MusicInstance.Playstate;
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Trying to play/search {name_or_url}..."));
-			var q = await g.musicInstance.QueueSong(name_or_url, ctx);
+			var q = await g.MusicInstance.QueueSong(name_or_url, ctx);
 			if (q == null)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Error: Song not found"));
@@ -210,7 +210,7 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (pos < 1)
 				return;
-			g.musicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
+			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
 
 			await g.ConditionalConnect(ctx);
 
@@ -219,10 +219,10 @@ public class Music : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Error: No song or file choosen"));
 				return;
 			}
-			g.musicInstance.usedChannel = ctx.Channel;
+			g.MusicInstance.CommandChannel = ctx.Channel;
 			name_or_url = music_file.SearchUrlOrAttachment(name_or_url);
-			var oldState = g.musicInstance.playstate;
-			var q = await g.musicInstance.QueueSong(name_or_url, ctx, pos);
+			var oldState = g.MusicInstance.Playstate;
+			var q = await g.MusicInstance.QueueSong(name_or_url, ctx, pos);
 			if (q == null)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Error: Song not found"));
@@ -261,29 +261,29 @@ public class Music : ApplicationCommandsModule
 			var queue = await Database.GetQueueAsync(ctx.Guild);
 			if (await g.IsNotConnected(ctx))
 				return;
-			g.musicInstance.usedChannel = ctx.Channel;
-			g.musicInstance.guildConnection.PlaybackFinished -= Lavalink.LavalinkTrackFinish;
-			if (g.musicInstance.currentSong != null)
+			g.MusicInstance.CommandChannel = ctx.Channel;
+			g.MusicInstance.GuildConnection.PlaybackFinished -= Lavalink.LavalinkTrackFinish;
+			if (g.MusicInstance.CurrentSong != null)
 			{
-				if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All)
-					await Database.RemoveFromQueueAsync(g.musicInstance.currentSong.position, ctx.Guild);
+				if (g.MusicInstance.RepeatMode != RepeatMode.On && g.MusicInstance.RepeatMode != RepeatMode.All)
+					await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, ctx.Guild);
 				if (lastPlayedSongs.Count == 0)
-					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-				else if (lastPlayedSongs[0]?.track.Uri != g.musicInstance.currentSong.track.Uri)
-					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.musicInstance.currentSong.track.TrackString);
+					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.MusicInstance.CurrentSong.Track.TrackString);
+				else if (lastPlayedSongs[0]?.Track.Uri != g.MusicInstance.CurrentSong.Track.Uri)
+					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.MusicInstance.CurrentSong.Track.TrackString);
 			}
 			queue = await Database.GetQueueAsync(ctx.Guild);
-			g.musicInstance.lastSong = g.musicInstance.currentSong;
-			g.musicInstance.currentSong = null;
+			g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
+			g.MusicInstance.CurrentSong = null;
 			if (queue.Count != 0)
-				await g.musicInstance.PlaySong();
+				await g.MusicInstance.PlaySong();
 			else
 			{
-				g.musicInstance.playstate = Playstate.NotPlaying;
-				await g.musicInstance.guildConnection.StopAsync();
+				g.MusicInstance.Playstate = Playstate.NotPlaying;
+				await g.MusicInstance.GuildConnection.StopAsync();
 			}
-			if (g.musicInstance.lastSong != null)
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Skipped:**\n{g.musicInstance.lastSong.track.Title}").Build()));
+			if (g.MusicInstance.LastSong != null)
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Skipped:**\n{g.MusicInstance.LastSong.Track.Title}").Build()));
 			else
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Continued!**").Build()));
 		}
@@ -296,8 +296,8 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (await g.IsNotConnected(ctx))
 				return;
-			g.musicInstance.usedChannel = ctx.Channel;
-			await Task.Run(g.musicInstance.guildConnection.StopAsync, MikuBot._cts.Token);
+			g.MusicInstance.CommandChannel = ctx.Channel;
+			await Task.Run(g.MusicInstance.GuildConnection.StopAsync, MikuBot._cts.Token);
 			var cmd_id = ctx.Client.GetApplicationCommands().GlobalCommands.First(x => x.Name == "music").Id;
 			await ctx.EditResponseAsync(builder: new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Stopped** (use </music playback resume:{cmd_id}> to start playback again)").Build()));
 		}
@@ -312,10 +312,10 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (await g.IsNotConnected(ctx))
 				return;
-			g.musicInstance.usedChannel = ctx.Channel;
+			g.MusicInstance.CommandChannel = ctx.Channel;
 			if (vol > 150)
 				vol = 150;
-			await g.musicInstance.guildConnection.SetVolumeAsync(vol);
+			await g.MusicInstance.GuildConnection.SetVolumeAsync(vol);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Set volume to {vol}**").Build()));
 		}
 
@@ -327,11 +327,11 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (await g.IsNotConnected(ctx))
 				return;
-			g.musicInstance.usedChannel = ctx.Channel;
-			if (g.musicInstance.playstate == Playstate.Playing)
+			g.MusicInstance.CommandChannel = ctx.Channel;
+			if (g.MusicInstance.Playstate == Playstate.Playing)
 			{
-				await g.musicInstance.guildConnection.PauseAsync();
-				g.musicInstance.playstate = Playstate.Paused;
+				await g.MusicInstance.GuildConnection.PauseAsync();
+				g.MusicInstance.Playstate = Playstate.Paused;
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Paused**").Build()));
 			}
 			else
@@ -346,16 +346,16 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (await g.IsNotConnected(ctx))
 				return;
-			g.musicInstance.usedChannel = ctx.Channel;
-			if (g.musicInstance.playstate == Playstate.Stopped)
+			g.MusicInstance.CommandChannel = ctx.Channel;
+			if (g.MusicInstance.Playstate == Playstate.Stopped)
 			{
-				await g.musicInstance.PlaySong();
+				await g.MusicInstance.PlaySong();
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Started Playback**").Build()));
 			}
 			else
 			{
-				await g.musicInstance.guildConnection.ResumeAsync();
-				g.musicInstance.playstate = Playstate.Playing;
+				await g.MusicInstance.GuildConnection.ResumeAsync();
+				g.MusicInstance.Playstate = Playstate.Playing;
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Resumed**").Build()));
 			}
 		}
@@ -388,23 +388,23 @@ public class Music : ApplicationCommandsModule
 					totalP++;
 				var emb = new DiscordEmbedBuilder();
 				List<Page> Pages = new();
-				if (g.musicInstance.repeatMode == RepeatMode.All)
+				if (g.MusicInstance.RepeatMode == RepeatMode.All)
 				{
-					songAmount = g.musicInstance.repeatAllPos;
+					songAmount = g.MusicInstance.RepeatAllPosition;
 					foreach (var Track in queue)
 					{
 						if (songsPerPage == 0 && currentPage == 1)
 						{
 							emb.WithTitle("Current Queue");
 							g.GetPlayingState(out var time1, out var time2);
-							emb.AddField(new DiscordEmbedField($"**{songAmount}.{g.musicInstance.currentSong.track.Title.Replace("*", "").Replace("|", "")}** by {g.musicInstance.currentSong.track.Author.Replace("*", "").Replace("|", "")} [{time1}/{time2}]",
-								$"Requested by <@{g.musicInstance.currentSong.addedBy}> [Link]({g.musicInstance.currentSong.track.Uri.AbsoluteUri})\nˉˉˉˉˉ"));
+							emb.AddField(new DiscordEmbedField($"**{songAmount}.{g.MusicInstance.CurrentSong.Track.Title.Replace("*", "").Replace("|", "")}** by {g.MusicInstance.CurrentSong.Track.Author.Replace("*", "").Replace("|", "")} [{time1}/{time2}]",
+								$"Requested by <@{g.MusicInstance.CurrentSong.AddedBy}> [Link]({g.MusicInstance.CurrentSong.Track.Uri.AbsoluteUri})\nˉˉˉˉˉ"));
 						}
 						else
 						{
 							queue.ElementAt(songAmount).GetPlayingState(out var time);
-							emb.AddField(new DiscordEmbedField($"**{songAmount}.{queue.ElementAt(songAmount).track.Title.Replace("*", "").Replace("|", "")}** by {queue.ElementAt(songAmount).track.Author.Replace("*", "").Replace("|", "")} [{time}]",
-								$"Requested by <@{queue.ElementAt(songAmount).addedBy}> [Link]({queue.ElementAt(songAmount).track.Uri.AbsoluteUri})"));
+							emb.AddField(new DiscordEmbedField($"**{songAmount}.{queue.ElementAt(songAmount).Track.Title.Replace("*", "").Replace("|", "")}** by {queue.ElementAt(songAmount).Track.Author.Replace("*", "").Replace("|", "")} [{time}]",
+								$"Requested by <@{queue.ElementAt(songAmount).AddedBy}> [Link]({queue.ElementAt(songAmount).Track.Uri.AbsoluteUri})"));
 						}
 						songsPerPage++;
 						songAmount++;
@@ -413,16 +413,16 @@ public class Music : ApplicationCommandsModule
 						if (songsPerPage == 5)
 						{
 							songsPerPage = 0;
-							emb.AddField(new DiscordEmbedField("Playback options", g.musicInstance.GetPlaybackOptions()));
+							emb.AddField(new DiscordEmbedField("Playback options", g.MusicInstance.GetPlaybackOptions()));
 							emb.WithFooter($"Page {currentPage}/{totalP}");
 							Pages.Add(new Page(embed: emb));
 							emb.ClearFields();
 							emb.WithTitle("more™");
 							currentPage++;
 						}
-						if (songAmount == g.musicInstance.repeatAllPos)
+						if (songAmount == g.MusicInstance.RepeatAllPosition)
 						{
-							emb.AddField(new DiscordEmbedField("Playback options", g.musicInstance.GetPlaybackOptions()));
+							emb.AddField(new DiscordEmbedField("Playback options", g.MusicInstance.GetPlaybackOptions()));
 							emb.WithFooter($"Page {currentPage}/{totalP}");
 							Pages.Add(new Page(embed: emb));
 							emb.ClearFields();
@@ -437,14 +437,14 @@ public class Music : ApplicationCommandsModule
 						{
 							emb.WithTitle("Current Queue");
 							g.GetPlayingState(out var time1, out var time2);
-							emb.AddField(new DiscordEmbedField($"**{g.musicInstance.currentSong.track.Title.Replace("*", "").Replace("|", "")}** by {g.musicInstance.currentSong.track.Author.Replace("*", "").Replace("|", "")} [{time1}/{time2}]",
-								$"Requested by <@{g.musicInstance.currentSong.addedBy}> [Link]({g.musicInstance.currentSong.track.Uri.AbsoluteUri})\nˉˉˉˉˉ"));
+							emb.AddField(new DiscordEmbedField($"**{g.MusicInstance.CurrentSong.Track.Title.Replace("*", "").Replace("|", "")}** by {g.MusicInstance.CurrentSong.Track.Author.Replace("*", "").Replace("|", "")} [{time1}/{time2}]",
+								$"Requested by <@{g.MusicInstance.CurrentSong.AddedBy}> [Link]({g.MusicInstance.CurrentSong.Track.Uri.AbsoluteUri})\nˉˉˉˉˉ"));
 						}
 						else
 						{
 							Track.GetPlayingState(out var time);
-							emb.AddField(new DiscordEmbedField($"**{songAmount}.{Track.track.Title.Replace("*", "").Replace("|", "")}** by {Track.track.Author.Replace("*", "").Replace("|", "")} [{time}]",
-								$"Requested by <@{Track.addedBy}> [Link]({Track.track.Uri.AbsoluteUri})"));
+							emb.AddField(new DiscordEmbedField($"**{songAmount}.{Track.Track.Title.Replace("*", "").Replace("|", "")}** by {Track.Track.Author.Replace("*", "").Replace("|", "")} [{time}]",
+								$"Requested by <@{Track.AddedBy}> [Link]({Track.Track.Uri.AbsoluteUri})"));
 						}
 						songsPerPage++;
 						songAmount++;
@@ -452,7 +452,7 @@ public class Music : ApplicationCommandsModule
 						{
 							songsPerPage = 0;
 							emb.WithFooter($"Page {currentPage}/{totalP}");
-							emb.AddField(new DiscordEmbedField("Playback options", g.musicInstance.GetPlaybackOptions()));
+							emb.AddField(new DiscordEmbedField("Playback options", g.MusicInstance.GetPlaybackOptions()));
 							Pages.Add(new Page(embed: emb));
 							emb.ClearFields();
 							emb.WithTitle("more™");
@@ -461,7 +461,7 @@ public class Music : ApplicationCommandsModule
 						if (songAmount == queue.Count)
 						{
 							emb.WithFooter($"Page {currentPage}/{totalP}");
-							emb.AddField(new DiscordEmbedField("Playback options", g.musicInstance.GetPlaybackOptions()));
+							emb.AddField(new DiscordEmbedField("Playback options", g.MusicInstance.GetPlaybackOptions()));
 							Pages.Add(new Page(embed: emb));
 							emb.ClearFields();
 						}
@@ -469,7 +469,7 @@ public class Music : ApplicationCommandsModule
 				}
 				if (currentPage == 1)
 				{
-					emb.AddField(new DiscordEmbedField("Playback options", g.musicInstance.GetPlaybackOptions()));
+					emb.AddField(new DiscordEmbedField("Playback options", g.MusicInstance.GetPlaybackOptions()));
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(Pages.First().Embed));
 					return;
 				}
@@ -496,10 +496,10 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (await g.IsNotConnected(ctx))
 				return;
-			g.musicInstance.usedChannel = ctx.Channel;
+			g.MusicInstance.CommandChannel = ctx.Channel;
 			await Database.ClearQueueAsync(ctx.Guild);
-			if (g.musicInstance.currentSong != null)
-				await Database.AddToQueueAsync(ctx.Guild, g.musicInstance.currentSong.addedBy, g.musicInstance.currentSong.track.TrackString);
+			if (g.MusicInstance.CurrentSong != null)
+				await Database.AddToQueueAsync(ctx.Guild, g.MusicInstance.CurrentSong.AddedBy, g.MusicInstance.CurrentSong.Track.TrackString);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Cleared queue!**").Build()));
 		}
 
@@ -516,12 +516,12 @@ public class Music : ApplicationCommandsModule
 			var queue = await Database.GetQueueAsync(ctx.Guild);
 			if (await g.IsNotConnected(ctx))
 				return;
-			g.musicInstance.usedChannel = ctx.Channel;
+			g.MusicInstance.CommandChannel = ctx.Channel;
 			if (old_pos < 1 || new_pos < 1 || old_pos == new_pos || new_pos >= queue.Count)
 				return;
 			var oldSong = queue[old_pos];
 			await Database.MoveQueueItemsAsync(ctx.Guild, old_pos, new_pos);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Moved**:\n **{oldSong.track.Title}**\nby {oldSong.track.Author}\n from position **{old_pos}** to **{new_pos}**!").Build()));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Moved**:\n **{oldSong.Track.Title}**\nby {oldSong.Track.Author}\n from position **{old_pos}** to **{new_pos}**!").Build()));
 		}
 
 		[SlashCommand("remove", "Removes a name_or_url from queue")]
@@ -535,10 +535,10 @@ public class Music : ApplicationCommandsModule
 			var queue = await Database.GetQueueAsync(ctx.Guild);
 			if (await g.IsNotConnected(ctx))
 				return;
-			g.musicInstance.usedChannel = ctx.Channel;
+			g.MusicInstance.CommandChannel = ctx.Channel;
 			var old = queue[position];
 			await Database.RemoveFromQueueAsync(position, ctx.Guild);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Removed:\n{old.track.Title}**\nby {old.track.Author}").Build()));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Removed:\n{old.Track.Title}**\nby {old.Track.Author}").Build()));
 		}
 	}
 
@@ -554,9 +554,9 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (await g.IsNotConnected(ctx))
 				return;
-			g.musicInstance.usedChannel = ctx.Channel;
-			g.musicInstance.repeatMode = mode;
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"Set repeat mode to:\n **{g.musicInstance.repeatMode}**").Build()));
+			g.MusicInstance.CommandChannel = ctx.Channel;
+			g.MusicInstance.RepeatMode = mode;
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"Set repeat mode to:\n **{g.MusicInstance.RepeatMode}**").Build()));
 		}
 
 		[SlashCommand("shuffle", "Play the queue in shuffle mode")]
@@ -566,9 +566,9 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (await g.IsNotConnected(ctx))
 				return;
-			g.musicInstance.usedChannel = ctx.Channel;
-			g.musicInstance.shuffleMode = g.musicInstance.shuffleMode == ShuffleMode.Off ? ShuffleMode.On : ShuffleMode.Off;
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"Set shuffle mode to:\n**{g.musicInstance.shuffleMode}**").Build()));
+			g.MusicInstance.CommandChannel = ctx.Channel;
+			g.MusicInstance.ShuffleMode = g.MusicInstance.ShuffleMode == ShuffleMode.Off ? ShuffleMode.On : ShuffleMode.Off;
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"Set shuffle mode to:\n**{g.MusicInstance.ShuffleMode}**").Build()));
 		}
 	}
 
@@ -635,7 +635,7 @@ public class Music : ApplicationCommandsModule
 				foreach (var Track in lastPlayedSongs)
 				{
 					Track.GetPlayingState(out var time);
-					emb.AddField(new DiscordEmbedField($"{songAmount + 1}.{Track.track.Title.Replace("*", "").Replace("|", "")}", $"by {Track.track.Author.Replace("*", "").Replace("|", "")} [{time}] [Link]({Track.track.Uri})"));
+					emb.AddField(new DiscordEmbedField($"{songAmount + 1}.{Track.Track.Title.Replace("*", "").Replace("|", "")}", $"by {Track.Track.Author.Replace("*", "").Replace("|", "")} [{time}] [Link]({Track.Track.Uri})"));
 					songsPerPage++;
 					songAmount++;
 					if (songsPerPage == 10)

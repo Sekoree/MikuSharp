@@ -125,9 +125,9 @@ public class PlaylistDB
 		string insertCmdText = "";
 		foreach (var entry in entries)
 		{
-			string additionDate = entry.additionDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
-			string modifyDate = entry.modifyDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
-			insertCmdText += $"INSERT INTO playlistentries VALUES ({position}, @playlistName, @userId, '{entry.track.TrackString}', '{additionDate}', '{modifyDate}');";
+			string additionDate = entry.AdditionDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+			string modifyDate = entry.ModifyDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+			insertCmdText += $"INSERT INTO playlistentries VALUES ({position}, @playlistName, @userId, '{entry.Track.TrackString}', '{additionDate}', '{modifyDate}');";
 			position++;
 		}
 
@@ -156,9 +156,9 @@ public class PlaylistDB
 		string insertCmdText = "";
 		foreach (var entry in entries)
 		{
-			string additionDate = entry.additionDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
-			string modifyDate = entry.modifyDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
-			insertCmdText += $"INSERT INTO playlistentries VALUES ({entry.Position}, @playlistName, @userId, '{entry.track.TrackString}', '{additionDate}', '{modifyDate}');";
+			string additionDate = entry.AdditionDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+			string modifyDate = entry.ModifyDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+			insertCmdText += $"INSERT INTO playlistentries VALUES ({entry.Position}, @playlistName, @userId, '{entry.Track.TrackString}', '{additionDate}', '{modifyDate}');";
 		}
 
 		var cmdInsert = new NpgsqlCommand(insertCmdText, conn);

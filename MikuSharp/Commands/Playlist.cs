@@ -1,4 +1,4 @@
-﻿using MikuSharp.Attributes;
+using MikuSharp.Attributes;
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 using MikuSharp.Utilities;
@@ -33,7 +33,7 @@ public class Playlists : ApplicationCommandsModule
 			await PlaylistDB.AddPlaylist(name, ctx.Member.Id);
 			foreach (var e in q)
 			{
-				await PlaylistDB.AddEntry(name, ctx.Member.Id, e.track.TrackString);
+				await PlaylistDB.AddEntry(name, ctx.Member.Id, e.Track.TrackString);
 			}
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Queue Copy").WithDescription("Queue was saved to new playlist -> " + name).Build()));
 		}
@@ -207,12 +207,12 @@ public class Playlists : ApplicationCommandsModule
 			foreach (var Track in queue)
 			{
 				string time = "";
-				if (Track.track.Length.Hours < 1)
-					time = Track.track.Length.ToString(@"mm\:ss");
+				if (Track.Track.Length.Hours < 1)
+					time = Track.Track.Length.ToString(@"mm\:ss");
 				else
-					time = Track.track.Length.ToString(@"hh\:mm\:ss");
-				emb.AddField(new DiscordEmbedField($"**{songAmount + 1}.{Track.track.Title.Replace("*", "").Replace("|", "")}** by {Track.track.Author.Replace("*", "").Replace("|", "")} [{time}]",
-					$"Added on {Track.additionDate} [Link]({Track.track.Uri.AbsoluteUri})"));
+					time = Track.Track.Length.ToString(@"hh\:mm\:ss");
+				emb.AddField(new DiscordEmbedField($"**{songAmount + 1}.{Track.Track.Title.Replace("*", "").Replace("|", "")}** by {Track.Track.Author.Replace("*", "").Replace("|", "")} [{time}]",
+					$"Added on {Track.AdditionDate} [Link]({Track.Track.Uri.AbsoluteUri})"));
 				songsPerPage++;
 				songAmount++;
 				emb.WithTitle($"Songs in {playlist}");
@@ -335,12 +335,12 @@ public class Playlists : ApplicationCommandsModule
 				MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
 			}
 			var g = MikuBot.Guilds[ctx.Guild.Id];
-			g.musicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
+			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
 			await g.ConditionalConnect(ctx);
-			g.musicInstance.usedChannel = ctx.Channel;
+			g.MusicInstance.CommandChannel = ctx.Channel;
 			await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, p);
-			if (g.musicInstance.guildConnection.IsConnected && (g.musicInstance.playstate == Playstate.NotPlaying || g.musicInstance.playstate == Playstate.Stopped))
-				await g.musicInstance.PlaySong();
+			if (g.MusicInstance.GuildConnection.IsConnected && (g.MusicInstance.Playstate == Playstate.NotPlaying || g.MusicInstance.Playstate == Playstate.Stopped))
+				await g.MusicInstance.PlaySong();
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Play Playlist").WithDescription($"Playing playlist/Added to queue!").Build()));
 		}
 	}
@@ -444,7 +444,7 @@ public class Playlists : ApplicationCommandsModule
 			if (e[newpos] == null | e[oldpos] == null)
 				return;
 			await PlaylistDB.MoveListItems(ctx.Guild, playlist, ctx.Member.Id, oldpos, newpos);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Move Song").WithDescription($"Moved entry -> {e[oldpos].track.Title} to position {newpos}!").Build()));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Move Song").WithDescription($"Moved entry -> {e[oldpos].Track.Title} to position {newpos}!").Build()));
 		}
 
 		[SlashCommand("remove", "Remove a song from a playlist")]
@@ -469,7 +469,7 @@ public class Playlists : ApplicationCommandsModule
 			var ents = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
 			var en = await ents.GetEntries();
 			await PlaylistDB.RemoveFromList(ctx.Guild, pos, playlist, ctx.Member.Id);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Remove Song").WithDescription($"Entry removed! -> {en[pos].track.Title}").Build()));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Remove Song").WithDescription($"Entry removed! -> {en[pos].Track.Title}").Build()));
 		}
 	}
 

@@ -175,13 +175,13 @@ internal class MikuBot : IDisposable
 			ResponseBehavior = InteractionResponseBehavior.Ignore
 		});
 
-		ApplicationCommandsModules = await ShardedClient.UseApplicationCommandsAsync(new()
+		this.ApplicationCommandsModules = await ShardedClient.UseApplicationCommandsAsync(new()
 		{
 			DebugStartup = false,
 			ManualOverride = true
 		});
 
-		CommandsNextModules = await ShardedClient.UseCommandsNextAsync(new()
+		this.CommandsNextModules = await ShardedClient.UseCommandsNextAsync(new()
 		{
 			CaseSensitive = true,
 			EnableMentionPrefix = true,
@@ -200,10 +200,10 @@ internal class MikuBot : IDisposable
 			Password = Config.LavaConfig.Password
 		};
 
-		LavalinkModules = await ShardedClient.UseLavalinkAsync();
+		this.LavalinkModules = await ShardedClient.UseLavalinkAsync();
 
 		RegisterEvents();
-		RegisterCommands();
+		this.RegisterCommands();
 	}
 
 	/// <summary>
@@ -276,8 +276,8 @@ internal class MikuBot : IDisposable
 	{
 		while (true)
 		{
-			var al = Guilds.Where(x => x.Value?.musicInstance != null);
-			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.musicInstance.guildConnection?.IsConnected == true).Count());
+			var al = Guilds.Where(x => x.Value?.MusicInstance != null);
+			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.MusicInstance.GuildConnection?.IsConnected == true).Count());
 			await Task.Delay(TimeSpan.FromMinutes(15));
 		}
 	}
@@ -322,7 +322,7 @@ internal class MikuBot : IDisposable
 
 		internal MotionGuildCount(int count)
 		{
-			Guilds = count;
+			this.Guilds = count;
 		}
 	}
 
@@ -364,20 +364,20 @@ internal class MikuBot : IDisposable
 	internal void RegisterCommands()
 	{
 		// Nsfw stuff needs to be hidden, that's why we use commands next
-		CommandsNextModules.RegisterCommands<Commands.NSFW>();
+		this.CommandsNextModules.RegisterCommands<Commands.NSFW>();
 
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Action>();
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Developer>();
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Fun>();
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.About>();
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Moderation>();
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Music>();
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Playlists>();
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Utility>();
-		ApplicationCommandsModules.RegisterGlobalCommands<Commands.Weeb>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Action>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Developer>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Fun>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.About>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Moderation>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Music>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Playlists>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Utility>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Weeb>();
 
 		// Smolcar command, only guild command
-		ApplicationCommandsModules.RegisterGuildCommands<Commands.MikuGuild>(483279257431441410);
+		this.ApplicationCommandsModules.RegisterGuildCommands<Commands.MikuGuild>(483279257431441410);
 	}
 
 	/// <summary>
@@ -389,13 +389,13 @@ internal class MikuBot : IDisposable
 		await WeebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
 		await ShardedClient.StartAsync();
 		await Task.Delay(5000);
-		foreach (var lavalinkShard in LavalinkModules)
+		foreach (var lavalinkShard in this.LavalinkModules)
 		{
 			var LCon = await lavalinkShard.Value.ConnectAsync(LavalinkConfig);
 			LavalinkNodeConnections.Add(lavalinkShard.Key, LCon);
 		}
-		SetActivityThread = Task.Run(SetActivity, _cts.Token);
-		ConnectionThread = Task.Run(ShowConnections, _cts.Token);
+		this.SetActivityThread = Task.Run(this.SetActivity, _cts.Token);
+		this.ConnectionThread = Task.Run(this.ShowConnections, _cts.Token);
 #if !DEBUG
 		DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
 		BotlistThread = Task.Run(UpdateBotList, _cts.Token);

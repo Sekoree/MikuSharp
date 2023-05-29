@@ -11,16 +11,16 @@ public class Lavalink
 		{
 			var g = MikuBot.Guilds[e.Player.Guild.Id];
 			var lastPlayedSongs = await Database.GetLastPlayingListAsync(e.Player.Guild);
-			if (g.musicInstance == null)
+			if (g.MusicInstance == null)
 				return;
 			switch (e.Reason)
 			{
 				case TrackEndReason.Stopped:
 				{
-					g.musicInstance.playstate = Playstate.Stopped;
-					g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-					g.musicInstance.lastSong = g.musicInstance.currentSong;
-					g.musicInstance.currentSong = null;
+					g.MusicInstance.Playstate = Playstate.Stopped;
+					g.MusicInstance.GuildConnection.PlaybackFinished -= LavalinkTrackFinish;
+					g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
+					g.MusicInstance.CurrentSong = null;
 					break;
 				}
 				case TrackEndReason.Replaced:
@@ -29,48 +29,48 @@ public class Lavalink
 				}
 				case TrackEndReason.LoadFailed:
 				{
-					await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithTitle("Track failed to play")
-						.WithDescription($"**{g.musicInstance.currentSong.track.Title}**\nby {g.musicInstance.currentSong.track.Author}\n" +
+					await g.MusicInstance.CommandChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithTitle("Track failed to play")
+						.WithDescription($"**{g.MusicInstance.CurrentSong.Track.Title}**\nby {g.MusicInstance.CurrentSong.Track.Author}\n" +
 						$"**Failed to load, Skipping to next track**"));
-					g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-					await Database.RemoveFromQueueAsync(g.musicInstance.currentSong.position, e.Player.Guild);
+					g.MusicInstance.GuildConnection.PlaybackFinished -= LavalinkTrackFinish;
+					await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, e.Player.Guild);
 					if (lastPlayedSongs.Count == 0)
 					{
-						await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
+						await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.MusicInstance.CurrentSong.Track.TrackString);
 					}
-					else if (lastPlayedSongs[0].track.Uri != g.musicInstance.currentSong.track.Uri)
+					else if (lastPlayedSongs[0].Track.Uri != g.MusicInstance.CurrentSong.Track.Uri)
 					{
-						await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
+						await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.MusicInstance.CurrentSong.Track.TrackString);
 					}
-					g.musicInstance.lastSong = g.musicInstance.currentSong;
-					g.musicInstance.currentSong = null;
+					g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
+					g.MusicInstance.CurrentSong = null;
 					var queue = await Database.GetQueueAsync(e.Player.Guild);
 					if (queue.Count != 0)
-						await g.musicInstance.PlaySong();
+						await g.MusicInstance.PlaySong();
 					else
-						g.musicInstance.playstate = Playstate.NotPlaying;
+						g.MusicInstance.Playstate = Playstate.NotPlaying;
 					break;
 				}
 				case TrackEndReason.Finished:
 				{
-					g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-					if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All)
-						await Database.RemoveFromQueueAsync(g.musicInstance.currentSong.position, e.Player.Guild);
+					g.MusicInstance.GuildConnection.PlaybackFinished -= LavalinkTrackFinish;
+					if (g.MusicInstance.RepeatMode != RepeatMode.On && g.MusicInstance.RepeatMode != RepeatMode.All)
+						await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, e.Player.Guild);
 					if (lastPlayedSongs.Count == 0)
 					{
-						await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
+						await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.MusicInstance.CurrentSong.Track.TrackString);
 					}
-					else if (lastPlayedSongs[0].track.Uri != g.musicInstance.currentSong.track.Uri)
+					else if (lastPlayedSongs[0].Track.Uri != g.MusicInstance.CurrentSong.Track.Uri)
 					{
-						await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
+						await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.MusicInstance.CurrentSong.Track.TrackString);
 					}
-					g.musicInstance.lastSong = g.musicInstance.currentSong;
-					g.musicInstance.currentSong = null;
+					g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
+					g.MusicInstance.CurrentSong = null;
 					var queue = await Database.GetQueueAsync(e.Player.Guild);
 					if (queue.Count != 0)
-						await g.musicInstance.PlaySong();
+						await g.MusicInstance.PlaySong();
 					else
-						g.musicInstance.playstate = Playstate.NotPlaying;
+						g.MusicInstance.Playstate = Playstate.NotPlaying;
 					break;
 				}
 			}
