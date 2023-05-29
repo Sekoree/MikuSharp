@@ -1,6 +1,6 @@
-﻿namespace MikuSharp.Enums;
+namespace MikuSharp.Enums;
 
-public enum Playstate : int
+public enum PlayState : int
 {
 	NotPlaying = 0,
 	Playing = 1,

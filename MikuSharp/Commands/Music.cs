@@ -53,7 +53,7 @@ public class Music : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("I'm not in a voice channel"));
 				return;
 			}
-			g.MusicInstance.Playstate = Playstate.NotPlaying;
+			g.MusicInstance.Playstate = PlayState.NotPlaying;
 			try
 			{
 				if (keep)
@@ -101,7 +101,7 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (await g.IsNotConnected(ctx))
 				return;
-			if (g.MusicInstance.Playstate != Playstate.Playing && g.MusicInstance.Playstate != Playstate.Paused)
+			if (g.MusicInstance.Playstate != PlayState.Playing && g.MusicInstance.Playstate != PlayState.Paused)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("I don't play anything right now"));
 				return;
@@ -126,7 +126,7 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
 			var curq = await Database.GetQueueAsync(ctx.Guild);
-			if (curq.Count != 0 && g.MusicInstance.Playstate == Playstate.NotPlaying)
+			if (curq.Count != 0 && g.MusicInstance.Playstate == PlayState.NotPlaying)
 			{
 				var inter = ctx.Client.GetInteractivity();
 				List<DiscordButtonComponent> buttons = new(2)
@@ -177,7 +177,7 @@ public class Music : ApplicationCommandsModule
 				return;
 			}
 			var emb = new DiscordEmbedBuilder();
-			if (oldState == Playstate.Playing)
+			if (oldState == PlayState.Playing)
 			{
 				emb.AddField(new DiscordEmbedField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\n" +
 					$"Requested by {ctx.Member.Mention}"));
@@ -229,7 +229,7 @@ public class Music : ApplicationCommandsModule
 				return;
 			}
 			var emb = new DiscordEmbedBuilder();
-			if (oldState == Playstate.Playing)
+			if (oldState == PlayState.Playing)
 			{
 				emb.AddField(new DiscordEmbedField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\n" +
 					$"Requested by {ctx.Member.Mention}\nAt position: {pos}"));
@@ -279,7 +279,7 @@ public class Music : ApplicationCommandsModule
 				await g.MusicInstance.PlaySong();
 			else
 			{
-				g.MusicInstance.Playstate = Playstate.NotPlaying;
+				g.MusicInstance.Playstate = PlayState.NotPlaying;
 				await g.MusicInstance.GuildConnection.StopAsync();
 			}
 			if (g.MusicInstance.LastSong != null)
@@ -328,10 +328,10 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			if (g.MusicInstance.Playstate == Playstate.Playing)
+			if (g.MusicInstance.Playstate == PlayState.Playing)
 			{
 				await g.MusicInstance.GuildConnection.PauseAsync();
-				g.MusicInstance.Playstate = Playstate.Paused;
+				g.MusicInstance.Playstate = PlayState.Paused;
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Paused**").Build()));
 			}
 			else
@@ -347,7 +347,7 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			if (g.MusicInstance.Playstate == Playstate.Stopped)
+			if (g.MusicInstance.Playstate == PlayState.Stopped)
 			{
 				await g.MusicInstance.PlaySong();
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Started Playback**").Build()));
@@ -355,7 +355,7 @@ public class Music : ApplicationCommandsModule
 			else
 			{
 				await g.MusicInstance.GuildConnection.ResumeAsync();
-				g.MusicInstance.Playstate = Playstate.Playing;
+				g.MusicInstance.Playstate = PlayState.Playing;
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Resumed**").Build()));
 			}
 		}

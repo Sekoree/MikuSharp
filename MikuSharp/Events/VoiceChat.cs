@@ -22,10 +22,10 @@ public class VoiceChat
 			|| e.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
 			&& g.MusicInstance?.GuildConnection?.Channel?.Users.Where(x => !x.IsBot).Count() == 0)
 			{
-				if (g.MusicInstance.Playstate == Playstate.Playing)
+				if (g.MusicInstance.Playstate == PlayState.Playing)
 				{
 					await g.MusicInstance.GuildConnection.PauseAsync();
-					g.MusicInstance.Playstate = Playstate.Paused;
+					g.MusicInstance.Playstate = PlayState.Paused;
 					try
 					{
 						await g.MusicInstance.CommandChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("**Paused** since everyone left the VC, connect back and use m%resume to continue playback otherwise I will disconnect in 5 min").Build());

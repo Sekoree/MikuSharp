@@ -339,7 +339,7 @@ public class Playlists : ApplicationCommandsModule
 			await g.ConditionalConnect(ctx);
 			g.MusicInstance.CommandChannel = ctx.Channel;
 			await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, p);
-			if (g.MusicInstance.GuildConnection.IsConnected && (g.MusicInstance.Playstate == Playstate.NotPlaying || g.MusicInstance.Playstate == Playstate.Stopped))
+			if (g.MusicInstance.GuildConnection.IsConnected && (g.MusicInstance.Playstate == PlayState.NotPlaying || g.MusicInstance.Playstate == PlayState.Stopped))
 				await g.MusicInstance.PlaySong();
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Play Playlist").WithDescription($"Playing playlist/Added to queue!").Build()));
 		}
