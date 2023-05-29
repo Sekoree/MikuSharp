@@ -71,22 +71,22 @@ public class MusicInstance
 		{
 			var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Processing NND Video...").AsEphemeral());
 			var split = name_or_url.Split("/".ToCharArray());
-			var nndID = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
+			var nico_nico_id = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
 			FtpClient client = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
 			client.Connect();
-			if (!client.FileExists($"{nndID}.mp3"))
+			if (!client.FileExists($"{nico_nico_id}.mp3"))
 			{
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Preparing download..."));
-				var ex = await ctx.GetNNDAsync(name_or_url, nndID, msg.Id);
+				var ex = await ctx.GetNNDAsync(name_or_url, nico_nico_id, msg.Id);
 				if (ex == null)
 				{
 					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Please try again or verify the link"));
 					return null;
 				}
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading"));
-				client.UploadStream(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
+				client.UploadStream(ex, $"{nico_nico_id}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var Track = await this.NodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
+			var Track = await this.NodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nico_nico_id}.mp3"));
 			if (position == -1)
 				await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
 			else

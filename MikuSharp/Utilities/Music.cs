@@ -89,7 +89,7 @@ public static class Music
 			searchListRequest.Q = searchQuery;
 			searchListRequest.MaxResults = 1;
 			searchListRequest.Type = "video";
-			var searchListResponse = await searchListRequest.ExecuteAsync();
+			var searchListResponse = await searchListRequest.ExecuteAsync(MikuBot._canellationTokenSource.Token);
 
 			if (lastPlayedSongs == null)
 			{
@@ -146,11 +146,11 @@ public static class Music
 			var uriSegments = entry.Track.Uri.Segments;
 			var filename = $"{uriSegments[^2]}.{uriSegments[^1]}";
 
-			using (MemoryStream d = new(await client.RestClient.GetByteArrayAsync(entry.Track.Uri)))
+			using (MemoryStream d = new(await client.RestClient.GetByteArrayAsync(entry.Track.Uri, MikuBot._canellationTokenSource.Token)))
 			using (var e = File.Create(filename))
 			{
 				d.Position = 0;
-				await d.CopyToAsync(e);
+				await d.CopyToAsync(e, MikuBot._canellationTokenSource.Token);
 			}
 
 			var selector = new Selector();

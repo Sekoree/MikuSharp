@@ -1,4 +1,4 @@
-﻿using MikuSharp.Entities;
+using MikuSharp.Entities;
 using MikuSharp.Enums;
 
 namespace MikuSharp.Utilities;

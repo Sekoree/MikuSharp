@@ -34,7 +34,7 @@ public static class Bilibili
 			{
 				using var audioFile = File.Open(audioFilePath, FileMode.Open);
 				var ms = new MemoryStream();
-				await audioFile.CopyToAsync(ms);
+				await audioFile.CopyToAsync(ms, MikuBot._canellationTokenSource.Token);
 				ms.Position = 0;
 				File.Delete(audioFilePath);
 				return ms;
