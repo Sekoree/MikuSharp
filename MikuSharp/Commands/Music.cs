@@ -1,4 +1,4 @@
-﻿using MikuSharp.Attributes;
+using MikuSharp.Attributes;
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 using MikuSharp.Events;
@@ -262,7 +262,7 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			g.MusicInstance.GuildConnection.PlaybackFinished -= Lavalink.LavalinkTrackFinish;
+			g.MusicInstance.GuildConnection.PlaybackFinished -= Lavalink.LavalinkTrackFinished;
 			if (g.MusicInstance.CurrentSong != null)
 			{
 				if (g.MusicInstance.RepeatMode != RepeatMode.On && g.MusicInstance.RepeatMode != RepeatMode.All)
@@ -484,8 +484,8 @@ public class Music : ApplicationCommandsModule
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError("{ex}", ex.Message);
-				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
+				ctx.Client.Logger.LogError("{msg}", ex.Message);
+				ctx.Client.Logger.LogError("{stack}", ex.StackTrace);
 			}
 		}
 
@@ -672,8 +672,8 @@ public class Music : ApplicationCommandsModule
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError("{ex}", ex.Message);
-				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
+				ctx.Client.Logger.LogError("{msg}", ex.Message);
+				ctx.Client.Logger.LogError("{stack}", ex.StackTrace);
 			}
 		}
 	}

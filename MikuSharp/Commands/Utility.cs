@@ -1,4 +1,4 @@
-﻿using Kitsu.Anime;
+using Kitsu.Anime;
 using Kitsu.Manga;
 
 namespace MikuSharp.Commands;
@@ -58,8 +58,8 @@ internal class Utility : ApplicationCommandsModule
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError("{ex}", ex.Message);
-				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
+				ctx.Client.Logger.LogError("{msg}", ex.Message);
+				ctx.Client.Logger.LogError("{stack}", ex.StackTrace);
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No Anime found!"));
 			}
 		}
@@ -109,8 +109,8 @@ internal class Utility : ApplicationCommandsModule
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError("{ex}", ex.Message);
-				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
+				ctx.Client.Logger.LogError("{msg}", ex.Message);
+				ctx.Client.Logger.LogError("{stack}", ex.StackTrace);
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No Manga found!"));
 			}
 		}

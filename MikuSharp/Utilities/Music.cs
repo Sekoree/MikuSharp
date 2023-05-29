@@ -1,4 +1,4 @@
-﻿using AlbumArtExtraction;
+using AlbumArtExtraction;
 
 using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
@@ -160,8 +160,8 @@ public static class Music
 		}
 		catch (Exception ex)
 		{
-			client.Logger.LogDebug("{ex}", ex.Message);
-			client.Logger.LogDebug("{ex}", ex.StackTrace);
+			client.Logger.LogDebug("{msg}", ex.Message);
+			client.Logger.LogDebug("{stack}", ex.StackTrace);
 			img = null;
 		}
 

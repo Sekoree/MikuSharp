@@ -1,4 +1,4 @@
-﻿using NYoutubeDL;
+using NYoutubeDL;
 
 namespace MikuSharp.Utilities;
 
@@ -50,8 +50,8 @@ public static class Bilibili
 		}
 		catch (Exception ex)
 		{
-			ctx.Client.Logger.LogDebug("{ex}", ex.Message);
-			ctx.Client.Logger.LogDebug("{ex}", ex.StackTrace);
+			ctx.Client.Logger.LogDebug("{msg}", ex.Message);
+			ctx.Client.Logger.LogDebug("{stack}", ex.StackTrace);
 			return null;
 		}
 	}

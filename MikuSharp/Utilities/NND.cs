@@ -1,4 +1,4 @@
-﻿using NicoNicoNii;
+using NicoNicoNii;
 
 namespace MikuSharp.Utilities;
 
@@ -57,8 +57,8 @@ public static class NND
 		}
 		catch (Exception ex)
 		{
-			ctx.Client.Logger.LogDebug("{ex}", ex.Message);
-			ctx.Client.Logger.LogDebug("{ex}", ex.StackTrace);
+			ctx.Client.Logger.LogDebug("{msg}", ex.Message);
+			ctx.Client.Logger.LogDebug("{stack}", ex.StackTrace);
 			await ctx.EditFollowupAsync(msg_id, new DiscordWebhookBuilder().WithContent("Encountered error"));
 			return null;
 		}

@@ -266,8 +266,8 @@ public class MusicInstance
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError("{ex}", ex.Message);
-				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
+				ctx.Client.Logger.LogError("{msg}", ex.Message);
+				ctx.Client.Logger.LogError("{stack}", ex.StackTrace);
 				return null;
 			}
 		}
@@ -368,7 +368,7 @@ public class MusicInstance
 		if (this.RepeatMode == RepeatMode.On)
 			this.CurrentSong = cur;
 		MikuBot.ShardedClient.Logger.LogDebug(this.CurrentSong?.Track.TrackString);
-		this.GuildConnection.PlaybackFinished += Lavalink.LavalinkTrackFinish;
+		this.GuildConnection.PlaybackFinished += Lavalink.LavalinkTrackFinished;
 		this.Playstate = PlayState.Playing;
 		await Task.Run(async () => await this.GuildConnection.PlayAsync(this.CurrentSong.Track), MikuBot._cts.Token);
 		return this.CurrentSong;
