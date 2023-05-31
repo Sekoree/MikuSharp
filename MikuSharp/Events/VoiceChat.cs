@@ -10,7 +10,6 @@ public class VoiceChat
 		{
 			if (!MikuBot.Guilds.ContainsKey(e.Guild.Id))
 				return;
-
 			var guild = MikuBot.Guilds[e.Guild.Id];
 			var musicInstance = guild.MusicInstance;
 
