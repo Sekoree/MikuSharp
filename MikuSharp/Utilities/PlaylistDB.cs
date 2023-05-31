@@ -10,7 +10,7 @@ public static partial class PlaylistDB
 	[GeneratedRegex("[^a-zA-Z0-9_\\- ]")]
 	private static partial Regex PlaylistNameRegex();
 
-	public static async Task<Dictionary<string, Playlist>> GetPlaylists(DiscordGuild guild, ulong userId)
+	public static async Task<Dictionary<string, Playlist>> GetPlaylists(this DiscordGuild guild, ulong userId)
 	{
 		try
 		{
@@ -61,7 +61,7 @@ public static partial class PlaylistDB
 		return playlists;
 	}
 
-	public static async Task<Playlist> GetPlaylist(DiscordGuild guild, ulong userId, string playlistName)
+	public static async Task<Playlist> GetPlaylist(this DiscordGuild guild, ulong userId, string playlistName)
 	{
 		try
 		{
@@ -123,7 +123,7 @@ public static partial class PlaylistDB
 		}
 	}
 
-	public static async Task ReorderList(DiscordGuild guild, string playlistName, ulong userId)
+	public static async Task ReorderList(this DiscordGuild guild, string playlistName, ulong userId)
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		using var conn = new NpgsqlConnection(connString);
@@ -306,7 +306,7 @@ public static partial class PlaylistDB
 		conn.Dispose();
 	}
 
-	public static async Task InsertEntry(DiscordGuild guild, string playlistName, ulong userId, string trackString, int position)
+	public static async Task InsertEntry(this DiscordGuild guild, string playlistName, ulong userId, string trackString, int position)
 	{
 		var playlist = await GetPlaylist(guild, userId, playlistName);
 		var entries = await playlist.GetEntries();
@@ -314,7 +314,7 @@ public static partial class PlaylistDB
 		await RebuildList(userId, playlistName, entries);
 	}
 
-	public static async Task InsertEntry(DiscordGuild guild, string playlistName, ulong userId, List<LavalinkTrack> tracks, int position)
+	public static async Task InsertEntry(this DiscordGuild guild, string playlistName, ulong userId, List<LavalinkTrack> tracks, int position)
 	{
 		var playlist = await GetPlaylist(guild, userId, playlistName);
 		var entries = await playlist.GetEntries();
@@ -339,7 +339,7 @@ public static partial class PlaylistDB
 		conn.Dispose();
 	}
 
-	public static async Task MoveListItems(DiscordGuild guild, string playlistName, ulong userId, int oldPosition, int newPosition)
+	public static async Task MoveListItems(this DiscordGuild guild, string playlistName, ulong userId, int oldPosition, int newPosition)
 	{
 		var playlist = await GetPlaylist(guild, userId, playlistName);
 		var entries = await playlist.GetEntries();
@@ -362,7 +362,7 @@ public static partial class PlaylistDB
 		await RebuildList(userId, playlistName, newEntries);
 	}
 
-	public static async Task RemoveFromList(DiscordGuild guild, int position, string playlistName, ulong userId)
+	public static async Task RemoveFromList(this DiscordGuild guild, int position, string playlistName, ulong userId)
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		using var conn = new NpgsqlConnection(connString);

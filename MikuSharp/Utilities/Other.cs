@@ -1,8 +1,8 @@
-﻿namespace MikuSharp.Utilities;
+namespace MikuSharp.Utilities;
 
 public static class Other
 {
-	public static string resizeLink(string url)
+	public static string resizeLink(this string url)
 		=> $"https://api.meek.moe/im/?image={url}&resize=500";
 
 	public static async Task DeferAsync(this InteractionContext ctx, bool ephemeral = true)

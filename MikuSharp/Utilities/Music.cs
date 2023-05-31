@@ -219,7 +219,7 @@ public static class Music
 		{
 			lBuilder = await builder.GetYoutubePlayingInformationAsync(guild, lastPlayedSongs);
 		}
-		else if (!entry.Track.Uri.ToString().StartsWith("https://media.discordapp.net/attachments/") && !entry.Track.Uri.ToString().StartsWith("https://cdn.discordapp.com/attachments/"))
+		else if (!entry.Track.Uri.ToString().StartsWith($"https://media.{DiscordDomain.GetDomain(CoreDomain.DiscordAppMediaProxy).Domain}/attachments/") && !entry.Track.Uri.ToString().StartsWith($"{DiscordDomain.GetDomain(CoreDomain.DiscordCdn).Url}/attachments/"))
 		{
 			lBuilder = builder.GetOtherPlayingInformationAsync(guild, lastPlayedSongs);
 		}
@@ -232,7 +232,7 @@ public static class Music
 				webhookBuilder.AddFile(info.FileName, info.File, true);
 			}
 		}
-
+		
 		await ctx.EditResponseAsync(webhookBuilder.AddEmbed(lBuilder.Build()));
 	}
 
