@@ -140,7 +140,7 @@ public class Playlists : ApplicationCommandsModule
 					//ctx.Client.Logger.LogDebug(Track.Value == null);
 					//ctx.Client.Logger.LogDebug(Track.Key);
 					var songCount = 0;
-					var ent = await track.Value.GetEntries();
+					var ent = await track.Value.GetEntriesAsync();
 					songCount = ent.Count;
 					var sub = track.Value.ExternalService == ExtService.None
 		? $"Created on: {track.Value.Creation}\n" +
@@ -206,8 +206,8 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Show Playlist").WithDescription("**Error** You dont have a playlist with that playlist!").Build()));
 				return;
 			}
-			var q = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
-			var queue = await q.GetEntries();
+			var q = await PlaylistDB.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
+			var queue = await q.GetEntriesAsync();
 			if (queue.Count == 0)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Playlist empty!"));
@@ -301,8 +301,8 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Rename Playlist").WithDescription("**Error** You dont have a playlist with that name!").Build()));
 				return;
 			}
-			var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
-			await pls.GetEntries();
+			var pls = await PlaylistDB.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
+			await pls.GetEntriesAsync();
 
 			await PlaylistDB.RenameList(playlist, ctx.Member.Id, name);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Rename Playlist").WithDescription($"Renamed Playlist to {playlist} -> {name}!").Build()));
@@ -325,7 +325,7 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Clear Playlist").WithDescription("**Error** You dont have a playlist with that playlist!").Build()));
 				return;
 			}
-			await PlaylistDB.ClearList(playlist, ctx.Member.Id);
+			await PlaylistDB.ClearListAsync(playlist, ctx.Member.Id);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Clear Playlist").WithDescription($"Cleared all songs from playlist -> {playlist}!").Build()));
 		}
 
@@ -342,8 +342,8 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Play Playlist").WithDescription("**Error** You dont have a playlist with that playlist!").Build()));
 				return;
 			}
-			var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
-			var p = await pls.GetEntries();
+			var pls = await PlaylistDB.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
+			var p = await pls.GetEntriesAsync();
 			if (!MikuBot.Guilds.Any(x => x.Key == ctx.Guild.Id))
 			{
 				MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
@@ -380,7 +380,7 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Add Song").WithDescription("**Error** You dont have a playlist with that playlist!").Build()));
 				return;
 			}
-			var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
+			var pls = await PlaylistDB.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
 			if (pls.ExternalService != ExtService.None)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Add Song").WithDescription("**Error** This playlist is a fixed one, you cant add songs to this!").Build()));
@@ -413,7 +413,7 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Insert Song").WithDescription("**Error** You dont have a playlist with that playlist!").Build()));
 				return;
 			}
-			var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
+			var pls = await PlaylistDB.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
 			if (pls.ExternalService != ExtService.None)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Insert Song").WithDescription("**Error** This playlist is a fixed one, you cant add songs to this!").Build()));
@@ -448,16 +448,16 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Insert Song").WithDescription("**Error** You dont have a playlist with that playlist!").Build()));
 				return;
 			}
-			var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
+			var pls = await PlaylistDB.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
 			if (pls.ExternalService != ExtService.None)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Insert Song").WithDescription("**Error** This playlist is a fixed one, you cant move songs!").Build()));
 				return;
 			}
-			var e = await pls.GetEntries();
+			var e = await pls.GetEntriesAsync();
 			if (e[newpos] == null | e[oldpos] == null)
 				return;
-			await PlaylistDB.MoveListItems(ctx.Guild, playlist, ctx.Member.Id, oldpos, newpos);
+			await PlaylistDB.MoveListItemsAsync(ctx.Guild, playlist, ctx.Member.Id, oldpos, newpos);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Move Song").WithDescription($"Moved entry -> {e[oldpos].Track.Title} to position {newpos}!").Build()));
 		}
 
@@ -480,8 +480,8 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Remove Song").WithDescription("**Error** You dont have a playlist with that playlist!").Build()));
 				return;
 			}
-			var ents = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
-			var en = await ents.GetEntries();
+			var ents = await PlaylistDB.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
+			var en = await ents.GetEntriesAsync();
 			await PlaylistDB.RemoveFromList(ctx.Guild, pos, playlist, ctx.Member.Id);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Remove Song").WithDescription($"Entry removed! -> {en[pos].Track.Title}").Build()));
 		}

@@ -11,26 +11,23 @@ public class Database
 		var position = 0;
 		var connString = MikuBot.Config.DbConnectString;
 
-		using var conn = new NpgsqlConnection(connString);
+		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
-		var countCmd = new NpgsqlCommand("SELECT Count(*) FROM lastplayedsongs WHERE guildId = @guild;", conn);
+		await using var countCmd = new NpgsqlCommand("SELECT Count(*) FROM lastplayedsongs WHERE guildId = @guild;", conn);
 		var guildParam = countCmd.CreateParameter();
 		guildParam.ParameterName = "guild";
 		guildParam.Value = guildId;
 		countCmd.Parameters.Add(guildParam);
 
-		var reader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+		await using var reader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 
 		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
-		{
 			position = reader.GetInt32(0);
-		}
 
-		reader.Close();
-		countCmd.Dispose();
+		await reader.CloseAsync();
 
-		var insertCmd = new NpgsqlCommand("INSERT INTO lastplayedsongs VALUES (@pos, @guild, @ts)", conn);
+		await using var insertCmd = new NpgsqlCommand("INSERT INTO lastplayedsongs VALUES (@pos, @guild, @ts)", conn);
 		var guildParam2 = insertCmd.CreateParameter();
 		guildParam2.ParameterName = "guild";
 		guildParam2.Value = guildId;
@@ -47,29 +44,26 @@ public class Database
 		insertCmd.Parameters.Add(posParam);
 
 		await insertCmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
-		insertCmd.Dispose();
 
-		conn.Close();
-		conn.Dispose();
+		await conn.CloseAsync();
 	}
 
 	public static async Task ReorderQueueAsync(DiscordGuild guild)
 	{
 		var connString = MikuBot.Config.DbConnectString;
 
-		using var conn = new NpgsqlConnection(connString);
+		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
 		var queueNow = await GetQueueAsync(guild);
 
-		var deleteCmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
+		await using var deleteCmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
 		var guildParam = deleteCmd.CreateParameter();
 		guildParam.ParameterName = "guild";
 		guildParam.Value = guild.Id;
 		deleteCmd.Parameters.Add(guildParam);
 
 		await deleteCmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
-		deleteCmd.Dispose();
 
 		if (queueNow.Count == 0)
 			return;
@@ -92,7 +86,7 @@ public class Database
 			i++;
 		}
 
-		var insertCmd = new NpgsqlCommand(insertCmdBuilder.ToString(), conn);
+		await using var insertCmd = new NpgsqlCommand(insertCmdBuilder.ToString(), conn);
 		var guildParam2 = insertCmd.CreateParameter();
 		guildParam2.ParameterName = "guild";
 		guildParam2.Value = guild.Id;
@@ -110,27 +104,24 @@ public class Database
 		}
 
 		await insertCmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
-		insertCmd.Dispose();
 
-		conn.Close();
-		conn.Dispose();
+		await conn.CloseAsync();
 	}
 
 	public static async Task RebuildQueueAsync(DiscordGuild guild, List<QueueEntry> queueEntries)
 	{
 		var connString = MikuBot.Config.DbConnectString;
 
-		using var conn = new NpgsqlConnection(connString);
+		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
-		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
+		await using var cmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
 		var guildParam = cmd.CreateParameter();
 		guildParam.ParameterName = "guild";
 		guildParam.Value = guild.Id;
 		cmd.Parameters.Add(guildParam);
 
 		await cmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
-		cmd.Dispose();
 
 		if (queueEntries.Count == 0)
 			return;
@@ -153,7 +144,7 @@ public class Database
 			i++;
 		}
 
-		var insertCmd = new NpgsqlCommand(insertCmdBuilder.ToString(), conn);
+		await using var insertCmd = new NpgsqlCommand(insertCmdBuilder.ToString(), conn);
 		var guildParam2 = insertCmd.CreateParameter();
 		guildParam2.ParameterName = "guild";
 		guildParam2.Value = guild.Id;
@@ -171,26 +162,24 @@ public class Database
 		}
 
 		await insertCmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
-		insertCmd.Dispose();
 
-		conn.Close();
-		conn.Dispose();
+		await conn.CloseAsync();
 	}
 
 	public static async Task<List<QueueEntry>> GetQueueAsync(DiscordGuild guild)
 	{
 		var connString = MikuBot.Config.DbConnectString;
 
-		using var conn = new NpgsqlConnection(connString);
+		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
-		var cmd = new NpgsqlCommand("SELECT * FROM queues WHERE guildId = @guild ORDER BY position ASC;", conn);
+		await using var cmd = new NpgsqlCommand("SELECT * FROM queues WHERE guildId = @guild ORDER BY position ASC;", conn);
 		var guildParam = cmd.CreateParameter();
 		guildParam.ParameterName = "guild";
 		guildParam.Value = guild.Id;
 		cmd.Parameters.Add(guildParam);
 
-		var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+		await using var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 		var queue = new List<QueueEntry>();
 
 		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
@@ -204,11 +193,9 @@ public class Database
 			queue.Add(queueEntry);
 		}
 
-		reader.Close();
-		cmd.Dispose();
+		await reader.CloseAsync();
 
-		conn.Close();
-		conn.Dispose();
+		await conn.CloseAsync();
 
 		return queue;
 	}
@@ -217,26 +204,23 @@ public class Database
 	{
 		var connString = MikuBot.Config.DbConnectString;
 
-		using var conn = new NpgsqlConnection(connString);
+		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
 		var position = 0;
-		var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
+		await using var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
 		var guildParam = countCmd.CreateParameter();
 		guildParam.ParameterName = "guild";
 		guildParam.Value = guild.Id;
 		countCmd.Parameters.Add(guildParam);
 
-		var countReader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+		await using var countReader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 		while (await countReader.ReadAsync(MikuBot._canellationTokenSource.Token))
-		{
 			position = countReader.GetInt32(0);
-		}
 
-		countReader.Close();
-		countCmd.Dispose();
+		await countReader.CloseAsync();
 
-		var insertCmd = new NpgsqlCommand("INSERT INTO queues VALUES (@pos, @guild, @user, @ts, @time)", conn);
+		await using var insertCmd = new NpgsqlCommand("INSERT INTO queues VALUES (@pos, @guild, @user, @ts, @time)", conn);
 		var guildParam2 = insertCmd.CreateParameter();
 		guildParam2.ParameterName = "guild";
 		guildParam2.Value = guild.Id;
@@ -263,34 +247,29 @@ public class Database
 		insertCmd.Parameters.Add(timeParam);
 
 		await insertCmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
-		insertCmd.Dispose();
 
-		conn.Close();
-		conn.Dispose();
+		await conn.CloseAsync();
 	}
 
 	public static async Task AddToQueueAsync(DiscordGuild guild, ulong userId, List<LavalinkTrack> tracks)
 	{
 		var connString = MikuBot.Config.DbConnectString;
 
-		using var conn = new NpgsqlConnection(connString);
+		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
 		var position = 0;
-		var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
+		await using var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
 		var guildParam = countCmd.CreateParameter();
 		guildParam.ParameterName = "guild";
 		guildParam.Value = guild.Id;
 		countCmd.Parameters.Add(guildParam);
 
-		var countReader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+		await using var countReader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 		while (await countReader.ReadAsync(MikuBot._canellationTokenSource.Token))
-		{
 			position = countReader.GetInt32(0);
-		}
 
-		countReader.Close();
-		countCmd.Dispose();
+		await countReader.CloseAsync();
 
 		var longcmd = new StringBuilder();
 
@@ -300,7 +279,7 @@ public class Database
 			position++;
 		}
 
-		var insertCmd = new NpgsqlCommand(longcmd.ToString(), conn);
+		await using var insertCmd = new NpgsqlCommand(longcmd.ToString(), conn);
 
 		var guildParam2 = insertCmd.CreateParameter();
 		guildParam2.ParameterName = "guild";
@@ -318,34 +297,29 @@ public class Database
 		insertCmd.Parameters.Add(timeParam);
 
 		await insertCmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
-		insertCmd.Dispose();
 
-		conn.Close();
-		conn.Dispose();
+		await conn.CloseAsync();
 	}
 
 	public static async Task AddToQueueAsync(DiscordGuild guild, ulong userId, List<PlaylistEntry> entries)
 	{
 		var connString = MikuBot.Config.DbConnectString;
 
-		using var conn = new NpgsqlConnection(connString);
+		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
 		var position = 0;
-		var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
+		await using var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
 		var guildParam = countCmd.CreateParameter();
 		guildParam.ParameterName = "guild";
 		guildParam.Value = guild.Id;
 		countCmd.Parameters.Add(guildParam);
 
-		var countReader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+		await using var countReader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 		while (await countReader.ReadAsync(MikuBot._canellationTokenSource.Token))
-		{
 			position = countReader.GetInt32(0);
-		}
 
-		countReader.Close();
-		countCmd.Dispose();
+		await countReader.CloseAsync();
 
 		var longcmd = new StringBuilder();
 
@@ -355,7 +329,7 @@ public class Database
 			position++;
 		}
 
-		var insertCmd = new NpgsqlCommand(longcmd.ToString(), conn);
+		await using var insertCmd = new NpgsqlCommand(longcmd.ToString(), conn);
 
 		var guildParam2 = insertCmd.CreateParameter();
 		guildParam2.ParameterName = "guild";
@@ -373,10 +347,8 @@ public class Database
 		insertCmd.Parameters.Add(timeParam);
 
 		await insertCmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
-		insertCmd.Dispose();
 
-		conn.Close();
-		conn.Dispose();
+		await conn.CloseAsync();
 	}
 
 	public static async Task InsertToQueueAsync(DiscordGuild guild, ulong userId, string trackString, int position)
@@ -397,29 +369,25 @@ public class Database
 	public static async Task RemoveFromQueueAsync(int position, DiscordGuild guild)
 	{
 		var connString = MikuBot.Config.DbConnectString;
-		using var conn = new NpgsqlConnection(connString);
+		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
-		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE position = @pos AND guildid = @guild;", conn);
+		await using var cmd = new NpgsqlCommand("DELETE FROM queues WHERE position = @pos AND guildid = @guild;", conn);
 		cmd.Parameters.AddWithValue("guild", guild.Id);
 		cmd.Parameters.AddWithValue("pos", position);
 		await cmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
-		cmd.Dispose();
-		conn.Close();
-		conn.Dispose();
+		await conn.CloseAsync();
 		await ReorderQueueAsync(guild);
 	}
 
 	public static async Task ClearQueueAsync(DiscordGuild guild)
 	{
 		var connString = MikuBot.Config.DbConnectString;
-		using var conn = new NpgsqlConnection(connString);
+		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
-		var cmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
+		await using var cmd = new NpgsqlCommand("DELETE FROM queues WHERE guildid = @guild;", conn);
 		cmd.Parameters.AddWithValue("guild", guild.Id);
 		await cmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
-		cmd.Dispose();
-		conn.Close();
-		conn.Dispose();
+		await conn.CloseAsync();
 	}
 
 	public static async Task MoveQueueItemsAsync(DiscordGuild guild, int oldPos, int newPos)
@@ -434,11 +402,11 @@ public class Database
 	public static async Task<List<Entry>> GetLastPlayingListAsync(DiscordGuild guild)
 	{
 		var connString = MikuBot.Config.DbConnectString;
-		using var conn = new NpgsqlConnection(connString);
+		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
-		var cmd = new NpgsqlCommand("SELECT * FROM lastplayedsongs WHERE guildId = @guild ORDER BY lastplayedsongs.trackposition DESC LIMIT 1000", conn);
+		await using var cmd = new NpgsqlCommand("SELECT * FROM lastplayedsongs WHERE guildId = @guild ORDER BY lastplayedsongs.trackposition DESC LIMIT 1000", conn);
 		cmd.Parameters.AddWithValue("guild", guild.Id);
-		var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+		await using var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 		List<Entry> queue = new();
 		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
 		{
@@ -447,10 +415,8 @@ public class Database
 			var entry = new Entry(track, DateTimeOffset.UtcNow);
 			queue.Add(entry);
 		}
-		reader.Close();
-		cmd.Dispose();
-		conn.Close();
-		conn.Dispose();
+		await reader.CloseAsync();
+		await conn.CloseAsync();
 		return queue;
 	}
 }

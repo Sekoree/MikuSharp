@@ -66,8 +66,8 @@ internal class AutocompleteProviders
 			if (playlist == "error")
 				return new List<DiscordApplicationCommandAutocompleteChoice>() { new("You have no valid playlist selected", "error") };
 
-			var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
-			var tracks = await pls.GetEntries();
+			var pls = await PlaylistDB.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
+			var tracks = await pls.GetEntriesAsync();
 			List<PlaylistEntry> songs = new(25);
 			if (ctx.FocusedOption.Value == null)
 				songs.AddRange(tracks.Take(25));

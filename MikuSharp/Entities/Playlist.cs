@@ -23,7 +23,7 @@ public class Playlist
 		this.Modify = mody;
 	}
 
-	public async Task<List<PlaylistEntry>> GetEntries()
+	public async Task<List<PlaylistEntry>> GetEntriesAsync()
 	{
 		var entries = new List<PlaylistEntry>();
 		if (this.SongCount > 0)
