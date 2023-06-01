@@ -228,7 +228,7 @@ public class Developer : ApplicationCommandsModule
 			var globals = new EvaluationVariables(ctx.TargetMessage, ctx.Client, ctx, MikuBot._canellationTokenSource, MikuBot._globalCancellationTokenSource);
 
 			var sopts = ScriptOptions.Default;
-			sopts = sopts.WithImports("System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "DisCatSharp", "DisCatSharp.Entities", "DisCatSharp.CommandsNext", "DisCatSharp.CommandsNext.Attributes", "DisCatSharp.Interactivity", "DisCatSharp.Interactivity.Extensions", "DisCatSharp.Enums", "Microsoft.Extensions.Logging", "MikuSharp.Entities", "DisCatSharp.Lavalink");
+			sopts = sopts.WithImports("System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "DisCatSharp", "DisCatSharp.Entities", "DisCatSharp.CommandsNext", "DisCatSharp.CommandsNext.Attributes", "DisCatSharp.Interactivity", "DisCatSharp.Interactivity.Extensions", "DisCatSharp.Enums", "Microsoft.Extensions.Logging", "MikuSharp.Entities", "MikuSharp.Enums", "MikuSharp.Utilities", "DisCatSharp.Lavalink");
 			sopts = sopts.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
 
 			var script = CSharpScript.Create(cs, sopts, typeof(EvaluationVariables));

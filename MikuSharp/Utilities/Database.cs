@@ -4,8 +4,53 @@ using NpgsqlTypes;
 
 namespace MikuSharp.Utilities;
 
-public class Database
+public static class Database
 {
+	public static async Task<bool> CanSendNewFeedback(this DiscordUser user)
+	{
+		var connString = MikuBot.Config.DbConnectString;
+		await using var conn = new NpgsqlConnection(connString);
+		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+
+		await using var cmd = new NpgsqlCommand("SELECT Count(*) FROM feedback WHERE user_id = @userId AND send_at >= @date::date", conn);
+		cmd.Parameters.AddWithValue("userId", Convert.ToInt64(user.Id));
+		cmd.Parameters.AddWithValue("date", DateTime.UtcNow.Subtract(TimeSpan.FromDays(14)).ToString("yyyy-MM-dd"));
+
+		await using var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+
+		var feedbackCountDuringTargetDate = 0;
+		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
+			feedbackCountDuringTargetDate = reader.GetInt32(0);
+
+		await reader.CloseAsync();
+
+		await conn.CloseAsync();
+
+		return feedbackCountDuringTargetDate == 0;
+	}
+
+	public static async Task<Feedback> SaveFeedbackAsync(this Feedback feedback)
+	{
+		var connString = MikuBot.Config.DbConnectString;
+		await using var conn = new NpgsqlConnection(connString);
+		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+
+		await using var cmd = new NpgsqlCommand("INSERT INTO feedback(user_id, message, rating) VALUES(@userId, @message, @rating) RETURNING ufid", conn);
+		cmd.Parameters.AddWithValue("userId", Convert.ToInt64(feedback.UserId));
+		cmd.Parameters.AddWithValue("message", feedback.Message);
+		cmd.Parameters.AddWithValue("rating", feedback.Rating);
+
+		using var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+		while(await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
+			feedback.Ufid = reader.GetInt64(0);
+
+		await reader.CloseAsync();
+
+		await conn.CloseAsync();
+
+		return feedback;
+	}
+
 	public static async Task AddToLastPlayingListAsync(ulong guildId, string ts)
 	{
 		var position = 0;
