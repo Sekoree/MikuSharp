@@ -144,7 +144,7 @@ internal class Utility : ApplicationCommandsModule
 			emb.AddField(new DiscordEmbedField("Owner", ctx.Guild.Owner.Mention, true));
 			emb.AddField(new DiscordEmbedField("Language", ctx.Guild.PreferredLocale, true));
 			emb.AddField(new DiscordEmbedField("ID", ctx.Guild.Id.ToString(), true));
-			emb.AddField(new DiscordEmbedField("Created At", Formatter.Timestamp(ctx.Guild.CreationTimestamp, TimestampFormat.LongDateTime), true));
+			emb.AddField(new DiscordEmbedField("SendAt At", Formatter.Timestamp(ctx.Guild.CreationTimestamp, TimestampFormat.LongDateTime), true));
 			emb.AddField(new DiscordEmbedField("Emojis", ctx.Guild.Emojis.Count.ToString(), true));
 			emb.AddField(new DiscordEmbedField("Members (Bots)", $"{members.Count} ({bots})", true));
 

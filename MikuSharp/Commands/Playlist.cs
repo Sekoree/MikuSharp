@@ -143,9 +143,9 @@ public class Playlists : ApplicationCommandsModule
 					var ent = await track.Value.GetEntriesAsync();
 					songCount = ent.Count;
 					var sub = track.Value.ExternalService == ExtService.None
-		? $"Created on: {track.Value.Creation}\n" +
+		? $"SendAt on: {track.Value.Creation}\n" +
 			$"Last modified on: {track.Value.Modify}"
-		: $"Created on: {track.Value.Creation}\n" +
+		: $"SendAt on: {track.Value.Creation}\n" +
 			$"{track.Value.ExternalService} [Link]({track.Value.Url})";
 					emb.AddField(new DiscordEmbedField($"**{songAmount + 1}.{track.Key}** ({songCount} Songs)", sub));
 					songsPerPage++;

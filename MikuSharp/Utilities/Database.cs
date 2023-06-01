@@ -31,20 +31,46 @@ public static class Database
 
 	public static async Task<Feedback> SaveFeedbackAsync(this Feedback feedback)
 	{
+		if (feedback.Metadata == null)
+			throw new InvalidOperationException($"{nameof(feedback.Metadata)} cannot be null for {nameof(feedback)}");
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
-		await using var cmd = new NpgsqlCommand("INSERT INTO feedback(user_id, message, rating) VALUES(@userId, @message, @rating) RETURNING ufid", conn);
-		cmd.Parameters.AddWithValue("userId", Convert.ToInt64(feedback.UserId));
-		cmd.Parameters.AddWithValue("message", feedback.Message);
-		cmd.Parameters.AddWithValue("rating", feedback.Rating);
+		await using var feeedbackCmd = new NpgsqlCommand("INSERT INTO feedback (user_id, message, rating) VALUES(@userId, @message, @rating) RETURNING ufid", conn);
+		feeedbackCmd.Parameters.AddWithValue("userId", Convert.ToInt64(feedback.UserId));
+		feeedbackCmd.Parameters.AddWithValue("message", feedback.Message);
+		if (feedback.Rating.HasValue)
+			feeedbackCmd.Parameters.AddWithValue("rating", feedback.Rating.Value);
+		else
+			feeedbackCmd.Parameters.AddWithValue("rating", DBNull.Value);
 
-		using var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+		using var reader = await feeedbackCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 		while(await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
 			feedback.Ufid = reader.GetInt64(0);
 
 		await reader.CloseAsync();
+
+		feedback.Metadata.Ufid = feedback.Ufid;
+
+		await using var feedbackMetadataCmd = new NpgsqlCommand("INSERT INTO feedback_metadata VALUES(@feedbackUfid, @type, @guildId, @dmId, @thread_id, @responseSend)", conn);
+		feedbackMetadataCmd.Parameters.AddWithValue("feedbackUfid", feedback.Metadata.Ufid);
+		feedbackMetadataCmd.Parameters.AddWithValue("type", feedback.Metadata.Type);
+		if (feedback.Metadata.GuildId.HasValue)
+			feedbackMetadataCmd.Parameters.AddWithValue("guildId", feedback.Metadata.GuildId.Value);
+		else
+			feedbackMetadataCmd.Parameters.AddWithValue("guildId", DBNull.Value);
+		if (feedback.Metadata.DmId.HasValue)
+			feedbackMetadataCmd.Parameters.AddWithValue("dmId", feedback.Metadata.DmId.Value);
+		else
+			feedbackMetadataCmd.Parameters.AddWithValue("dmId", DBNull.Value);
+		if (feedback.Metadata.ThreadId.HasValue)
+			feedbackMetadataCmd.Parameters.AddWithValue("thread_id", feedback.Metadata.ThreadId.Value);
+		else
+			feedbackMetadataCmd.Parameters.AddWithValue("thread_id", DBNull.Value);
+		feedbackMetadataCmd.Parameters.AddWithValue("responseSend", feedback.Metadata.ResponseSend);
+
+		await feedbackMetadataCmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
 
 		await conn.CloseAsync();
 
