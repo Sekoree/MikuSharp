@@ -13,9 +13,9 @@ namespace MikuSharp.Commands;
 public class Music : ApplicationCommandsModule
 {
 	private static readonly string[] s_units = new[] { "", "ki", "Mi", "Gi" };
-	private static string SizeToString(long l)
+	private static string SizeToString(long size)
 	{
-		double d = l;
+		double d = size;
 		var u = 0;
 		while (d >= 900 && u < s_units.Length - 2)
 		{
