@@ -189,7 +189,7 @@ internal class MikuBot : IDisposable
 			ManualOverride = true
 		});
 
-		this.CommandsNextModules = await ShardedClient.UseCommandsNextAsync(new()
+		/*this.CommandsNextModules = await ShardedClient.UseCommandsNextAsync(new()
 		{
 			CaseSensitive = true,
 			EnableMentionPrefix = true,
@@ -199,7 +199,7 @@ internal class MikuBot : IDisposable
 			StringPrefixes = new(),
 			UseDefaultCommandHandler = true,
 			DefaultHelpChecks = new(1) { new NotStaffAttribute() }
-		});
+		});*/
 
 		LavalinkConfig = new()
 		{
@@ -342,13 +342,13 @@ internal class MikuBot : IDisposable
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test, userStatus: UserStatus.Online);
 			await Task.Delay(TimeSpan.FromMinutes(20), _canellationTokenSource.Token);
-			DiscordActivity test2 = new()
+			/*DiscordActivity test2 = new()
 			{
 				Name = "Mention me with help for nsfw commands!",
 				ActivityType = ActivityType.Watching
 			};
 			await ShardedClient.UpdateStatusAsync(activity: test2, userStatus: UserStatus.Online);
-			await Task.Delay(TimeSpan.FromMinutes(20), _canellationTokenSource.Token);
+			await Task.Delay(TimeSpan.FromMinutes(20), _canellationTokenSource.Token);*/
 			DiscordActivity test3 = new()
 			{
 				Name = "Full NND support!",
@@ -365,7 +365,7 @@ internal class MikuBot : IDisposable
 	internal void RegisterCommands()
 	{
 		// Nsfw stuff needs to be hidden, that's why we use commands next
-		this.CommandsNextModules.RegisterCommands<NSFW>();
+		//this.CommandsNextModules.RegisterCommands<NSFW>();
 
 		this.ApplicationCommandsModules.RegisterGlobalCommands<ActionCommands>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Developer>();
@@ -422,7 +422,7 @@ internal class MikuBot : IDisposable
 	{
 		this.DiscordBotListApi = null;
 		this.ApplicationCommandsModules = null;
-		this.CommandsNextModules = null;
+		//this.CommandsNextModules = null;
 		this.LavalinkModules = null;
 		Guilds.Clear();
 		ShardedClient = null;

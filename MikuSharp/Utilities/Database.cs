@@ -28,7 +28,7 @@ public static class Database
 	public static async Task<Feedback> SaveFeedbackAsync(this Feedback feedback)
 	{
 		if (feedback.Metadata == null)
-			throw new InvalidOperationException($"{nameof(feedback.Metadata)} cannot be null for {nameof(feedback)}");
+			throw new ArgumentException($"{nameof(feedback.Metadata)} cannot be null for {nameof(feedback)}", nameof(feedback));
 
 		var connString = MikuBot.Config.DbConnectString;
 

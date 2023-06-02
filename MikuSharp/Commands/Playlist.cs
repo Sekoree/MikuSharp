@@ -38,9 +38,7 @@ public class Playlists : ApplicationCommandsModule
 			}
 			await PlaylistDB.AddPlaylist(playlistName, ctx.Member.Id);
 			foreach (var e in q)
-			{
 				await PlaylistDB.AddEntry(playlistName, ctx.Member.Id, e.Track.TrackString);
-			}
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Queue Copy").WithDescription("Queue was saved to new playlist -> " + playlistName).Build()));
 		}
 
@@ -99,13 +97,9 @@ public class Playlists : ApplicationCommandsModule
 				return;
 			}
 			if (link.Contains("youtu") && !link.Contains("soundcloud"))
-			{
 				await PlaylistDB.AddPlaylist(playlistName, ctx.Member.Id, ExtService.Youtube, link);
-			}
 			else
-			{
 				await PlaylistDB.AddPlaylist(playlistName, ctx.Member.Id, ExtService.Soundcloud, link);
-			}
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription($"Fixed playlist created with playlist -> {playlistName} and {s.Tracks.Count} Songs!").Build()));
 		}
 	}
@@ -177,9 +171,7 @@ public class Playlists : ApplicationCommandsModule
 					return;
 				}
 				foreach (var eP in Pages.Where(x => x.Embed.Fields.Count == 0).ToList())
-				{
 					Pages.Remove(eP);
-				}
 				await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages, token: MikuBot._canellationTokenSource.Token);
 			}
 			catch (Exception ex)
@@ -256,9 +248,7 @@ public class Playlists : ApplicationCommandsModule
 				return;
 			}
 			foreach (var eP in Pages.Where(x => x.Embed.Fields.Count == 0).ToList())
-			{
 				Pages.Remove(eP);
-			}
 			await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages, token: MikuBot._canellationTokenSource.Token);
 		}
 
@@ -345,9 +335,7 @@ public class Playlists : ApplicationCommandsModule
 			var pls = await PlaylistDB.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
 			var p = await pls.GetEntriesAsync();
 			if (!MikuBot.Guilds.Any(x => x.Key == ctx.Guild.Id))
-			{
 				MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
-			}
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
 			await g.ConditionalConnect(ctx);

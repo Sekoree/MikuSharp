@@ -14,7 +14,6 @@ public static partial class PlaylistDB
 	{
 		try
 		{
-
 			var connString = MikuBot.Config.DbConnectString;
 			await using var conn = new NpgsqlConnection(connString);
 			await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
