@@ -18,11 +18,7 @@ public static class Database
 
 		await using var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 
-		var feedbackCountDuringTargetDate = 0;
-		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
-			feedbackCountDuringTargetDate = reader.GetInt32(0);
-
-		await reader.CloseAsync();
+		var feedbackCountDuringTargetDate = (int?)await cmd.ExecuteScalarAsync() ?? 0;
 
 		await conn.CloseAsync();
 
@@ -33,23 +29,21 @@ public static class Database
 	{
 		if (feedback.Metadata == null)
 			throw new InvalidOperationException($"{nameof(feedback.Metadata)} cannot be null for {nameof(feedback)}");
+
 		var connString = MikuBot.Config.DbConnectString;
+
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync();
 
-		await using var feeedbackCmd = new NpgsqlCommand("INSERT INTO feedback (user_id, message, rating) VALUES(@userId, @message, @rating) RETURNING ufid", conn);
-		feeedbackCmd.Parameters.AddWithValue("userId", Convert.ToInt64(feedback.UserId));
-		feeedbackCmd.Parameters.AddWithValue("message", feedback.Message);
+		await using var feedbackCmd = new NpgsqlCommand("INSERT INTO feedback (user_id, message, rating) VALUES(@userId, @message, @rating) RETURNING ufid", conn);
+		feedbackCmd.Parameters.AddWithValue("userId", Convert.ToInt64(feedback.UserId));
+		feedbackCmd.Parameters.AddWithValue("message", feedback.Message);
 		if (feedback.Rating.HasValue)
-			feeedbackCmd.Parameters.AddWithValue("rating", feedback.Rating.Value);
+			feedbackCmd.Parameters.AddWithValue("rating", feedback.Rating.Value);
 		else
-			feeedbackCmd.Parameters.AddWithValue("rating", DBNull.Value);
+			feedbackCmd.Parameters.AddWithValue("rating", DBNull.Value);
 
-		using var reader = await feeedbackCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
-		while(await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
-			feedback.Ufid = reader.GetInt64(0);
-
-		await reader.CloseAsync();
+		feedback.Ufid = (long?)await feedbackCmd.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? throw new NullReferenceException("Database returned null. Something went wrong");
 
 		feedback.Metadata.Ufid = feedback.Ufid;
 
@@ -57,15 +51,15 @@ public static class Database
 		feedbackMetadataCmd.Parameters.AddWithValue("feedbackUfid", feedback.Metadata.Ufid);
 		feedbackMetadataCmd.Parameters.AddWithValue("type", feedback.Metadata.Type);
 		if (feedback.Metadata.GuildId.HasValue)
-			feedbackMetadataCmd.Parameters.AddWithValue("guildId", feedback.Metadata.GuildId.Value);
+			feedbackMetadataCmd.Parameters.AddWithValue("guildId", Convert.ToInt64(feedback.Metadata.GuildId.Value));
 		else
 			feedbackMetadataCmd.Parameters.AddWithValue("guildId", DBNull.Value);
 		if (feedback.Metadata.DmId.HasValue)
-			feedbackMetadataCmd.Parameters.AddWithValue("dmId", feedback.Metadata.DmId.Value);
+			feedbackMetadataCmd.Parameters.AddWithValue("dmId", Convert.ToInt64(feedback.Metadata.DmId.Value));
 		else
 			feedbackMetadataCmd.Parameters.AddWithValue("dmId", DBNull.Value);
 		if (feedback.Metadata.ThreadId.HasValue)
-			feedbackMetadataCmd.Parameters.AddWithValue("thread_id", feedback.Metadata.ThreadId.Value);
+			feedbackMetadataCmd.Parameters.AddWithValue("thread_id", Convert.ToInt64(feedback.Metadata.ThreadId.Value));
 		else
 			feedbackMetadataCmd.Parameters.AddWithValue("thread_id", DBNull.Value);
 		feedbackMetadataCmd.Parameters.AddWithValue("responseSend", feedback.Metadata.ResponseSend);
@@ -77,9 +71,9 @@ public static class Database
 		return feedback;
 	}
 
+
 	public static async Task AddToLastPlayingListAsync(ulong guildId, string ts)
 	{
-		var position = 0;
 		var connString = MikuBot.Config.DbConnectString;
 
 		await using var conn = new NpgsqlConnection(connString);
@@ -91,12 +85,7 @@ public static class Database
 		guildParam.Value = guildId;
 		countCmd.Parameters.Add(guildParam);
 
-		await using var reader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
-
-		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
-			position = reader.GetInt32(0);
-
-		await reader.CloseAsync();
+		var position = (int?)await countCmd.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? 0;
 
 		await using var insertCmd = new NpgsqlCommand("INSERT INTO lastplayedsongs VALUES (@pos, @guild, @ts)", conn);
 		var guildParam2 = insertCmd.CreateParameter();
@@ -278,18 +267,13 @@ public static class Database
 		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
-		var position = 0;
 		await using var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
 		var guildParam = countCmd.CreateParameter();
 		guildParam.ParameterName = "guild";
 		guildParam.Value = guild.Id;
 		countCmd.Parameters.Add(guildParam);
 
-		await using var countReader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
-		while (await countReader.ReadAsync(MikuBot._canellationTokenSource.Token))
-			position = countReader.GetInt32(0);
-
-		await countReader.CloseAsync();
+		var position = (int?)await countCmd.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? 0;
 
 		await using var insertCmd = new NpgsqlCommand("INSERT INTO queues VALUES (@pos, @guild, @user, @ts, @time)", conn);
 		var guildParam2 = insertCmd.CreateParameter();
@@ -329,18 +313,13 @@ public static class Database
 		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
-		var position = 0;
 		await using var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
 		var guildParam = countCmd.CreateParameter();
 		guildParam.ParameterName = "guild";
 		guildParam.Value = guild.Id;
 		countCmd.Parameters.Add(guildParam);
 
-		await using var countReader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
-		while (await countReader.ReadAsync(MikuBot._canellationTokenSource.Token))
-			position = countReader.GetInt32(0);
-
-		await countReader.CloseAsync();
+		var position = (int?)await countCmd.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? 0;
 
 		var longcmd = new StringBuilder();
 
@@ -379,18 +358,13 @@ public static class Database
 		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
-		var position = 0;
 		await using var countCmd = new NpgsqlCommand("SELECT Count(*) FROM queues WHERE guildId = @guild;", conn);
 		var guildParam = countCmd.CreateParameter();
 		guildParam.ParameterName = "guild";
 		guildParam.Value = guild.Id;
 		countCmd.Parameters.Add(guildParam);
 
-		await using var countReader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
-		while (await countReader.ReadAsync(MikuBot._canellationTokenSource.Token))
-			position = countReader.GetInt32(0);
-
-		await countReader.CloseAsync();
+		var position = (int?)await countCmd.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? 0;
 
 		var longcmd = new StringBuilder();
 

@@ -63,7 +63,7 @@ public class Feedback
 	/// </summary>
 	/// <returns>A string that represents the current object.</returns>
 	public override string ToString()
-		=> $"**Feedback from {this.UserId}**\n\n- Message:\n```\n{this.Message}\n```\n\n- Rating: {this.Rating?.ToString() ?? "Not given"}\n- Send at: {Formatter.Timestamp(this.SendAt, TimestampFormat.LongDateTime)}\n- Unique ID: {this.Ufid ?? new Random().NextInt64()}";
+		=> $"**Feedback from {this.UserId}**\n\n- Message:\n```\n{this.Message}\n```\n\n- Rating: {this.Rating?.ToString() ?? "Not given"}\n- Send at: {Formatter.Timestamp(this.SendAt, TimestampFormat.LongDateTime)}\n- Unique ID: {this.Ufid ?? new Random().NextInt64()}\n\n\n{this.Metadata}";
 }
 
 /// <summary>
@@ -119,4 +119,12 @@ public class FeedbackMetadata
 		this.ThreadId = threadId;
 		this.ResponseSend = responseSend;
 	}
+
+	/// <summary>
+	/// Returns a string that represents the current object.
+	/// </summary>
+	/// <returns>A string that represents the current object.</returns>
+	public override string ToString()
+		=> $"**Metadata**\n\n- Type: {this.Type}\n\n- Guild Id: {this.GuildId?.ToString() ?? "Not applicable"}\n\n- Dm Id: {this.DmId?.ToString() ?? "Not yet applicable"}\n\n- Thread Id: {this.ThreadId?.ToString() ?? "Not yet applicable"}\n\n- Response Send: {this.ResponseSend}";
+
 }

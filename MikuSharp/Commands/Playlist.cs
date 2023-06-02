@@ -120,7 +120,7 @@ public class Playlists : ApplicationCommandsModule
 			try
 			{
 				var pls = await PlaylistDB.GetPlaylists(ctx.Guild, ctx.Member.Id);
-				ctx.Client.Logger.LogDebug(pls.Count.ToString());
+				ctx.Client.Logger.LogDebug("{plCount}", pls.Count.ToString());
 				if (pls.Count == 0)
 				{
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You dont have any playlists"));

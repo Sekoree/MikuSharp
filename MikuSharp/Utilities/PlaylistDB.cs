@@ -41,8 +41,8 @@ public static partial class PlaylistDB
 		}
 		catch (Exception ex)
 		{
-			MikuBot.ShardedClient.Logger.LogError(ex.Message);
-			MikuBot.ShardedClient.Logger.LogError(ex.StackTrace);
+			MikuBot.ShardedClient.Logger.LogError("{msg}", ex.Message);
+			MikuBot.ShardedClient.Logger.LogError("{stack}", ex.StackTrace);
 			return null;
 		}
 	}
@@ -77,14 +77,10 @@ public static partial class PlaylistDB
 			await using var conn = new NpgsqlConnection(connString);
 			await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
 
-			var entryCount = 0;
 			await using var countCmd = new NpgsqlCommand("SELECT COUNT(*) FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName;", conn);
 			countCmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 			countCmd.Parameters.AddWithValue("playlistName", playlistName);
-			await using var countReader = await countCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
-			while (await countReader.ReadAsync(MikuBot._canellationTokenSource.Token))
-				entryCount = Convert.ToInt32(countReader["count"]);
-			await countReader.CloseAsync();
+			var entryCount = (int?)await countCmd.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? 0;
 
 			await using var playlistCmd = new NpgsqlCommand("SELECT * FROM playlists WHERE userid = @userId AND playlistname = @playlistName;", conn);
 			playlistCmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
@@ -242,7 +238,6 @@ public static partial class PlaylistDB
 
 	public static async Task AddEntry(string playlistName, ulong userId, string trackString)
 	{
-		var position = 0;
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
@@ -250,10 +245,7 @@ public static partial class PlaylistDB
 		await using var cmd2 = new NpgsqlCommand($"SELECT COUNT(*) FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName;", conn);
 		cmd2.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 		cmd2.Parameters.AddWithValue("playlistName", playlistName);
-		await using var reader = await cmd2.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
-		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
-			position = reader.GetInt32(0);
-		await reader.CloseAsync();
+		var position = (int?)await cmd2.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? 0;
 
 		await using var cmd = new NpgsqlCommand("INSERT INTO playlistentries VALUES (@position, @playlistName, @userId, @trackString, @additionDate, @modifyDate);" +
 									"UPDATE playlists SET changed = @modifyDate WHERE userid = @userId AND playlistname = @playlistName;", conn);
@@ -270,7 +262,6 @@ public static partial class PlaylistDB
 
 	public static async Task AddEntry(string playlistName, ulong userId, List<LavalinkTrack> tracks)
 	{
-		var position = 0;
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
 		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
@@ -278,10 +269,7 @@ public static partial class PlaylistDB
 		await using var cmd2 = new NpgsqlCommand("SELECT COUNT(*) FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName;", conn);
 		cmd2.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 		cmd2.Parameters.AddWithValue("playlistName", playlistName);
-		await using var reader = await cmd2.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
-		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
-			position = reader.GetInt32(0);
-		await reader.CloseAsync();
+		var position = (int?)await cmd2.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? 0;
 
 		var longcmd = "UPDATE playlists SET changed = @modifyDate WHERE userid = @userId AND playlistname = @playlistName;";
 		foreach (var track in tracks)
