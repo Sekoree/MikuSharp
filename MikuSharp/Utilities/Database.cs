@@ -243,15 +243,15 @@ public static class Database
 
 		await using var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 		var queue = new List<QueueEntry>();
-
+		var ll = MikuBot.ShardedClient.GetShard(guild).GetLavalink();
 		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
 		{
 			var trackString = Convert.ToString(reader["trackstring"]);
 			var userId = Convert.ToUInt64(reader["userid"]);
 			var addTime = DateTimeOffset.Parse(reader["addtime"].ToString());
 			var position = Convert.ToInt32(reader["position"]);
-
-			var queueEntry = new QueueEntry(LavalinkUtilities.DecodeTrack(trackString), userId, addTime, position);
+			var track = await ll.ConnectedSessions.First().Value.DecodeTrackAsync(trackString);
+			var queueEntry = new QueueEntry(track, userId, addTime, position);
 			queue.Add(queueEntry);
 		}
 
@@ -401,7 +401,9 @@ public static class Database
 	public static async Task InsertToQueueAsync(DiscordGuild guild, ulong userId, string trackString, int position)
 	{
 		var queueNow = await GetQueueAsync(guild);
-		queueNow.Insert(position, new QueueEntry(LavalinkUtilities.DecodeTrack(trackString), userId, DateTimeOffset.UtcNow, position));
+		var ll = MikuBot.ShardedClient.GetShard(guild).GetLavalink();
+		var track = await ll.ConnectedSessions.First().Value.DecodeTrackAsync(trackString);
+		queueNow.Insert(position, new QueueEntry(track, userId, DateTimeOffset.UtcNow, position));
 		await RebuildQueueAsync(guild, queueNow);
 	}
 
@@ -409,7 +411,7 @@ public static class Database
 	{
 		var queueNow = await GetQueueAsync(guild);
 		foreach (var track in tracks)
-			queueNow.Insert(position, new QueueEntry(LavalinkUtilities.DecodeTrack(track.Encoded), userId, DateTimeOffset.UtcNow, position));
+			queueNow.Insert(position, new QueueEntry(track, userId, DateTimeOffset.UtcNow, position));
 		await RebuildQueueAsync(guild, queueNow);
 	}
 
@@ -455,10 +457,11 @@ public static class Database
 		cmd.Parameters.AddWithValue("guild", guild.Id);
 		await using var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 		List<Entry> queue = new();
+		var ll = MikuBot.ShardedClient.GetShard(guild).GetLavalink();
 		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
 		{
 			var trackString = reader.GetString(reader.GetOrdinal("trackstring"));
-			var track = LavalinkUtilities.DecodeTrack(trackString);
+			var track = await ll.ConnectedSessions.First().Value.DecodeTrackAsync(trackString);
 			var entry = new Entry(track, DateTimeOffset.UtcNow);
 			queue.Add(entry);
 		}

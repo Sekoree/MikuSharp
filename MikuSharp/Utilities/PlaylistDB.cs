@@ -295,7 +295,9 @@ public static partial class PlaylistDB
 	{
 		var playlist = await GetPlaylistAsync(guild, userId, playlistName);
 		var entries = await playlist.GetEntriesAsync();
-		entries.Insert(position, new PlaylistEntry(LavalinkUtilities.DecodeTrack(trackString), DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, position));
+		var ll = MikuBot.ShardedClient.GetShard(guild).GetLavalink();
+		var track = await ll.ConnectedSessions.First().Value.DecodeTrackAsync(trackString);
+		entries.Insert(position, new PlaylistEntry(track, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, position));
 		await RebuildListAsync(userId, playlistName, entries);
 	}
 
@@ -304,7 +306,7 @@ public static partial class PlaylistDB
 		var playlist = await GetPlaylistAsync(guild, userId, playlistName);
 		var entries = await playlist.GetEntriesAsync();
 		foreach (var track in tracks)
-			entries.Insert(position, new PlaylistEntry(LavalinkUtilities.DecodeTrack(track.Encoded), DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, position));
+			entries.Insert(position, new PlaylistEntry(track, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, position));
 		await RebuildListAsync(userId, playlistName, entries);
 	}
 

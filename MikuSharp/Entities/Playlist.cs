@@ -39,9 +39,10 @@ public class Playlist
 				cmd.Parameters.AddWithValue("userId", Convert.ToInt64(this.UserID));
 				cmd.Parameters.AddWithValue("playlistName", this.Name);
 				cmd.Prepare();
+				var ll = MikuBot.ShardedClient.GetShard(0).GetLavalink();
 				var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
 				while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
-					entries.Add(new PlaylistEntry(LavalinkUtilities.DecodeTrack(Convert.ToString(reader["trackstring"])), DateTimeOffset.Parse(Convert.ToString(reader["addition"])), DateTimeOffset.Parse(Convert.ToString(reader["changed"])), Convert.ToInt32(reader["pos"])));
+					entries.Add(new PlaylistEntry(await ll.ConnectedSessions.First().Value.DecodeTrackAsync(Convert.ToString(reader["trackstring"])), DateTimeOffset.Parse(Convert.ToString(reader["addition"])), DateTimeOffset.Parse(Convert.ToString(reader["changed"])), Convert.ToInt32(reader["pos"])));
 				reader.Close();
 				cmd.Dispose();
 				conn.Close();
