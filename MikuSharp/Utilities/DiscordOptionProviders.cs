@@ -41,16 +41,16 @@ internal class AutocompleteProviders
 	{
 		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
 		{
-			var plls = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
+			var plls = await PlaylistDb.GetPlaylistsSimple(ctx.Member.Id);
 			if (plls.Count == 0)
 				return new List<DiscordApplicationCommandAutocompleteChoice>() { new("You have no songs", "error") };
-			var DbPlaylists = await PlaylistDB.GetPlaylists(ctx.Guild, ctx.Member.Id);
+			var dbPlaylists = await PlaylistDb.GetPlaylists(ctx.Guild, ctx.Member.Id);
 
 			List<KeyValuePair<string, Playlist>> playlists = new(25);
 			if (ctx.FocusedOption.Value == null)
-				playlists.AddRange(DbPlaylists.Take(25));
+				playlists.AddRange(dbPlaylists.Take(25));
 			else
-				playlists.AddRange(DbPlaylists.Where(x => x.Value.Name.Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
+				playlists.AddRange(dbPlaylists.Where(x => x.Value.Name.Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
 
 			return playlists.Select(x => new DiscordApplicationCommandAutocompleteChoice(x.Value.Name, x.Key));
 		}
@@ -66,7 +66,7 @@ internal class AutocompleteProviders
 			if (playlist == "error")
 				return new List<DiscordApplicationCommandAutocompleteChoice>() { new("You have no valid playlist selected", "error") };
 
-			var pls = await PlaylistDB.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
+			var pls = await PlaylistDb.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
 			var tracks = await pls.GetEntriesAsync();
 			List<PlaylistEntry> songs = new(25);
 			if (ctx.FocusedOption.Value == null)

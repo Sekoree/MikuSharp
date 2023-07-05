@@ -4,18 +4,18 @@ namespace MikuSharp.Entities;
 
 public class TrackResult
 {
-	public LavalinkPlaylistInfo PlaylistInfo { get; set; }
+	public string Name { get; set; }
 
 	public List<LavalinkTrack> Tracks { get; set; } = new();
 
-	public TrackResult(LavalinkPlaylistInfo playlistInfo, IEnumerable<LavalinkTrack> tracks)
+	public TrackResult(string name, IEnumerable<LavalinkTrack> tracks)
 	{
-		this.PlaylistInfo = playlistInfo;
+		this.Name = name;
 		this.Tracks.AddRange(tracks);
 	}
-	public TrackResult(LavalinkPlaylistInfo playlistInfo, LavalinkTrack track)
+	public TrackResult(string name, LavalinkTrack track)
 	{
-		this.PlaylistInfo = playlistInfo;
+		this.Name = name;
 		this.Tracks.Add(track);
 	}
 }

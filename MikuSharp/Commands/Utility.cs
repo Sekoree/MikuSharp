@@ -10,13 +10,13 @@ internal class Utility : ApplicationCommandsModule
 	internal class AnimeMangaUtility : ApplicationCommandsModule
 	{
 		[SlashCommand("anime_search", "Search for an anime")]
-		public static async Task SearchAnimeAsync(InteractionContext ctx, [Option("search_query", "Search query")] string search_query)
+		public static async Task SearchAnimeAsync(InteractionContext ctx, [Option("search_query", "Search query")] string searchQuery)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 			try
 			{
 				var ine = ctx.Client.GetInteractivity();
-				var a = await Anime.GetAnimeAsync(search_query);
+				var a = await Anime.GetAnimeAsync(searchQuery);
 				var emb = new DiscordEmbedBuilder();
 				List<DiscordEmbedBuilder> res = new();
 				List<Page> ress = new();
@@ -54,7 +54,7 @@ internal class Utility : ApplicationCommandsModule
 					ress.Add(new Page(embed: aa));
 					i++;
 				}
-				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable, token: MikuBot._canellationTokenSource.Token);
+				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable, token: MikuBot.CanellationTokenSource.Token);
 			}
 			catch (Exception ex)
 			{
@@ -65,13 +65,13 @@ internal class Utility : ApplicationCommandsModule
 		}
 
 		[SlashCommand("manga_search", "Search for an manga")]
-		public static async Task SearchMangaAsync(InteractionContext ctx, [Option("search_query", "Search query")] string search_query)
+		public static async Task SearchMangaAsync(InteractionContext ctx, [Option("search_query", "Search query")] string searchQuery)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 			try
 			{
 				var ine = ctx.Client.GetInteractivity();
-				var a = await Manga.GetMangaAsync(search_query);
+				var a = await Manga.GetMangaAsync(searchQuery);
 				var emb = new DiscordEmbedBuilder();
 				List<DiscordEmbedBuilder> res = new();
 				List<Page> ress = new();
@@ -105,7 +105,7 @@ internal class Utility : ApplicationCommandsModule
 					ress.Add(new Page(embed: aa));
 					i++;
 				}
-				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable, token: MikuBot._canellationTokenSource.Token);
+				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable, token: MikuBot.CanellationTokenSource.Token);
 			}
 			catch (Exception ex)
 			{

@@ -27,10 +27,10 @@ public class VoiceChat
 			if ((afterChannelUserCount == 0 || currentChannelUserCount == 0)
 				&& !isCurrentUserInChannel && guildConnectionUserCount == 0)
 			{
-				if (musicInstance.Playstate == PlayState.Playing)
+				if (musicInstance.PlayState == PlayState.Playing)
 				{
 					await musicInstance.GuildPlayer.PauseAsync();
-					musicInstance.Playstate = PlayState.Paused;
+					musicInstance.PlayState = PlayState.Paused;
 
 					try
 					{
@@ -53,11 +53,11 @@ public class VoiceChat
 
 				musicInstance.AloneTime = DateTime.UtcNow;
 				musicInstance.AloneCheckCancellationToken = new();
-				guild.AloneCheckThread = Task.Run(guild.CheckAlone, MikuBot._canellationTokenSource.Token);
+				guild.AloneCheckThread = Task.Run(guild.CheckAlone, MikuBot.CanellationTokenSource.Token);
 			}
 			else if (afterChannelUserCount != 0 && isCurrentUserInChannel)
 			{
-				if (musicInstance != null && musicInstance.AloneCheckCancellationToken != null)
+				if (musicInstance is { AloneCheckCancellationToken: not null })
 				{
 					musicInstance.AloneCheckCancellationToken.Cancel(); try
 					{

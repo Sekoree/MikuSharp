@@ -89,8 +89,8 @@ public class Developer : ApplicationCommandsModule
 		MikuBot.LavalinkSessions.Clear();
 		foreach (var l in ll)
 		{
-			var LCon = await l.Value.ConnectAsync(MikuBot.LavalinkConfig);
-			MikuBot.LavalinkSessions.Add(l.Key, LCon);
+			var lCon = await l.Value.ConnectAsync(MikuBot.LavalinkConfig);
+			MikuBot.LavalinkSessions.Add(l.Key, lCon);
 			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Started lavalink on shard {l.Key}"));
 		}
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
@@ -109,7 +109,7 @@ public class Developer : ApplicationCommandsModule
 
 			await guildConnection.Value.StopAsync();
 			if (clearQueues)
-				_ = Task.Run(async () => await Database.ClearQueueAsync(guildConnection.Value.Guild), MikuBot._canellationTokenSource.Token);
+				_ = Task.Run(async () => await Database.ClearQueueAsync(guildConnection.Value.Guild), MikuBot.CanellationTokenSource.Token);
 			await guildConnection.Value.DisconnectAsync();
 			connection.Discord.Logger.LogInformation("Forcefully disconnected lavalink voice from {guild}", guildConnection.Key);
 		}
@@ -158,28 +158,28 @@ public class Developer : ApplicationCommandsModule
 
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Trying to get log"));
 		var now = DateTime.Now;
-		var target_file = $"miku_log{now.ToString("yyyy/MM/dd").Replace("/", "")}.txt";
-		if (!File.Exists(target_file))
+		var targetFile = $"miku_log{now.ToString("yyyy/MM/dd").Replace("/", "")}.txt";
+		if (!File.Exists(targetFile))
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Failed to get log"));
 			return;
 		}
 		else
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Found log {Formatter.Bold(target_file)}"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Found log {Formatter.Bold(targetFile)}"));
 		try
 		{
-			if (!File.Exists($"temp-{target_file}"))
-				File.Copy(target_file, $"temp-{target_file}");
+			if (!File.Exists($"temp-{targetFile}"))
+				File.Copy(targetFile, $"temp-{targetFile}");
 			else
 			{
-				File.Delete($"temp-{target_file}");
-				File.Copy(target_file, $"temp-{target_file}");
+				File.Delete($"temp-{targetFile}");
+				File.Copy(targetFile, $"temp-{targetFile}");
 			}
-			FileStream log = new(path: $"temp-{target_file}", FileMode.Open, FileAccess.Read);
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddFile(target_file, log, true).WithContent($"Log {Formatter.Bold(target_file)}").AsEphemeral());
+			FileStream log = new(path: $"temp-{targetFile}", FileMode.Open, FileAccess.Read);
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddFile(targetFile, log, true).WithContent($"Log {Formatter.Bold(targetFile)}").AsEphemeral());
 			log.Close();
-			log.Dispose();
-			File.Delete($"temp-{target_file}");
+			await log.DisposeAsync();
+			File.Delete($"temp-{targetFile}");
 		}
 		catch (Exception ex)
 		{
@@ -225,7 +225,7 @@ public class Developer : ApplicationCommandsModule
 		msg = await ctx.GetOriginalResponseAsync();
 		try
 		{
-			var globals = new EvaluationVariables(ctx.TargetMessage, ctx.Client, ctx, MikuBot._canellationTokenSource, MikuBot._globalCancellationTokenSource);
+			var globals = new EvaluationVariables(ctx.TargetMessage, ctx.Client, ctx, MikuBot.CanellationTokenSource, MikuBot.GlobalCancellationTokenSource);
 
 			var sopts = ScriptOptions.Default;
 			sopts = sopts.WithImports("System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "DisCatSharp", "DisCatSharp.Entities", "DisCatSharp.CommandsNext", "DisCatSharp.CommandsNext.Attributes", "DisCatSharp.Interactivity", "DisCatSharp.Interactivity.Extensions", "DisCatSharp.Enums", "Microsoft.Extensions.Logging", "MikuSharp.Entities", "MikuSharp.Enums", "MikuSharp.Utilities", "DisCatSharp.Lavalink");
@@ -235,7 +235,7 @@ public class Developer : ApplicationCommandsModule
 			script.Compile();
 			var result = await script.RunAsync(globals).ConfigureAwait(false);
 
-			if (result != null && result.ReturnValue != null && !string.IsNullOrWhiteSpace(result.ReturnValue.ToString()))
+			if (result is { ReturnValue: not null } && !string.IsNullOrWhiteSpace(result.ReturnValue.ToString()))
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder { Title = "Evaluation Result", Description = result.ReturnValue.ToString(), Color = new DiscordColor("#007FFF") }.Build())).ConfigureAwait(false);
 			else
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder { Title = "Evaluation Successful", Description = "No result was returned.", Color = new DiscordColor("#007FFF") }.Build())).ConfigureAwait(false);

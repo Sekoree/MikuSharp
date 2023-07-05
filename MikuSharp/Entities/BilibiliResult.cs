@@ -9,7 +9,7 @@ public class BiliPlayinfo
 	public string Message { get; set; }
 
 	[JsonProperty("ttl")]
-	public int TTL { get; set; }
+	public int Ttl { get; set; }
 
 	[JsonProperty("data")]
 	public BiliData Data { get; set; }

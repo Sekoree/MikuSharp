@@ -53,7 +53,7 @@ public class Music : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("I'm not in a voice channel"));
 				return;
 			}
-			g.MusicInstance.Playstate = PlayState.NotPlaying;
+			g.MusicInstance.PlayState = PlayState.NotPlaying;
 			try
 			{
 				if (keep)
@@ -101,7 +101,7 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (await g.IsNotConnected(ctx))
 				return;
-			if (g.MusicInstance.Playstate != PlayState.Playing && g.MusicInstance.Playstate != PlayState.Paused)
+			if (g.MusicInstance.PlayState != PlayState.Playing && g.MusicInstance.PlayState != PlayState.Paused)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("I don't play anything right now"));
 				return;
@@ -116,8 +116,8 @@ public class Music : ApplicationCommandsModule
 		[SlashCommand("play", "Play or queue a song")]
 		[RequireUserVoicechatConnection]
 		public static async Task PlayAsync(InteractionContext ctx,
-			[Option("song", "Song name or url to play")] string name_or_url = null,
-			[Option("music_file", "Music file to play")] DiscordAttachment music_file = null
+			[Option("song", "Song name or url to play")] string nameOrUrl = null,
+			[Option("music_file", "Music file to play")] DiscordAttachment musicFile = null
 		)
 		{
 			await ctx.DeferAsync(true);
@@ -126,7 +126,7 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkSessions[ctx.Client.ShardId], ctx.Client.ShardId);
 			var curq = await Database.GetQueueAsync(ctx.Guild);
-			if (curq.Count != 0 && g.MusicInstance.Playstate == PlayState.NotPlaying)
+			if (curq.Count != 0 && g.MusicInstance.PlayState == PlayState.NotPlaying)
 			{
 				var inter = ctx.Client.GetInteractivity();
 				List<DiscordButtonComponent> buttons = new(2)
@@ -161,16 +161,16 @@ public class Music : ApplicationCommandsModule
 
 			await g.ConditionalConnect(ctx);
 
-			if (music_file == null && name_or_url == null)
+			if (musicFile == null && nameOrUrl == null)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Error: No song or file choosen"));
 				return;
 			}
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			name_or_url = music_file.SearchUrlOrAttachment(name_or_url);
-			var oldState = g.MusicInstance.Playstate;
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Trying to play/search {name_or_url}..."));
-			var q = await g.MusicInstance.QueueSong(name_or_url, ctx);
+			nameOrUrl = musicFile.SearchUrlOrAttachment(nameOrUrl);
+			var oldState = g.MusicInstance.PlayState;
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Trying to play/search {nameOrUrl}..."));
+			var q = await g.MusicInstance.QueueSong(nameOrUrl, ctx);
 			if (q == null)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Error: Song not found"));
@@ -201,8 +201,8 @@ public class Music : ApplicationCommandsModule
 		[RequireUserVoicechatConnection]
 		public static async Task InsertToQueueAsync(InteractionContext ctx,
 			[Option("position", "Position to move song to", true), Autocomplete(typeof(AutocompleteProviders.QueueProvider))] string posi,
-			[Option("song", "Song name or url to play")] string name_or_url = null,
-			[Option("music_file", "Music file to play")] DiscordAttachment music_file = null
+			[Option("song", "Song name or url to play")] string nameOrUrl = null,
+			[Option("music_file", "Music file to play")] DiscordAttachment musicFile = null
 		)
 		{
 			await ctx.DeferAsync(true);
@@ -214,15 +214,15 @@ public class Music : ApplicationCommandsModule
 
 			await g.ConditionalConnect(ctx);
 
-			if (music_file == null && name_or_url == null)
+			if (musicFile == null && nameOrUrl == null)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Error: No song or file choosen"));
 				return;
 			}
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			name_or_url = music_file.SearchUrlOrAttachment(name_or_url);
-			var oldState = g.MusicInstance.Playstate;
-			var q = await g.MusicInstance.QueueSong(name_or_url, ctx, pos);
+			nameOrUrl = musicFile.SearchUrlOrAttachment(nameOrUrl);
+			var oldState = g.MusicInstance.PlayState;
+			var q = await g.MusicInstance.QueueSong(nameOrUrl, ctx, pos);
 			if (q == null)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Error: Song not found"));
@@ -279,7 +279,7 @@ public class Music : ApplicationCommandsModule
 				await g.MusicInstance.PlaySong();
 			else
 			{
-				g.MusicInstance.Playstate = PlayState.NotPlaying;
+				g.MusicInstance.PlayState = PlayState.NotPlaying;
 				await g.MusicInstance.GuildPlayer.StopAsync();
 			}
 			if (g.MusicInstance.LastSong != null)
@@ -297,9 +297,9 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			await Task.Run(g.MusicInstance.GuildPlayer.StopAsync, MikuBot._canellationTokenSource.Token);
-			var cmd_id = ctx.Client.GetApplicationCommands().GlobalCommands.First(x => x.Name == "music").Id;
-			await ctx.EditResponseAsync(builder: new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Stopped** (use </music playback resume:{cmd_id}> to start playback again)").Build()));
+			await Task.Run(g.MusicInstance.GuildPlayer.StopAsync, MikuBot.CanellationTokenSource.Token);
+			var cmdId = ctx.Client.GetApplicationCommands().GlobalCommands.First(x => x.Name == "music").Id;
+			await ctx.EditResponseAsync(builder: new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Stopped** (use </music playback resume:{cmdId}> to start playback again)").Build()));
 		}
 
 		[SlashCommand("volume", "Change the music volume")]
@@ -328,10 +328,10 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			if (g.MusicInstance.Playstate == PlayState.Playing)
+			if (g.MusicInstance.PlayState == PlayState.Playing)
 			{
 				await g.MusicInstance.GuildPlayer.PauseAsync();
-				g.MusicInstance.Playstate = PlayState.Paused;
+				g.MusicInstance.PlayState = PlayState.Paused;
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Paused**").Build()));
 			}
 			else
@@ -347,7 +347,7 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			if (g.MusicInstance.Playstate == PlayState.Stopped)
+			if (g.MusicInstance.PlayState == PlayState.Stopped)
 			{
 				await g.MusicInstance.PlaySong();
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Started Playback**").Build()));
@@ -355,7 +355,7 @@ public class Music : ApplicationCommandsModule
 			else
 			{
 				await g.MusicInstance.GuildPlayer.ResumeAsync();
-				g.MusicInstance.Playstate = PlayState.Playing;
+				g.MusicInstance.PlayState = PlayState.Playing;
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Resumed**").Build()));
 			}
 		}
@@ -387,11 +387,11 @@ public class Music : ApplicationCommandsModule
 				if (queue.Count % 5 != 0)
 					totalP++;
 				var emb = new DiscordEmbedBuilder();
-				List<Page> Pages = new();
+				List<Page> pages = new();
 				if (g.MusicInstance.RepeatMode == RepeatMode.All)
 				{
 					songAmount = g.MusicInstance.RepeatAllPosition;
-					foreach (var Track in queue)
+					foreach (var track in queue)
 					{
 						if (songsPerPage == 0 && currentPage == 1)
 						{
@@ -415,7 +415,7 @@ public class Music : ApplicationCommandsModule
 							songsPerPage = 0;
 							emb.AddField(new DiscordEmbedField("Playback options", g.MusicInstance.GetPlaybackOptions()));
 							emb.WithFooter($"Page {currentPage}/{totalP}");
-							Pages.Add(new Page(embed: emb));
+							pages.Add(new Page(embed: emb));
 							emb.ClearFields();
 							emb.WithTitle("more™");
 							currentPage++;
@@ -424,14 +424,14 @@ public class Music : ApplicationCommandsModule
 						{
 							emb.AddField(new DiscordEmbedField("Playback options", g.MusicInstance.GetPlaybackOptions()));
 							emb.WithFooter($"Page {currentPage}/{totalP}");
-							Pages.Add(new Page(embed: emb));
+							pages.Add(new Page(embed: emb));
 							emb.ClearFields();
 						}
 					}
 				}
 				else
 				{
-					foreach (var Track in queue)
+					foreach (var track in queue)
 					{
 						if (songsPerPage == 0 && currentPage == 1)
 						{
@@ -442,9 +442,9 @@ public class Music : ApplicationCommandsModule
 						}
 						else
 						{
-							Track.GetPlayingState(out var time);
-							emb.AddField(new DiscordEmbedField($"**{songAmount}.{Track.Track.Info.Title.Replace("*", "").Replace("|", "")}** by {Track.Track.Info.Author.Replace("*", "").Replace("|", "")} [{time}]",
-								$"Requested by <@{Track.AddedBy}> [Link]({Track.Track.Info.Uri.AbsoluteUri})"));
+							track.GetPlayingState(out var time);
+							emb.AddField(new DiscordEmbedField($"**{songAmount}.{track.Track.Info.Title.Replace("*", "").Replace("|", "")}** by {track.Track.Info.Author.Replace("*", "").Replace("|", "")} [{time}]",
+								$"Requested by <@{track.AddedBy}> [Link]({track.Track.Info.Uri.AbsoluteUri})"));
 						}
 						songsPerPage++;
 						songAmount++;
@@ -453,7 +453,7 @@ public class Music : ApplicationCommandsModule
 							songsPerPage = 0;
 							emb.WithFooter($"Page {currentPage}/{totalP}");
 							emb.AddField(new DiscordEmbedField("Playback options", g.MusicInstance.GetPlaybackOptions()));
-							Pages.Add(new Page(embed: emb));
+							pages.Add(new Page(embed: emb));
 							emb.ClearFields();
 							emb.WithTitle("more™");
 							currentPage++;
@@ -462,7 +462,7 @@ public class Music : ApplicationCommandsModule
 						{
 							emb.WithFooter($"Page {currentPage}/{totalP}");
 							emb.AddField(new DiscordEmbedField("Playback options", g.MusicInstance.GetPlaybackOptions()));
-							Pages.Add(new Page(embed: emb));
+							pages.Add(new Page(embed: emb));
 							emb.ClearFields();
 						}
 					}
@@ -470,17 +470,17 @@ public class Music : ApplicationCommandsModule
 				if (currentPage == 1)
 				{
 					emb.AddField(new DiscordEmbedField("Playback options", g.MusicInstance.GetPlaybackOptions()));
-					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(Pages.First().Embed));
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(pages.First().Embed));
 					return;
 				}
 				else if (currentPage == 2 && songsPerPage == 0)
 				{
-					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(Pages.First().Embed));
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(pages.First().Embed));
 					return;
 				}
-				foreach (var eP in Pages.Where(x => !x.Embed.Fields.Any(y => y.Name != "Playback keep")).ToList())
-					Pages.Remove(eP);
-				await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages, token: MikuBot._canellationTokenSource.Token);
+				foreach (var eP in pages.Where(x => !x.Embed.Fields.Any(y => y.Name != "Playback keep")).ToList())
+					pages.Remove(eP);
+				await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, pages, token: MikuBot.CanellationTokenSource.Token);
 			}
 			catch (Exception ex)
 			{
@@ -505,23 +505,23 @@ public class Music : ApplicationCommandsModule
 
 		[SlashCommand("move", "Moves a specific song within the queue")]
 		public static async Task MoveWithinQueueAsync(InteractionContext ctx,
-			[Option("song", "Song to move within the queue", true), Autocomplete(typeof(AutocompleteProviders.QueueProvider))] string old_posi,
-			[Option("position", "Position to move song to", true), Autocomplete(typeof(AutocompleteProviders.QueueProvider))] string new_posi
+			[Option("song", "Song to move within the queue", true), Autocomplete(typeof(AutocompleteProviders.QueueProvider))] string oldPosi,
+			[Option("position", "Position to move song to", true), Autocomplete(typeof(AutocompleteProviders.QueueProvider))] string newPosi
 		)
 		{
 			await ctx.DeferAsync(true);
-			var old_pos = Convert.ToInt32(old_posi);
-			var new_pos = Convert.ToInt32(new_posi);
+			var oldPos = Convert.ToInt32(oldPosi);
+			var newPos = Convert.ToInt32(newPosi);
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			var queue = await Database.GetQueueAsync(ctx.Guild);
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			if (old_pos < 1 || new_pos < 1 || old_pos == new_pos || new_pos >= queue.Count)
+			if (oldPos < 1 || newPos < 1 || oldPos == newPos || newPos >= queue.Count)
 				return;
-			var oldSong = queue[old_pos];
-			await Database.MoveQueueItemsAsync(ctx.Guild, old_pos, new_pos);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Moved**:\n **{oldSong.Track.Info.Title}**\nby {oldSong.Track.Info.Author}\n from position **{old_pos}** to **{new_pos}**!").Build()));
+			var oldSong = queue[oldPos];
+			await Database.MoveQueueItemsAsync(ctx.Guild, oldPos, newPos);
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Moved**:\n **{oldSong.Track.Info.Title}**\nby {oldSong.Track.Info.Author}\n from position **{oldPos}** to **{newPos}**!").Build()));
 		}
 
 		[SlashCommand("remove", "Removes a name_or_url from queue")]
@@ -631,11 +631,11 @@ public class Music : ApplicationCommandsModule
 				if (lastPlayedSongs.Count % 10 != 0)
 					totalP++;
 				var emb = new DiscordEmbedBuilder();
-				List<Page> Pages = new();
-				foreach (var Track in lastPlayedSongs)
+				List<Page> pages = new();
+				foreach (var track in lastPlayedSongs)
 				{
-					Track.GetPlayingState(out var time);
-					emb.AddField(new DiscordEmbedField($"{songAmount + 1}.{Track.Track.Info.Title.Replace("*", "").Replace("|", "")}", $"by {Track.Track.Info.Author.Replace("*", "").Replace("|", "")} [{time}] [Link]({Track.Track.Info.Uri})"));
+					track.GetPlayingState(out var time);
+					emb.AddField(new DiscordEmbedField($"{songAmount + 1}.{track.Track.Info.Title.Replace("*", "").Replace("|", "")}", $"by {track.Track.Info.Author.Replace("*", "").Replace("|", "")} [{time}] [Link]({track.Track.Info.Uri})"));
 					songsPerPage++;
 					songAmount++;
 					if (songsPerPage == 10)
@@ -643,7 +643,7 @@ public class Music : ApplicationCommandsModule
 						songsPerPage = 0;
 						emb.WithTitle("Last played songs in this server:\n");
 						emb.WithFooter($"Page {currentPage}/{totalP}");
-						Pages.Add(new Page(embed: emb));
+						pages.Add(new Page(embed: emb));
 						emb.ClearFields();
 						emb.WithTitle("more™");
 						currentPage++;
@@ -652,23 +652,23 @@ public class Music : ApplicationCommandsModule
 					{
 						emb.WithTitle("Last played songs in this server:\n");
 						emb.WithFooter($"Page {currentPage}/{totalP}");
-						Pages.Add(new Page(embed: emb));
+						pages.Add(new Page(embed: emb));
 						emb.ClearFields();
 					}
 				}
 				if (currentPage == 1)
 				{
-					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(Pages.First().Embed));
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(pages.First().Embed));
 					return;
 				}
 				else if (currentPage == 2 && songsPerPage == 0)
 				{
-					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(Pages.First().Embed));
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(pages.First().Embed));
 					return;
 				}
-				foreach (var eP in Pages.Where(x => x.Embed.Fields.Count == 0).ToList())
-					Pages.Remove(eP);
-				await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, Pages, token: MikuBot._canellationTokenSource.Token);
+				foreach (var eP in pages.Where(x => x.Embed.Fields.Count == 0).ToList())
+					pages.Remove(eP);
+				await inter.SendPaginatedResponseAsync(ctx.Interaction, true, false, ctx.User, pages, token: MikuBot.CanellationTokenSource.Token);
 			}
 			catch (Exception ex)
 			{

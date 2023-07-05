@@ -8,7 +8,7 @@ using MikuSharp.Enums;
 
 namespace MikuSharp.Utilities;
 
-public static partial class PlaylistDB
+public static partial class PlaylistDb
 {
 	[GeneratedRegex("[^a-zA-Z0-9_\\- ]")]
 	private static partial Regex PlaylistNameRegex();
@@ -19,14 +19,14 @@ public static partial class PlaylistDB
 		{
 			var connString = MikuBot.Config.DbConnectString;
 			await using var conn = new NpgsqlConnection(connString);
-			await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+			await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 			await using var cmd = new NpgsqlCommand("SELECT * FROM playlists WHERE userid = @userId ORDER BY playlistname ASC;", conn);
 			cmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
-			await using var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+			await using var reader = await cmd.ExecuteReaderAsync(MikuBot.CanellationTokenSource.Token);
 
 			var playlists = new Dictionary<string, Playlist>();
-			while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
+			while (await reader.ReadAsync(MikuBot.CanellationTokenSource.Token))
 			{
 				var playlistName = Convert.ToString(reader["playlistname"]);
 				var playlist = await GetPlaylistAsync(guild, userId, playlistName);
@@ -53,15 +53,15 @@ public static partial class PlaylistDB
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 		await using var cmd = new NpgsqlCommand("SELECT playlistname FROM playlists WHERE userid = @userId ORDER BY playlistname ASC;", conn);
 		cmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
-		await using var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+		await using var reader = await cmd.ExecuteReaderAsync(MikuBot.CanellationTokenSource.Token);
 
 		var playlists = new List<string>();
 
-		while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
+		while (await reader.ReadAsync(MikuBot.CanellationTokenSource.Token))
 			playlists.Add(Convert.ToString(reader["playlistname"]));
 
 		await reader.CloseAsync();
@@ -77,20 +77,20 @@ public static partial class PlaylistDB
 		{
 			var connString = MikuBot.Config.DbConnectString;
 			await using var conn = new NpgsqlConnection(connString);
-			await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+			await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 			await using var countCmd = new NpgsqlCommand("SELECT COUNT(*) FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName;", conn);
 			countCmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 			countCmd.Parameters.AddWithValue("playlistName", playlistName);
-			var entryCount = (int?)await countCmd.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? 0;
+			var entryCount = (int?)await countCmd.ExecuteScalarAsync(MikuBot.CanellationTokenSource.Token) ?? 0;
 
 			await using var playlistCmd = new NpgsqlCommand("SELECT * FROM playlists WHERE userid = @userId AND playlistname = @playlistName;", conn);
 			playlistCmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 			playlistCmd.Parameters.AddWithValue("playlistName", playlistName);
-			await using var playlistReader = await playlistCmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
+			await using var playlistReader = await playlistCmd.ExecuteReaderAsync(MikuBot.CanellationTokenSource.Token);
 
 			Playlist playlist = null;
-			while (await playlistReader.ReadAsync(MikuBot._canellationTokenSource.Token))
+			while (await playlistReader.ReadAsync(MikuBot.CanellationTokenSource.Token))
 			{
 				var extService = Convert.ToString(playlistReader["extservice"]);
 				if (Music.GetExtService(extService) != ExtService.None)
@@ -132,7 +132,7 @@ public static partial class PlaylistDB
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 		var playlist = await GetPlaylistAsync(guild, userId, playlistName);
 		var entries = await playlist.GetEntriesAsync();
@@ -140,7 +140,7 @@ public static partial class PlaylistDB
 		await using var deleteCmd = new NpgsqlCommand("DELETE FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName;", conn);
 		deleteCmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 		deleteCmd.Parameters.AddWithValue("playlistName", playlistName);
-		await deleteCmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await deleteCmd.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 		var position = 0;
 		await using var batch = new NpgsqlBatch(conn);
@@ -157,7 +157,7 @@ public static partial class PlaylistDB
 			batch.BatchCommands.Add(batchCmd);
 			position++;
 		}
-		await batch.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await batch.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 		await conn.CloseAsync();
 	}
@@ -166,12 +166,12 @@ public static partial class PlaylistDB
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 		await using var cmdDelete = new NpgsqlCommand("DELETE FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName;", conn);
 		cmdDelete.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 		cmdDelete.Parameters.AddWithValue("playlistName", playlistName);
-		await cmdDelete.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await cmdDelete.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 
 		await using var batch = new NpgsqlBatch(conn);
@@ -187,7 +187,7 @@ public static partial class PlaylistDB
 			batchCmd.Parameters.AddWithValue("mod", entry.ModifyDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"));
 			batch.BatchCommands.Add(batchCmd);
 		}
-		await batch.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await batch.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 		await conn.CloseAsync();
 	}
@@ -209,7 +209,7 @@ public static partial class PlaylistDB
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 		await using var cmd = new NpgsqlCommand("INSERT INTO playlists VALUES (@userId, @playlistName, @url, @extService, @creationDate, @modifiedDate)", conn);
 		cmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
@@ -218,7 +218,7 @@ public static partial class PlaylistDB
 		cmd.Parameters.AddWithValue("extService", extService.ToString());
 		cmd.Parameters.AddWithValue("creationDate", DateTime.UtcNow);
 		cmd.Parameters.AddWithValue("modifiedDate", DateTime.UtcNow);
-		await cmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await cmd.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 		await conn.CloseAsync();
 	}
@@ -227,12 +227,12 @@ public static partial class PlaylistDB
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 		await using var cmd = new NpgsqlCommand("DELETE FROM playlists WHERE playlistname = @playlistName AND userid = @userId;", conn);
 		cmd.Parameters.AddWithValue("playlistName", playlistName);
 		cmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
-		await cmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await cmd.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 		await conn.CloseAsync();
 
 		await ClearListAsync(playlistName, userId);
@@ -242,12 +242,12 @@ public static partial class PlaylistDB
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 		await using var cmd2 = new NpgsqlCommand($"SELECT COUNT(*) FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName;", conn);
 		cmd2.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 		cmd2.Parameters.AddWithValue("playlistName", playlistName);
-		var position = (int?)await cmd2.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? 0;
+		var position = (int?)await cmd2.ExecuteScalarAsync(MikuBot.CanellationTokenSource.Token) ?? 0;
 
 		await using var cmd = new NpgsqlCommand("INSERT INTO playlistentries VALUES (@position, @playlistName, @userId, @trackString, @additionDate, @modifyDate);" +
 									"UPDATE playlists SET changed = @modifyDate WHERE userid = @userId AND playlistname = @playlistName;", conn);
@@ -257,7 +257,7 @@ public static partial class PlaylistDB
 		cmd.Parameters.AddWithValue("trackString", trackString);
 		cmd.Parameters.AddWithValue("additionDate", DateTime.UtcNow);
 		cmd.Parameters.AddWithValue("modifyDate", DateTime.UtcNow);
-		await cmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await cmd.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 		await conn.CloseAsync();
 	}
@@ -266,12 +266,12 @@ public static partial class PlaylistDB
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 		await using var cmd2 = new NpgsqlCommand("SELECT COUNT(*) FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName;", conn);
 		cmd2.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 		cmd2.Parameters.AddWithValue("playlistName", playlistName);
-		var position = (int?)await cmd2.ExecuteScalarAsync(MikuBot._canellationTokenSource.Token) ?? 0;
+		var position = (int?)await cmd2.ExecuteScalarAsync(MikuBot.CanellationTokenSource.Token) ?? 0;
 
 		var longcmd = "UPDATE playlists SET changed = @modifyDate WHERE userid = @userId AND playlistname = @playlistName;";
 		foreach (var track in tracks)
@@ -286,7 +286,7 @@ public static partial class PlaylistDB
 		cmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 		cmd.Parameters.AddWithValue("additionDate", DateTime.UtcNow);
 		cmd.Parameters.AddWithValue("modifyDate", DateTime.UtcNow);
-		await cmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await cmd.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 		await conn.CloseAsync();
 	}
@@ -314,12 +314,12 @@ public static partial class PlaylistDB
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 		await using var cmd = new NpgsqlCommand("DELETE FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName;", conn);
 		cmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 		cmd.Parameters.AddWithValue("playlistName", playlistName);
-		await cmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await cmd.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 		await conn.CloseAsync();
 	}
@@ -351,7 +351,7 @@ public static partial class PlaylistDB
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 		await using var cmd = new NpgsqlCommand("DELETE FROM playlistentries WHERE pos = @position AND userid = @userId AND playlistname = @playlistName; UPDATE playlists SET changed = @modifyDate WHERE userid = @userId AND playlistname = @playlistName;", conn);
 		cmd.Parameters.AddWithValue("position", position);
@@ -359,7 +359,7 @@ public static partial class PlaylistDB
 		cmd.Parameters.AddWithValue("playlistName", playlistName);
 		cmd.Parameters.AddWithValue("modifyDate", DateTime.UtcNow);
 
-		await cmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await cmd.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 		await ReorderList(guild, playlistName, userId);
 
@@ -370,14 +370,14 @@ public static partial class PlaylistDB
 	{
 		var connString = MikuBot.Config.DbConnectString;
 		await using var conn = new NpgsqlConnection(connString);
-		await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+		await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 
 		await using var cmd = new NpgsqlCommand("UPDATE playlists SET playlistname = @newName WHERE userid = @userId AND playlistname = @playlistName;", conn);
 		cmd.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
 		cmd.Parameters.AddWithValue("playlistName", playlistName);
 		cmd.Parameters.AddWithValue("newName", newName);
 
-		await cmd.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await cmd.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 		await using var cmd2 = new NpgsqlCommand("UPDATE playlistentries SET playlistname = @newName WHERE userid = @userId AND playlistname = @playlistName; UPDATE playlists SET changed = @modifyDate WHERE userid = @userId AND playlistname = @newName;", conn);
 		cmd2.Parameters.AddWithValue("userId", Convert.ToInt64(userId));
@@ -385,71 +385,71 @@ public static partial class PlaylistDB
 		cmd2.Parameters.AddWithValue("newName", newName);
 		cmd2.Parameters.AddWithValue("modifyDate", DateTime.UtcNow);
 
-		await cmd2.ExecuteNonQueryAsync(MikuBot._canellationTokenSource.Token);
+		await cmd2.ExecuteNonQueryAsync(MikuBot.CanellationTokenSource.Token);
 
 		await conn.CloseAsync();
 	}
 
-	public static async Task<TrackResult> GetSong(string url_or_name, InteractionContext ctx)
+	public static async Task<TrackResult> GetSong(string urlOrName, InteractionContext ctx)
 	{
 		var session = MikuBot.LavalinkSessions.First().Value;
 		var inter = ctx.Client.GetInteractivity();
-		if (url_or_name.IsNndUrl())
+		if (urlOrName.IsNndUrl())
 		{
 			var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Processing NND Video...").AsEphemeral());
-			var split = url_or_name.Split("/".ToCharArray());
-			var nico_nico_id = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
+			var split = urlOrName.Split("/".ToCharArray());
+			var nicoNicoId = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
 			FtpClient ftpClient = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
 			ftpClient.Connect();
-			if (!ftpClient.FileExists($"{nico_nico_id}.mp3"))
+			if (!ftpClient.FileExists($"{nicoNicoId}.mp3"))
 			{
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Preparing download..."));
-				var ex = await ctx.GetNNDAsync(url_or_name, nico_nico_id, msg.Id);
+				var ex = await ctx.GetNndAsync(urlOrName, nicoNicoId, msg.Id);
 				if (ex == null)
 				{
 					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Please try again or verify the link"));
 					return null;
 				}
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading..."));
-				ftpClient.UploadStream(ex, $"{nico_nico_id}.mp3", FtpRemoteExists.Skip, true);
+				ftpClient.UploadStream(ex, $"{nicoNicoId}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var Track = await session.LoadTracksAsync($"https://nnd.meek.moe/new/{nico_nico_id}.mp3");
-			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
+			var track = await session.LoadTracksAsync($"https://nnd.meek.moe/new/{nicoNicoId}.mp3");
+			return new TrackResult(track.PlaylistInfo, track.Tracks.First());
 		}
 		// Bilibili
-		else if (url_or_name.ToLower().StartsWith("https://www.bilibili.com")
-			|| url_or_name.ToLower().StartsWith("http://www.bilibili.com"))
+		else if (urlOrName.ToLower().StartsWith("https://www.bilibili.com")
+			|| urlOrName.ToLower().StartsWith("http://www.bilibili.com"))
 		{
 			var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Processing Bilibili Video...").AsEphemeral());
-			url_or_name = url_or_name.Replace("https://www.bilibili.com/", "");
-			url_or_name = url_or_name.Replace("http://www.bilibili.com/", "");
-			var split = url_or_name.Split("/".ToCharArray());
+			urlOrName = urlOrName.Replace("https://www.bilibili.com/", "");
+			urlOrName = urlOrName.Replace("http://www.bilibili.com/", "");
+			var split = urlOrName.Split("/".ToCharArray());
 			if (!split.Contains("video"))
 			{
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Failure"));
 				return null;
 			}
-			var nndID = split[1].Split("?")[0];
+			var nndId = split[1].Split("?")[0];
 			FtpClient client = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
 			client.Connect();
-			if (!client.FileExists($"{nndID}.mp3"))
+			if (!client.FileExists($"{nndId}.mp3"))
 			{
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Preparing download..."));
-				var ex = await ctx.GetBilibiliAsync(nndID, msg.Id);
+				var ex = await ctx.GetBilibiliAsync(nndId, msg.Id);
 				if (ex == null)
 				{
 					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Please try again or verify the link"));
 					return null;
 				}
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading..."));
-				client.UploadStream(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
+				client.UploadStream(ex, $"{nndId}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var Track = await session.LoadTracksAsync($"https://nnd.meek.moe/new/{nndID}.mp3");
-			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
+			var track = await session.LoadTracksAsync($"https://nnd.meek.moe/new/{nndId}.mp3");
+			return new TrackResult(track.PlaylistInfo, track.Tracks.First());
 		}
-		else if (url_or_name.StartsWith("http://") | url_or_name.StartsWith("https://"))
+		else if (urlOrName.StartsWith("http://") | urlOrName.StartsWith("https://"))
 		{
-			var s = await session.LoadTracksAsync(url_or_name);
+			var s = await session.LoadTracksAsync(urlOrName);
 			switch (s.LoadType)
 			{
 				case LavalinkLoadResultType.Error:
@@ -547,7 +547,7 @@ public static partial class PlaylistDB
 		}
 		else
 		{
-			var s = await session.LoadTracksAsync(url_or_name);
+			var s = await session.LoadTracksAsync(urlOrName);
 			switch (s.LoadType)
 			{
 				case LavalinkLoadResultType.Error:

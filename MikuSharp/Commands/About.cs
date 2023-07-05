@@ -53,9 +53,9 @@ internal class About : ApplicationCommandsModule
 		var webhooks = await channel.GetWebhooksAsync();
 		var webhook = webhooks.First(x => x.Id == f.WebhookId);
 		var selfAvatarUrl = ctx.Client.CurrentUser.AvatarUrl;
-		var stream = await ctx.Client.RestClient.GetStreamAsync(selfAvatarUrl, MikuBot._canellationTokenSource.Token);
+		var stream = await ctx.Client.RestClient.GetStreamAsync(selfAvatarUrl, MikuBot.CanellationTokenSource.Token);
 		var memoryStream = new MemoryStream();
-		await stream.CopyToAsync(memoryStream, MikuBot._canellationTokenSource.Token);
+		await stream.CopyToAsync(memoryStream, MikuBot.CanellationTokenSource.Token);
 		memoryStream.Position = 0;
 		await webhook.ModifyAsync(name, memoryStream, reason: "Dev update follow");
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"News setup complete {DiscordEmoji.FromGuildEmote(client: MikuBot.ShardedClient.GetShard(483279257431441410), id: 623933340520546306)}\n\nYou'll get the newest news about the bot in your server in {channel.Mention}!"));
@@ -113,24 +113,24 @@ internal class About : ApplicationCommandsModule
 	public static async Task StatsAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-		var GuildCount = 0;
-		var UserCount = 0;
-		var ChannelCount = 0;
+		var guildCount = 0;
+		var userCount = 0;
+		var channelCount = 0;
 		foreach (var client in MikuBot.ShardedClient.ShardClients)
 		{
-			GuildCount += client.Value.Guilds.Count;
+			guildCount += client.Value.Guilds.Count;
 			foreach (var guild in client.Value.Guilds)
 			{
-				UserCount += guild.Value.MemberCount;
-				ChannelCount += guild.Value.Channels.Count;
+				userCount += guild.Value.MemberCount;
+				channelCount += guild.Value.Channels.Count;
 			}
 		}
 		var emb = new DiscordEmbedBuilder().
 			WithTitle("Stats").
 			WithDescription("Some stats of the MikuBot!").
-			AddField(new DiscordEmbedField("Guilds", GuildCount.ToString(), true)).
-			AddField(new DiscordEmbedField("Users", UserCount.ToString(), true)).
-			AddField(new DiscordEmbedField("Channels", ChannelCount.ToString(), true)).
+			AddField(new DiscordEmbedField("Guilds", guildCount.ToString(), true)).
+			AddField(new DiscordEmbedField("Users", userCount.ToString(), true)).
+			AddField(new DiscordEmbedField("Channels", channelCount.ToString(), true)).
 			AddField(new DiscordEmbedField("Ping", ctx.Client.Ping.ToString(), true)).
 			AddField(new DiscordEmbedField("Lib (Version)", ctx.Client.BotLibrary + " " + ctx.Client.VersionString, true)).
 			WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);

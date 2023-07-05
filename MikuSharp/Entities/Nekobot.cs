@@ -1,6 +1,6 @@
 namespace MikuSharp.Entities;
 
-public class NekoBot : Img_Data
+public class NekoBot : ImgData
 {
 	[JsonProperty("status")]
 	public string Message { get; set; }

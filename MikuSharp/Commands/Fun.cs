@@ -20,11 +20,11 @@ internal class Fun : ApplicationCommandsModule
 	public static async Task CatAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
-		var ImgURL = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/v2/img/meow");
+		var imgUrl = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/v2/img/meow");
 
 		DiscordWebhookBuilder builder = new();
-		builder.AddFile($"image.{ImgURL.Filetype}", ImgURL.Data);
-		builder.AddEmbed(ImgURL.Embed);
+		builder.AddFile($"image.{imgUrl.Filetype}", imgUrl.Data);
+		builder.AddEmbed(imgUrl.Embed);
 		await ctx.EditResponseAsync(builder);
 	}
 
@@ -32,8 +32,8 @@ internal class Fun : ApplicationCommandsModule
 	public static async Task ClydeAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
-		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}", MikuBot._canellationTokenSource.Token));
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.Message, MikuBot._canellationTokenSource.Token));
+		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}", MikuBot.CanellationTokenSource.Token));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.Message, MikuBot.CanellationTokenSource.Token));
 
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"clyde.png", img);
@@ -52,8 +52,8 @@ internal class Fun : ApplicationCommandsModule
 	public static async Task DogAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
-		var dc = JsonConvert.DeserializeObject<DogCeo>(await ctx.Client.RestClient.GetStringAsync("https://dog.ceo/api/breeds/image/random", MikuBot._canellationTokenSource.Token));
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(dc.Message), MikuBot._canellationTokenSource.Token));
+		var dc = JsonConvert.DeserializeObject<DogCeo>(await ctx.Client.RestClient.GetStringAsync("https://dog.ceo/api/breeds/image/random", MikuBot.CanellationTokenSource.Token));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(dc.Message), MikuBot.CanellationTokenSource.Token));
 		var em = new DiscordEmbedBuilder();
 		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
 		em.WithFooter("by dog.ceo", "https://dog.ceo/img/favicon.png");
@@ -97,7 +97,7 @@ internal class Fun : ApplicationCommandsModule
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
 		var get = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/lizard");
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(get.Url), MikuBot._canellationTokenSource.Token));
+		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(get.Url), MikuBot.CanellationTokenSource.Token));
 
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
@@ -139,7 +139,7 @@ internal class Fun : ApplicationCommandsModule
     }*/
 
 	[SlashCommand("rps", "Play rock paper scissors!")]
-	public static async Task RPSAsync(InteractionContext ctx, [Option("rps", "Your rock paper scissor choice")] string rps)
+	public static async Task RpsAsync(InteractionContext ctx, [Option("rps", "Your rock paper scissor choice")] string rps)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
 		var rock = new[] { $"Rock {DiscordEmoji.FromName(ctx.Client, ":black_circle:")}", $"Paper {DiscordEmoji.FromName(ctx.Client, ":pencil:")}", $"Scissors {DiscordEmoji.FromName(ctx.Client, ":scissors:")}" };

@@ -19,7 +19,7 @@ public class Lavalink
 			{
 				case LavalinkTrackEndReason.Stopped:
 				{
-					g.MusicInstance.Playstate = PlayState.Stopped;
+					g.MusicInstance.PlayState = PlayState.Stopped;
 					g.MusicInstance.GuildPlayer.TrackEnded -= LavalinkTrackFinished;
 					g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
 					g.MusicInstance.CurrentSong = null;
@@ -44,7 +44,7 @@ public class Lavalink
 					if (queue.Count != 0)
 						await g.MusicInstance.PlaySong();
 					else
-						g.MusicInstance.Playstate = PlayState.NotPlaying;
+						g.MusicInstance.PlayState = PlayState.NotPlaying;
 					break;
 				}
 				case LavalinkTrackEndReason.Finished:
@@ -62,7 +62,7 @@ public class Lavalink
 					if (queue.Count != 0)
 						await g.MusicInstance.PlaySong();
 					else
-						g.MusicInstance.Playstate = PlayState.NotPlaying;
+						g.MusicInstance.PlayState = PlayState.NotPlaying;
 					break;
 				}
 			}

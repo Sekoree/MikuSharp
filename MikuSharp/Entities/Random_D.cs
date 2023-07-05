@@ -1,6 +1,6 @@
 namespace MikuSharp.Entities;
 
-public class Random_D
+public class RandomD
 {
 	[JsonProperty("url")]
 	public string Url { get; set; }

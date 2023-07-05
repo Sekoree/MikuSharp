@@ -7,7 +7,7 @@ namespace MikuSharp.Entities;
 public class Playlist
 {
 	public string Name { get; set; }
-	public ulong UserID { get; set; }
+	public ulong UserId { get; set; }
 	public ExtService ExternalService { get; set; }
 	public string Url { get; set; }
 	public int SongCount { get; set; }
@@ -19,7 +19,7 @@ public class Playlist
 		this.ExternalService = e;
 		this.Url = u;
 		this.Name = n;
-		this.UserID = usr;
+		this.UserId = usr;
 		this.SongCount = c;
 		this.Creation = crea;
 		this.Modify = mody;
@@ -34,19 +34,19 @@ public class Playlist
 			{
 				var connString = MikuBot.Config.DbConnectString;
 				var conn = new NpgsqlConnection(connString);
-				await conn.OpenAsync(MikuBot._canellationTokenSource.Token);
+				await conn.OpenAsync(MikuBot.CanellationTokenSource.Token);
 				var cmd = new NpgsqlCommand("SELECT * FROM playlistentries WHERE userid = @userId AND playlistname = @playlistName ORDER BY pos ASC;", conn);
-				cmd.Parameters.AddWithValue("userId", Convert.ToInt64(this.UserID));
+				cmd.Parameters.AddWithValue("userId", Convert.ToInt64(this.UserId));
 				cmd.Parameters.AddWithValue("playlistName", this.Name);
-				cmd.Prepare();
+				await cmd.PrepareAsync();
 				var ll = MikuBot.ShardedClient.GetShard(0).GetLavalink();
-				var reader = await cmd.ExecuteReaderAsync(MikuBot._canellationTokenSource.Token);
-				while (await reader.ReadAsync(MikuBot._canellationTokenSource.Token))
+				var reader = await cmd.ExecuteReaderAsync(MikuBot.CanellationTokenSource.Token);
+				while (await reader.ReadAsync(MikuBot.CanellationTokenSource.Token))
 					entries.Add(new PlaylistEntry(await ll.ConnectedSessions.First().Value.DecodeTrackAsync(Convert.ToString(reader["trackstring"])), DateTimeOffset.Parse(Convert.ToString(reader["addition"])), DateTimeOffset.Parse(Convert.ToString(reader["changed"])), Convert.ToInt32(reader["pos"])));
-				reader.Close();
-				cmd.Dispose();
-				conn.Close();
-				conn.Dispose();
+				await reader.CloseAsync();
+				await cmd.DisposeAsync();
+				await conn.CloseAsync();
+				await conn.DisposeAsync();
 			}
 			else
 			{
@@ -54,15 +54,14 @@ public class Playlist
 				LavalinkGuildPlayer? client = null;
 				if (conn.ConnectedPlayers.Any())
 					client = conn.ConnectedPlayers.First().Value;
-				if (client != null)
+				if (client == null)
+					return entries;
+				var trs = await client.LoadTracksAsync(this.Url);
+				var i = 0;
+				foreach (var t in ((LavalinkPlaylist)trs.Result).Tracks)
 				{
-					var trs = await client.LoadTracksAsync(this.Url);
-					var i = 0;
-					foreach (var t in ((LavalinkPlaylist)trs.Result).Tracks)
-					{
-						entries.Add(new PlaylistEntry(t, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, i));
-						i++;
-					}
+					entries.Add(new PlaylistEntry(t, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, i));
+					i++;
 				}
 			}
 		}

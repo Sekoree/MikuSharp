@@ -1,6 +1,6 @@
 namespace MikuSharp.Entities;
 
-public class KsoftSiRanImg : Img_Data
+public class KsoftSiRanImg : ImgData
 {
 	[JsonProperty("url")]
 	public string Url { get; set; }

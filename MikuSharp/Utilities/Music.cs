@@ -36,7 +36,7 @@ public static class Music
 
 	public static async Task ConditionalConnect(this Guild guild, InteractionContext ctx)
 	{
-		if (guild.MusicInstance.GuildPlayer?.IsConnected != null && guild.MusicInstance.GuildPlayer.IsConnected)
+		if (guild.MusicInstance.GuildPlayer?.IsConnected is true)
 			return;
 		await guild.MusicInstance.ConnectToChannel(ctx.Member.VoiceState.Channel);
 	}
@@ -51,8 +51,8 @@ public static class Music
 		return false;
 	}
 
-	public static string SearchUrlOrAttachment(this DiscordAttachment? attachment, string? search_or_url)
-		=> !string.IsNullOrEmpty(search_or_url) ? search_or_url : attachment?.ProxyUrl;
+	public static string SearchUrlOrAttachment(this DiscordAttachment? attachment, string? searchOrUrl)
+		=> !string.IsNullOrEmpty(searchOrUrl) ? searchOrUrl : attachment?.ProxyUrl;
 
 	public static void GetPlayingState(this Guild guild, out string time1, out string time2)
 	{
@@ -89,7 +89,7 @@ public static class Music
 			searchListRequest.Q = searchQuery;
 			searchListRequest.MaxResults = 1;
 			searchListRequest.Type = "video";
-			var searchListResponse = await searchListRequest.ExecuteAsync(MikuBot._canellationTokenSource.Token);
+			var searchListResponse = await searchListRequest.ExecuteAsync(MikuBot.CanellationTokenSource.Token);
 
 			if (lastPlayedSongs == null)
 			{
@@ -146,11 +146,11 @@ public static class Music
 			var uriSegments = entry.Track.Info.Uri.Segments;
 			var filename = $"{uriSegments[^2]}.{uriSegments[^1]}";
 
-			using (MemoryStream d = new(await client.RestClient.GetByteArrayAsync(entry.Track.Info.Uri, MikuBot._canellationTokenSource.Token)))
+			using (MemoryStream d = new(await client.RestClient.GetByteArrayAsync(entry.Track.Info.Uri, MikuBot.CanellationTokenSource.Token)))
 			using (var e = File.Create(filename))
 			{
 				d.Position = 0;
-				await d.CopyToAsync(e, MikuBot._canellationTokenSource.Token);
+				await d.CopyToAsync(e, MikuBot.CanellationTokenSource.Token);
 			}
 
 			var selector = new Selector();

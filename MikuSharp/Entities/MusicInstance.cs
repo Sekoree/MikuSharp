@@ -1,3 +1,4 @@
+using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
 
 using MikuSharp.Enums;
@@ -8,13 +9,13 @@ namespace MikuSharp.Entities;
 
 public class MusicInstance
 {
-	public int ShardID { get; set; }
+	public int ShardId { get; set; }
 
 	public DiscordChannel CommandChannel { get; set; }
 
 	public DiscordChannel VoiceChannel { get; set; }
 
-	public PlayState Playstate { get; set; }
+	public PlayState PlayState { get; set; }
 
 	public RepeatMode RepeatMode { get; set; }
 
@@ -36,10 +37,10 @@ public class MusicInstance
 
 	public MusicInstance(LavalinkSession session, int shardId)
 	{
-		this.ShardID = shardId;
+		this.ShardId = shardId;
 		this.Session = session;
 		this.CommandChannel = null;
-		this.Playstate = PlayState.NotPlaying;
+		this.PlayState = PlayState.NotPlaying;
 		this.RepeatMode = RepeatMode.Off;
 		this.RepeatAllPosition = 0;
 		this.ShuffleMode = ShuffleMode.Off;
@@ -60,82 +61,94 @@ public class MusicInstance
 				return null;
 		}
 	}
-	public async Task<TrackResult> QueueSong(string url_or_name, InteractionContext ctx, int position = -1)
+	public async Task<TrackResult> QueueSong(string urlOrName, InteractionContext ctx, int position = -1)
 	{
 		var queue = await Database.GetQueueAsync(ctx.Guild);
 		var inter = ctx.Client.GetInteractivity();
 		// NicoNicoNii
-		if (url_or_name.IsNndUrl())
+		if (urlOrName.IsNndUrl())
 		{
 			var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Processing NND Video...").AsEphemeral());
-			var split = url_or_name.Split("/".ToCharArray());
-			var nico_nico_id = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
+			var split = urlOrName.Split("/".ToCharArray());
+			var nicoNicoId = split.First(x => x.StartsWith("sm") || x.StartsWith("nm")).Split("?")[0];
 			FtpClient client = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
 			client.Connect();
-			if (!client.FileExists($"{nico_nico_id}.mp3"))
+			if (!client.FileExists($"{nicoNicoId}.mp3"))
 			{
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Preparing download..."));
-				var ex = await ctx.GetNNDAsync(url_or_name, nico_nico_id, msg.Id);
+				var ex = await ctx.GetNndAsync(urlOrName, nicoNicoId, msg.Id);
 				if (ex == null)
 				{
 					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Please try again or verify the link"));
 					return null;
 				}
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading"));
-				client.UploadStream(ex, $"{nico_nico_id}.mp3", FtpRemoteExists.Skip, true);
+				client.UploadStream(ex, $"{nicoNicoId}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var Track = await this.Session.LoadTracksAsync($"https://nnd.meek.moe/new/{nico_nico_id}.mp3");
-			if (position == -1)
-				await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
-			else
-				await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, position);
-			if (this.GuildPlayer.IsConnected && (this.Playstate == PlayState.NotPlaying || this.Playstate == PlayState.Stopped))
-				await this.PlaySong();
-			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
+
+			var trackResult = await this.Session.LoadTracksAsync($"https://nnd.meek.moe/new/{nicoNicoId}.mp3");
+			if (trackResult is { LoadType: LavalinkLoadResultType.Track, Result: LavalinkTrack track })
+			{
+				if (position == -1)
+					await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, track.Encoded);
+				else
+					await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, track.Encoded, position);
+				if (this.GuildPlayer.IsConnected && this.PlayState is PlayState.NotPlaying or PlayState.Stopped)
+					await this.PlaySong();
+				return new TrackResult(track.Info.Title, track);
+			}
+
+			return null!;
 		}
 		// Bilibili
-		else if (url_or_name.ToLower().StartsWith("https://www.bilibili.com")
-			|| url_or_name.ToLower().StartsWith("http://www.bilibili.com"))
+		else if (urlOrName.ToLower().StartsWith("https://www.bilibili.com")
+			|| urlOrName.ToLower().StartsWith("http://www.bilibili.com"))
 		{
 			var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("Processing Bilibili Video...").AsEphemeral());
-			url_or_name = url_or_name.Replace("https://www.bilibili.com/", "");
-			url_or_name = url_or_name.Replace("http://www.bilibili.com/", "");
-			var split = url_or_name.Split("/".ToCharArray());
+			urlOrName = urlOrName.Replace("https://www.bilibili.com/", "");
+			urlOrName = urlOrName.Replace("http://www.bilibili.com/", "");
+			var split = urlOrName.Split("/".ToCharArray());
 			if (!split.Contains("video"))
 			{
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Failure"));
 				return null;
 			}
-			var nndID = split[1].Split("?")[0];
+			var nndId = split[1].Split("?")[0];
 			FtpClient client = new(MikuBot.Config.NndConfig.FtpConfig.Hostname, new NetworkCredential(MikuBot.Config.NndConfig.FtpConfig.User, MikuBot.Config.NndConfig.FtpConfig.Password));
 			client.Connect();
-			if (!client.FileExists($"{nndID}.mp3"))
+			if (!client.FileExists($"{nndId}.mp3"))
 			{
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Preparing download..."));
-				var ex = await ctx.GetBilibiliAsync(nndID, msg.Id);
+				var ex = await ctx.GetBilibiliAsync(nndId, msg.Id);
 				if (ex == null)
 				{
 					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Please try again or verify the link"));
 					return null;
 				}
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading..."));
-				client.UploadStream(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
+				client.UploadStream(ex, $"{nndId}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var Track = await this.Session.LoadTracksAsync($"https://nnd.meek.moe/new/{nndID}.mp3");
-			if (position == -1)
-				await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
-			else
-				await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, position);
-			if (this.GuildPlayer.IsConnected && (this.Playstate == PlayState.NotPlaying || this.Playstate == PlayState.Stopped))
-				await this.PlaySong();
-			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
+			var trackResult = await this.Session.LoadTracksAsync($"https://nnd.meek.moe/new/{nndId}.mp3");
+			if (trackResult is { LoadType: LavalinkLoadResultType.Track, Result: LavalinkTrack track })
+			{
+				if (position == -1)
+					await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, track.Encoded);
+				else
+					await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, track.Encoded,
+						position);
+				if (this.GuildPlayer.IsConnected && this.PlayState is PlayState.NotPlaying or PlayState.Stopped)
+					await this.PlaySong();
+				return new TrackResult(track.Info.Title, track);
+			}
+
+			return null!;
 		}
 		// Http(s) stream/file
-		else if (url_or_name.StartsWith("http://") | url_or_name.StartsWith("https://"))
+		else if (urlOrName.StartsWith("http://") | urlOrName.StartsWith("https://"))
 		{
 			try
 			{
-				var s = await this.Session.LoadTracksAsync(url_or_name);
+				var s = await this.Session.LoadTracksAsync(urlOrName);
 				switch (s.LoadType)
 				{
 					case LavalinkLoadResultType.Error:
@@ -152,8 +165,9 @@ public class MusicInstance
 					};
 					case LavalinkLoadResultType.Playlist:
 					{
+						var trackPlaylist = (LavalinkPlaylist)s.Result;
 						// This is a playlist
-						if (s.PlaylistInfo.SelectedTrack == -1)
+						if (trackPlaylist.Info.SelectedTrack == -1)
 						{
 							List<DiscordButtonComponent> buttons = new(2)
 							{
@@ -176,10 +190,10 @@ public class MusicInstance
 								await resp.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 								buttons.ForEach(x => x.Disable());
 								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Adding entire playlist"));
-								await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.ToList());
-								if (this.GuildPlayer.IsConnected && (this.Playstate == PlayState.NotPlaying || this.Playstate == PlayState.Stopped))
+								await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, trackPlaylist.Tracks.ToList());
+								if (this.GuildPlayer.IsConnected && this.PlayState is PlayState.NotPlaying or PlayState.Stopped)
 									await this.PlaySong();
-								return new TrackResult(s.PlaylistInfo, s.Tracks);
+								return new TrackResult(trackPlaylist.Info.Name, trackPlaylist.Tracks);
 							}
 							else
 							{
@@ -214,30 +228,30 @@ public class MusicInstance
 							{
 								await resp.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 								buttons.ForEach(x => x.Disable());
-								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding single song: {s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).Title}"));
+								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding single song: {trackPlaylist.Tracks.ElementAt(trackPlaylist.Info.SelectedTrack).Info.Title}"));
 								if (position == -1)
-									await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).TrackString);
+									await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, trackPlaylist.Tracks.ElementAt(trackPlaylist.Info.SelectedTrack).Encoded);
 								else
-									await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).TrackString, position);
-								if (this.GuildPlayer.IsConnected && (this.Playstate == PlayState.NotPlaying || this.Playstate == PlayState.Stopped))
+									await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, trackPlaylist.Tracks.ElementAt(trackPlaylist.Info.SelectedTrack).Encoded, position);
+								if (this.GuildPlayer.IsConnected && this.PlayState is PlayState.NotPlaying or PlayState.Stopped)
 									await this.PlaySong();
-								return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack));
+								return new TrackResult(trackPlaylist.Info.Name, trackPlaylist.Tracks.ElementAt(trackPlaylist.Info.SelectedTrack));
 							}
 							else if (resp.Result.Id == "all")
 							{
 								await resp.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 								buttons.ForEach(x => x.Disable());
-								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding entire playlist: {s.PlaylistInfo.Name}"));
+								await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding entire playlist: {trackPlaylist.Info.Name}"));
 								if (position == -1)
-									await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks);
+									await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, trackPlaylist.Tracks);
 								else
 								{
-									s.Tracks.Reverse();
-									await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks, position);
+									trackPlaylist.Tracks.Reverse();
+									await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, trackPlaylist.Tracks, position);
 								}
-								if (this.GuildPlayer.IsConnected && (this.Playstate == PlayState.NotPlaying || this.Playstate == PlayState.Stopped))
+								if (this.GuildPlayer.IsConnected && this.PlayState is PlayState.NotPlaying or PlayState.Stopped)
 									await this.PlaySong();
-								return new TrackResult(s.PlaylistInfo, s.Tracks);
+								return new TrackResult(trackPlaylist.Info.Name, trackPlaylist.Tracks);
 							}
 							else
 							{
@@ -251,14 +265,15 @@ public class MusicInstance
 					// We play a single song
 					default:
 					{
-						await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {s.Tracks.First().Info.Title}"));
+						var track = (LavalinkTrack)s.Result;
+						await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {track.Info.Title}"));
 						if (position == -1)
-							await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.First().TrackString);
+							await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, track.Encoded);
 						else
-							await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.First().TrackString, position);
-						if (this.GuildPlayer.IsConnected && (this.Playstate == PlayState.NotPlaying || this.Playstate == PlayState.Stopped))
+							await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, track.Encoded, position);
+						if (this.GuildPlayer.IsConnected && this.PlayState is PlayState.NotPlaying or PlayState.Stopped)
 							await this.PlaySong();
-						return new TrackResult(s.PlaylistInfo, s.Tracks.First());
+						return new TrackResult(track.Info.Title, track);
 					};
 				}
 			}
@@ -273,28 +288,28 @@ public class MusicInstance
 		else
 		{
 			var type = LavalinkSearchType.Youtube;
-			if (url_or_name.StartsWith("ytsearch:"))
+			if (urlOrName.StartsWith("ytsearch:"))
 			{
-				url_or_name = url_or_name.Replace("ytsearch:", "");
+				urlOrName = urlOrName.Replace("ytsearch:", "");
 				type = LavalinkSearchType.Youtube;
 			}
-			else if (url_or_name.StartsWith("scsearch:"))
+			else if (urlOrName.StartsWith("scsearch:"))
 			{
-				url_or_name = url_or_name.Replace("ytsearch:", "");
+				urlOrName = urlOrName.Replace("ytsearch:", "");
 				type = LavalinkSearchType.SoundCloud;
 			}
-			else if (url_or_name.StartsWith("spsearch:"))
+			else if (urlOrName.StartsWith("spsearch:"))
 			{
-				url_or_name = url_or_name.Replace("spsearch:", "");
+				urlOrName = urlOrName.Replace("spsearch:", "");
 				type = LavalinkSearchType.Spotify;
 			}
-			else if (url_or_name.StartsWith("amsearch:"))
+			else if (urlOrName.StartsWith("amsearch:"))
 			{
-				url_or_name = url_or_name.Replace("amsearch:", "");
+				urlOrName = urlOrName.Replace("amsearch:", "");
 				type = LavalinkSearchType.AppleMusic;
 			}
 
-			var s = await this.GuildPlayer.LoadTracksAsync(type, url_or_name);
+			var s = await this.GuildPlayer.LoadTracksAsync(type, urlOrName);
 			switch (s.LoadType)
 			{
 				case LavalinkLoadResultType.Error:
@@ -312,8 +327,9 @@ public class MusicInstance
 				};
 				default:
 				{
+					var searchResult = (List<LavalinkTrack>)s.Result;
 					ctx.Client.Logger.LogDebug("Found something");
-					var leng = s.Tracks.Count;
+					var leng = searchResult.Count;
 					if (leng > 5)
 						leng = 5;
 					List<DiscordStringSelectComponentOption> selectOptions = new(leng);
@@ -323,8 +339,8 @@ public class MusicInstance
 							.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl);
 					for (var i = 0; i < leng; i++)
 					{
-						em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));
-						selectOptions.Add(new DiscordStringSelectComponentOption(s.Tracks.ElementAt(i).Title, i.ToString(), $"by {s.Tracks.ElementAt(i).Author}. Length: {s.Tracks.ElementAt(i).Length}"));
+						em.AddField(new DiscordEmbedField($"{i + 1}.{searchResult.ElementAt(i).Info.Title} [{searchResult.ElementAt(i).Info.Length}]", $"by {searchResult.ElementAt(i).Info.Author} [Link]({searchResult.ElementAt(i).Info.Uri})"));
+						selectOptions.Add(new DiscordStringSelectComponentOption(searchResult.ElementAt(i).Info.Title, i.ToString(), $"by {searchResult.ElementAt(i).Info.Author}. Length: {searchResult.ElementAt(i).Info.Length}"));
 					}
 					DiscordStringSelectComponent select = new("Select song to play", selectOptions, minOptions: 1, maxOptions: 1);
 					var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(em.Build()).AddComponents(select));
@@ -337,16 +353,16 @@ public class MusicInstance
 					}
 					await resp.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredMessageUpdate);
 					var trackSelect = Convert.ToInt32(resp.Result.Values.First());
-					var track = s.Tracks.ElementAt(trackSelect);
+					var track = searchResult.ElementAt(trackSelect);
 					select.Disable();
-					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent($"Chose {track.Title}"));
+					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent($"Chose {track.Info.Title}"));
 					if (position == -1)
 						await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, track.Encoded);
 					else
 						await Database.InsertToQueueAsync(ctx.Guild, ctx.Member.Id, track.Encoded, position);
-					if (this.GuildPlayer.IsConnected && (this.Playstate == PlayState.NotPlaying || this.Playstate == PlayState.Stopped))
+					if (this.GuildPlayer.IsConnected && this.PlayState is PlayState.NotPlaying or PlayState.Stopped)
 						await this.PlaySong();
-					return new TrackResult(s.PlaylistInfo, track);
+					return new TrackResult(track.Info.Title, track);
 				};
 			}
 		}
@@ -367,8 +383,8 @@ public class MusicInstance
 			this.CurrentSong = cur;
 		MikuBot.ShardedClient.Logger.LogDebug("PlaySong(): {track}", this.CurrentSong?.Track.Info.Identifier);
 		this.GuildPlayer.TrackEnded += Lavalink.LavalinkTrackFinished;
-		this.Playstate = PlayState.Playing;
-		await Task.Run(async () => await this.GuildPlayer.PlayAsync(this.CurrentSong.Track), MikuBot._canellationTokenSource.Token);
+		this.PlayState = PlayState.Playing;
+		await Task.Run(async () => await this.GuildPlayer.PlayAsync(this.CurrentSong.Track), MikuBot.CanellationTokenSource.Token);
 		return this.CurrentSong;
 	}
 }

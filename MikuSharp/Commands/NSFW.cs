@@ -3,7 +3,7 @@ using MikuSharp.Utilities;
 namespace MikuSharp.Commands
 {
 	[RequireNsfw]
-	class NSFW : BaseCommandModule
+	class Nsfw : BaseCommandModule
 	{
 		[Command("4k")]
 		[Description("lewd")]
