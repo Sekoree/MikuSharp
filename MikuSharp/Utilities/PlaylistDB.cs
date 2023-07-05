@@ -413,8 +413,9 @@ public static partial class PlaylistDb
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading..."));
 				ftpClient.UploadStream(ex, $"{nicoNicoId}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var track = await session.LoadTracksAsync($"https://nnd.meek.moe/new/{nicoNicoId}.mp3");
-			return new TrackResult(track.PlaylistInfo, track.Tracks.First());
+			var res = await session.LoadTracksAsync($"https://nnd.meek.moe/new/{nicoNicoId}.mp3");
+			var track = (LavalinkTrack)res.Result;
+			return new TrackResult(track.Info.SourceName, track);
 		}
 		// Bilibili
 		else if (urlOrName.ToLower().StartsWith("https://www.bilibili.com")
@@ -444,8 +445,9 @@ public static partial class PlaylistDb
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading..."));
 				client.UploadStream(ex, $"{nndId}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var track = await session.LoadTracksAsync($"https://nnd.meek.moe/new/{nndId}.mp3");
-			return new TrackResult(track.PlaylistInfo, track.Tracks.First());
+			var res = await session.LoadTracksAsync($"https://nnd.meek.moe/new/{nndId}.mp3");
+			var track = (LavalinkTrack)res.Result;
+			return new TrackResult(track.Info.SourceName, track);
 		}
 		else if (urlOrName.StartsWith("http://") | urlOrName.StartsWith("https://"))
 		{
@@ -466,7 +468,8 @@ public static partial class PlaylistDb
 				};
 				case LavalinkLoadResultType.Playlist:
 				{
-					if (s.PlaylistInfo.SelectedTrack == -1)
+					var playlistResult = (LavalinkPlaylist)s.Result;
+					if (playlistResult.Info.SelectedTrack == -1)
 					{
 						List<DiscordButtonComponent> buttons = new(2)
 							{
@@ -489,7 +492,7 @@ public static partial class PlaylistDb
 						{
 							buttons.ForEach(x => x.Disable());
 							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent("Adding entire playlist"));
-							return new TrackResult(s.PlaylistInfo, s.Tracks);
+							return new TrackResult(playlistResult.Info.Name, playlistResult.Tracks);
 						}
 						else
 						{
@@ -521,14 +524,14 @@ public static partial class PlaylistDb
 						else if (resp.Result.Id == "yes")
 						{
 							buttons.ForEach(x => x.Disable());
-							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding single song: {s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack).Title}"));
-							return new TrackResult(s.PlaylistInfo, s.Tracks.ElementAt(s.PlaylistInfo.SelectedTrack));
+							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding single song: {playlistResult.Tracks.ElementAt(playlistResult.Info.SelectedTrack).Info.Title}"));
+							return new TrackResult(playlistResult.Info.Name, playlistResult.Tracks.ElementAt(playlistResult.Info.SelectedTrack));
 						}
 						else if (resp.Result.Id == "all")
 						{
 							buttons.ForEach(x => x.Disable());
-							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding entire playlist: {s.PlaylistInfo.Name}"));
-							return new TrackResult(s.PlaylistInfo, s.Tracks);
+							await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(buttons).WithContent($"Adding entire playlist: {playlistResult.Info.Name}"));
+							return new TrackResult(playlistResult.Info.Name, playlistResult.Tracks);
 						}
 						else
 						{
@@ -540,8 +543,9 @@ public static partial class PlaylistDb
 				};
 				default:
 				{
-					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {s.Tracks.First().Info.Title}"));
-					return new TrackResult(s.PlaylistInfo, s.Tracks.First());
+					var track = (LavalinkTrack)s.Result;
+					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {track.Info.Title}"));
+					return new TrackResult(track.Info.Title, track);
 				};
 			}
 		}
@@ -563,7 +567,8 @@ public static partial class PlaylistDb
 				};
 				default:
 				{
-					var leng = s.Tracks.Count;
+					var searchResult = (List<LavalinkTrack>)s.Result;
+					var leng = searchResult.Count;
 					if (leng > 5)
 						leng = 5;
 					List<DiscordStringSelectComponentOption> selectOptions = new(leng)
@@ -576,7 +581,7 @@ public static partial class PlaylistDb
 							.WithDescription("Please select a track:\n")
 							.WithAuthor($"Requested by {ctx.Member.UsernameWithDiscriminator} || Timeout 30 seconds", iconUrl: ctx.Member.AvatarUrl);
 					for (var i = 0; i < leng; i++)
-						em.AddField(new DiscordEmbedField($"{i + 1}.{s.Tracks.ElementAt(i).Title} [{s.Tracks.ElementAt(i).Length}]", $"by {s.Tracks.ElementAt(i).Author} [Link]({s.Tracks.ElementAt(i).Uri})"));
+						em.AddField(new DiscordEmbedField($"{i + 1}.{searchResult.ElementAt(i).Info.Title} [{searchResult.ElementAt(i).Info.Length}]", $"by {searchResult.ElementAt(i).Info.Author} [Link]({searchResult.ElementAt(i).Info.Uri})"));
 					var msg = await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(em.Build()).AddComponents(select));
 					var resp = await inter.WaitForSelectAsync(msg, ctx.User, select.CustomId, ComponentType.StringSelect, TimeSpan.FromSeconds(30));
 					if (resp.TimedOut)
@@ -586,11 +591,11 @@ public static partial class PlaylistDb
 						return null;
 					}
 					var trackSelect = Convert.ToInt32(resp.Result.Values.First());
-					var track = s.Tracks.ElementAt(trackSelect);
+					var track = searchResult.ElementAt(trackSelect);
 					select.Disable();
-					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent($"Choosed {track.Title}"));
+					await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().AddComponents(select).WithContent($"Chose {track.Info.Title}"));
 
-					return new TrackResult(s.PlaylistInfo, track);
+					return new TrackResult(track.Info.Title, track);
 				};
 			}
 		}
