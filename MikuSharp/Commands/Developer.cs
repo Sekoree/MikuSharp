@@ -11,7 +11,7 @@ namespace MikuSharp.Commands;
 /// </summary>
 public class Developer : ApplicationCommandsModule
 {
-	private static readonly string[] s_units = new[] { "", "ki", "Mi", "Gi" };
+	private static readonly string[] s_units = { "", "ki", "Mi", "Gi" };
 	private static string SizeToString(long l)
 	{
 		double d = l;
@@ -33,22 +33,22 @@ public class Developer : ApplicationCommandsModule
 	public static async Task GetGlobalLavalinkStatsAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent("Loading statistics for every shard."));
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
 		}
-		foreach (var lavaNode in MikuBot.LavalinkNodeConnections)
+		foreach (var lavaSession in MikuBot.LavalinkSessions)
 		{
-			var stats = lavaNode.Value.Statistics;
+			var stats = lavaSession.Value.Statistics;
 			var sb = new StringBuilder();
-			sb.Append($"Lavalink resources usage statistics for shard {lavaNode.Key}: ```")
+			sb.Append($"Lavalink resources usage statistics for shard {lavaSession.Key}: ```")
 				.Append("Uptime:                    ").Append(stats.Uptime).AppendLine()
-				.Append("Players:                   ").AppendFormat("{0} active / {1} total", stats.ActivePlayers, stats.TotalPlayers).AppendLine()
-				.Append("CPU Cores:                 ").Append(stats.CpuCoreCount).AppendLine()
-				.Append("CPU Usage:                 ").AppendFormat("{0:#,##0.0%} lavalink / {1:#,##0.0%} system", stats.CpuLavalinkLoad, stats.CpuSystemLoad).AppendLine()
-				.Append("RAM Usage:                 ").AppendFormat("{0} allocated / {1} used / {2} free / {3} reservable", SizeToString(stats.RamAllocated), SizeToString(stats.RamUsed), SizeToString(stats.RamFree), SizeToString(stats.RamReservable)).AppendLine()
-				.Append("Audio frames (per minute): ").AppendFormat("{0:#,##0} sent / {1:#,##0} nulled / {2:#,##0} deficit", stats.AverageSentFramesPerMinute, stats.AverageNulledFramesPerMinute, stats.AverageDeficitFramesPerMinute).AppendLine()
+				.Append("Players:                   ").AppendFormat("{0} active / {1} total", stats.PlayingPlayers, stats.Players).AppendLine()
+				.Append("CPU Cores:                 ").Append(stats.Cpu.Cores).AppendLine()
+				.Append("CPU Usage:                 ").AppendFormat("{0:#,##0.0%} lavalink / {1:#,##0.0%} system", stats.Cpu.LavalinkLoad, stats.Cpu.SystemLoad).AppendLine()
+				.Append("RAM Usage:                 ").AppendFormat("{0} allocated / {1} used / {2} free / {3} reservable", SizeToString(stats.Memory.Allocated), SizeToString(stats.Memory.Used), SizeToString(stats.Memory.Free), SizeToString(stats.Memory.Reservable)).AppendLine()
+				.Append("Audio frames (per minute): ").AppendFormat("{0:#,##0} sent / {1:#,##0} nulled / {2:#,##0} deficit", stats.Frames?.Sent, stats.Frames?.Nulled, stats.Frames?.Deficit).AppendLine()
 				.Append("```");
 			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent(sb.ToString()));
 		}
@@ -58,13 +58,13 @@ public class Developer : ApplicationCommandsModule
 	public static async Task RestartGlobalShardsAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent("Restarting all shards"));
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
 		}
 		foreach (var shard in MikuBot.ShardedClient.ShardClients.Values)
-			await shard.ReconnectAsync(true);
+			await shard.ReconnectAsync();
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
 	}
 
@@ -72,33 +72,33 @@ public class Developer : ApplicationCommandsModule
 	public static async Task RestartLalalinkGlobalAsync(InteractionContext ctx, [Option("clear_queues", "Clear all queues?")] bool clearQueues = false)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent("Restarting all lavalink connections"));
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
 		}
 		var ll = await MikuBot.ShardedClient.GetLavalinkAsync();
 		foreach (var l in ll)
-			foreach (var n in l.Value.ConnectedNodes)
+			foreach (var n in l.Value.ConnectedSessions)
 			{
 				await DisconnectVoiceConnectionsAsync(ctx, n.Value, clearQueues);
-				await n.Value.StopAsync();
+				await n.Value.DestroyAsync();
 				await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Stopped lavalink on shard {l.Key}"));
 			}
 
-		MikuBot.LavalinkNodeConnections.Clear();
+		MikuBot.LavalinkSessions.Clear();
 		foreach (var l in ll)
 		{
 			var LCon = await l.Value.ConnectAsync(MikuBot.LavalinkConfig);
-			MikuBot.LavalinkNodeConnections.Add(l.Key, LCon);
+			MikuBot.LavalinkSessions.Add(l.Key, LCon);
 			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Started lavalink on shard {l.Key}"));
 		}
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Done!"));
 	}
 
-	private static async Task DisconnectVoiceConnectionsAsync(InteractionContext ctx, LavalinkNodeConnection connection, bool clearQueues)
+	private static async Task DisconnectVoiceConnectionsAsync(InteractionContext ctx, LavalinkSession connection, bool clearQueues)
 	{
-		foreach (var guildConnection in connection.ConnectedGuilds)
+		foreach (var guildConnection in connection.ConnectedPlayers)
 		{
 			try
 			{
@@ -119,7 +119,7 @@ public class Developer : ApplicationCommandsModule
 	public static async Task GuildTestAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"Loading shards").AsEphemeral());
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
@@ -133,7 +133,7 @@ public class Developer : ApplicationCommandsModule
 	public static async Task DeleteMessageAsync(ContextMenuContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Log request").AsEphemeral());
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
@@ -150,7 +150,7 @@ public class Developer : ApplicationCommandsModule
 	public static async Task GetDebugLogsAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Log request").AsEphemeral());
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
@@ -197,7 +197,7 @@ public class Developer : ApplicationCommandsModule
 	public static async Task EvalCodeAsync(ContextMenuContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Eval request").AsEphemeral());
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
@@ -290,7 +290,7 @@ public class EvaluationVariables
 	/// <summary>
 	/// Gets the lavalink node connections.
 	/// </summary>
-	public Dictionary<int, LavalinkNodeConnection> Connections = MikuBot.LavalinkNodeConnections;
+	public Dictionary<int, LavalinkSession> Sessions = MikuBot.LavalinkSessions;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="EvaluationVariables"/> class.

@@ -80,7 +80,7 @@ internal class MikuBot : IDisposable
 	/// <summary>
 	/// Gets the lavalink node connections for every shard.
 	/// </summary>
-	internal static Dictionary<int, LavalinkNodeConnection> LavalinkNodeConnections { get; } = new();
+	internal static Dictionary<int, LavalinkSession> LavalinkSessions { get; } = new();
 
 	/// <summary>
 	/// Gets the custom guild entities.
@@ -205,7 +205,8 @@ internal class MikuBot : IDisposable
 		{
 			SocketEndpoint = new() { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
 			RestEndpoint = new() { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
-			Password = Config.LavaConfig.Password
+			Password = Config.LavaConfig.Password,
+			DefaultVolume = 40
 		};
 
 		this.LavalinkModules = await ShardedClient.UseLavalinkAsync();
@@ -390,7 +391,7 @@ internal class MikuBot : IDisposable
 		await ShardedClient.StartAsync();
 		await Task.Delay(5000);
 		foreach (var lavalinkShard in this.LavalinkModules)
-			LavalinkNodeConnections.Add(lavalinkShard.Key, await lavalinkShard.Value.ConnectAsync(LavalinkConfig));
+			LavalinkSessions.Add(lavalinkShard.Key, await lavalinkShard.Value.ConnectAsync(LavalinkConfig));
 		this.SetActivityThread = Task.Run(this.SetActivity, _canellationTokenSource.Token);
 		this.ConnectionThread = Task.Run(this.ShowConnections, _canellationTokenSource.Token);
 #if !DEBUG
@@ -400,9 +401,9 @@ internal class MikuBot : IDisposable
 		while (!_canellationTokenSource.IsCancellationRequested && !_globalCancellationTokenSource.IsCancellationRequested)
 			await Task.Delay(1000);
 		foreach (var lavalinkShard in this.LavalinkModules.Values)
-			foreach (var node in lavalinkShard.ConnectedNodes.Values)
-				await node.StopAsync();
-		LavalinkNodeConnections.Clear();
+			foreach (var session in lavalinkShard.ConnectedSessions.Values)
+				await session.DestroyAsync();
+		LavalinkSessions.Clear();
 		foreach (var appModule in await ShardedClient.GetApplicationCommandsAsync())
 			appModule.Value.CleanModule();
 		if (_globalCancellationTokenSource.IsCancellationRequested)

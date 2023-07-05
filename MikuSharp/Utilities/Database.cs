@@ -1,3 +1,5 @@
+using DisCatSharp.Lavalink.Entities;
+
 using MikuSharp.Entities;
 
 using NpgsqlTypes;
@@ -134,7 +136,7 @@ public static class Database
 		foreach (var qi in queueNow)
 		{
 			var addDateParamName = $"adddate{i}";
-			insertCmdBuilder.Append($"INSERT INTO queues VALUES ({i}, @guild, '{qi.AddedBy}', '{qi.Track.TrackString}', @{addDateParamName});");
+			insertCmdBuilder.Append($"INSERT INTO queues VALUES ({i}, @guild, '{qi.AddedBy}', '{qi.Track.Encoded}', @{addDateParamName});");
 
 			var addDateParam = new NpgsqlParameter(addDateParamName, NpgsqlDbType.Timestamp)
 			{
@@ -192,7 +194,7 @@ public static class Database
 		foreach (var qi in queueEntries)
 		{
 			var addDateParamName = $"adddate{i}";
-			insertCmdBuilder.Append($"INSERT INTO queues VALUES ({i}, @guild, '{qi.AddedBy}', '{qi.Track.TrackString}', @{addDateParamName});");
+			insertCmdBuilder.Append($"INSERT INTO queues VALUES ({i}, @guild, '{qi.AddedBy}', '{qi.Track.Encoded}', @{addDateParamName});");
 
 			var addDateParam = new NpgsqlParameter(addDateParamName, NpgsqlDbType.Timestamp)
 			{
@@ -325,7 +327,7 @@ public static class Database
 
 		foreach (var track in tracks)
 		{
-			longcmd.AppendLine($"INSERT INTO queues VALUES (@pos, @guild, @user, '{track.TrackString}', @time);");
+			longcmd.AppendLine($"INSERT INTO queues VALUES (@pos, @guild, @user, '{track.Encoded}', @time);");
 			position++;
 		}
 
@@ -370,7 +372,7 @@ public static class Database
 
 		foreach (var entry in entries)
 		{
-			longcmd.AppendLine($"INSERT INTO queues VALUES (@pos, @guild, @user, '{entry.Track.TrackString}', @time);");
+			longcmd.AppendLine($"INSERT INTO queues VALUES (@pos, @guild, @user, '{entry.Track.Encoded}', @time);");
 			position++;
 		}
 
@@ -407,7 +409,7 @@ public static class Database
 	{
 		var queueNow = await GetQueueAsync(guild);
 		foreach (var track in tracks)
-			queueNow.Insert(position, new QueueEntry(LavalinkUtilities.DecodeTrack(track.TrackString), userId, DateTimeOffset.UtcNow, position));
+			queueNow.Insert(position, new QueueEntry(LavalinkUtilities.DecodeTrack(track.Encoded), userId, DateTimeOffset.UtcNow, position));
 		await RebuildQueueAsync(guild, queueNow);
 	}
 

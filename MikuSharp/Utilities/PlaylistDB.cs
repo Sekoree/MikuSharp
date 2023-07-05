@@ -1,5 +1,8 @@
 using System.Text.RegularExpressions;
 
+using DisCatSharp.Lavalink.Entities;
+using DisCatSharp.Lavalink.Enums;
+
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 
@@ -94,7 +97,7 @@ public static partial class PlaylistDB
 					try
 					{
 						var url = new Uri(Convert.ToString(playlistReader["url"]));
-						var ss = await MikuBot.LavalinkNodeConnections.First().Value.Rest.GetTracksAsync(url);
+						var ss = await MikuBot.LavalinkSessions.First().Value.Rest.GetTracksAsync(url);
 						entryCount = ss.Tracks.Count;
 					}
 					catch { }
@@ -148,7 +151,7 @@ public static partial class PlaylistDB
 			batchCmd.Parameters.AddWithValue("pos", position);
 			batchCmd.Parameters.AddWithValue("playlistName", playlistName);
 			batchCmd.Parameters.AddWithValue("userId", uid);
-			batchCmd.Parameters.AddWithValue("ts", entry.Track.TrackString);
+			batchCmd.Parameters.AddWithValue("ts", entry.Track.Encoded);
 			batchCmd.Parameters.AddWithValue("add", entry.AdditionDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"));
 			batchCmd.Parameters.AddWithValue("mod", DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss"));
 			batch.BatchCommands.Add(batchCmd);
@@ -179,7 +182,7 @@ public static partial class PlaylistDB
 			batchCmd.Parameters.AddWithValue("pos", entry.Position);
 			batchCmd.Parameters.AddWithValue("playlistName", playlistName);
 			batchCmd.Parameters.AddWithValue("userId", uid);
-			batchCmd.Parameters.AddWithValue("ts", entry.Track.TrackString);
+			batchCmd.Parameters.AddWithValue("ts", entry.Track.Encoded);
 			batchCmd.Parameters.AddWithValue("add", entry.AdditionDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"));
 			batchCmd.Parameters.AddWithValue("mod", entry.ModifyDate.UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss"));
 			batch.BatchCommands.Add(batchCmd);
@@ -273,7 +276,7 @@ public static partial class PlaylistDB
 		var longcmd = "UPDATE playlists SET changed = @modifyDate WHERE userid = @userId AND playlistname = @playlistName;";
 		foreach (var track in tracks)
 		{
-			longcmd += $"INSERT INTO playlistentries VALUES (@position, @playlistName, @userId, '{track.TrackString}', @additionDate, @modifyDate);";
+			longcmd += $"INSERT INTO playlistentries VALUES (@position, @playlistName, @userId, '{track.Encoded}', @additionDate, @modifyDate);";
 			position++;
 		}
 
@@ -301,7 +304,7 @@ public static partial class PlaylistDB
 		var playlist = await GetPlaylistAsync(guild, userId, playlistName);
 		var entries = await playlist.GetEntriesAsync();
 		foreach (var track in tracks)
-			entries.Insert(position, new PlaylistEntry(LavalinkUtilities.DecodeTrack(track.TrackString), DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, position));
+			entries.Insert(position, new PlaylistEntry(LavalinkUtilities.DecodeTrack(track.Encoded), DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, position));
 		await RebuildListAsync(userId, playlistName, entries);
 	}
 
@@ -387,7 +390,7 @@ public static partial class PlaylistDB
 
 	public static async Task<TrackResult> GetSong(string url_or_name, InteractionContext ctx)
 	{
-		var nodeConnection = MikuBot.LavalinkNodeConnections.First().Value;
+		var nodeConnection = MikuBot.LavalinkSessions.First().Value;
 		var inter = ctx.Client.GetInteractivity();
 		if (url_or_name.IsNndUrl())
 		{
@@ -447,19 +450,19 @@ public static partial class PlaylistDB
 			var s = await nodeConnection.Rest.GetTracksAsync(new Uri(url_or_name));
 			switch (s.LoadResultType)
 			{
-				case LavalinkLoadResultType.LoadFailed:
+				case LavalinkLoadResultType.Error:
 				{
 					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("Loading this song/playlist failed, please try again, reasons could be:\n" +
 						"> Playlist is set to private or unlisted\n" +
 						"> The song is unavailable/deleted").Build()));
 					return null;
 				};
-				case LavalinkLoadResultType.NoMatches:
+				case LavalinkLoadResultType.Empty:
 				{
 					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("No song/playlist was found with this URL, please try again/a different one").Build()));
 					return null;
 				};
-				case LavalinkLoadResultType.PlaylistLoaded:
+				case LavalinkLoadResultType.Playlist:
 				{
 					if (s.PlaylistInfo.SelectedTrack == -1)
 					{
@@ -545,13 +548,13 @@ public static partial class PlaylistDB
 			var s = await nodeConnection.Rest.GetTracksAsync(url_or_name);
 			switch (s.LoadResultType)
 			{
-				case LavalinkLoadResultType.LoadFailed:
+				case LavalinkLoadResultType.Error:
 				{
 					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("Loading this song/playlist failed, please try again, reasons could be:\n" +
 						"> The song is unavailable/deleted").Build()));
 					return null;
 				};
-				case LavalinkLoadResultType.NoMatches:
+				case LavalinkLoadResultType.Empty:
 				{
 					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithTitle("Failed to load").WithDescription("No song was found, please try again").Build()));
 					return null;

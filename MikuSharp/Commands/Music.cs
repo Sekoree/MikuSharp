@@ -37,7 +37,7 @@ public class Music : ApplicationCommandsModule
 			if (!MikuBot.Guilds.Any(x => x.Key == ctx.Guild.Id))
 				MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
 			var g = MikuBot.Guilds[ctx.Guild.Id];
-			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
+			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkSessions[ctx.Client.ShardId], ctx.Client.ShardId);
 			await g.ConditionalConnect(ctx);
 			g.MusicInstance.CommandChannel = ctx.Channel;
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Heya {ctx.Member.Mention}!"));
@@ -74,7 +74,7 @@ public class Music : ApplicationCommandsModule
 		public static async Task GetLavalinkStatsAsync(InteractionContext ctx)
 		{
 			await ctx.DeferAsync(true);
-			var stats = MikuBot.LavalinkNodeConnections[ctx.Client.ShardId].Statistics;
+			var stats = MikuBot.LavalinkSessions[ctx.Client.ShardId].Statistics;
 			var sb = new StringBuilder();
 			sb.Append("Lavalink resources usage statistics: ```")
 				.Append("Uptime:                    ").Append(stats.Uptime).AppendLine()
@@ -124,7 +124,7 @@ public class Music : ApplicationCommandsModule
 			if (!MikuBot.Guilds.Any(x => x.Key == ctx.Guild.Id))
 				MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
 			var g = MikuBot.Guilds[ctx.Guild.Id];
-			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
+			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkSessions[ctx.Client.ShardId], ctx.Client.ShardId);
 			var curq = await Database.GetQueueAsync(ctx.Guild);
 			if (curq.Count != 0 && g.MusicInstance.Playstate == PlayState.NotPlaying)
 			{
@@ -210,7 +210,7 @@ public class Music : ApplicationCommandsModule
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			if (pos < 1)
 				return;
-			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkNodeConnections[ctx.Client.ShardId], ctx.Client.ShardId);
+			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkSessions[ctx.Client.ShardId], ctx.Client.ShardId);
 
 			await g.ConditionalConnect(ctx);
 
@@ -268,9 +268,9 @@ public class Music : ApplicationCommandsModule
 				if (g.MusicInstance.RepeatMode != RepeatMode.On && g.MusicInstance.RepeatMode != RepeatMode.All)
 					await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, ctx.Guild);
 				if (lastPlayedSongs.Count == 0)
-					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.MusicInstance.CurrentSong.Track.TrackString);
+					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.MusicInstance.CurrentSong.Track.Encoded);
 				else if (lastPlayedSongs[0]?.Track.Uri != g.MusicInstance.CurrentSong.Track.Uri)
-					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.MusicInstance.CurrentSong.Track.TrackString);
+					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.MusicInstance.CurrentSong.Track.Encoded);
 			}
 			queue = await Database.GetQueueAsync(ctx.Guild);
 			g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
@@ -499,7 +499,7 @@ public class Music : ApplicationCommandsModule
 			g.MusicInstance.CommandChannel = ctx.Channel;
 			await Database.ClearQueueAsync(ctx.Guild);
 			if (g.MusicInstance.CurrentSong != null)
-				await Database.AddToQueueAsync(ctx.Guild, g.MusicInstance.CurrentSong.AddedBy, g.MusicInstance.CurrentSong.Track.TrackString);
+				await Database.AddToQueueAsync(ctx.Guild, g.MusicInstance.CurrentSong.AddedBy, g.MusicInstance.CurrentSong.Track.Encoded);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Cleared queue!**").Build()));
 		}
 

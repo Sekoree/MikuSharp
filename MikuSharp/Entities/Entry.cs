@@ -1,3 +1,5 @@
+using DisCatSharp.Lavalink.Entities;
+
 namespace MikuSharp.Entities;
 
 public class Entry

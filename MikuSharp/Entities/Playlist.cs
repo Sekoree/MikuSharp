@@ -47,7 +47,7 @@ public class Playlist
 			}
 			else
 			{
-				var conn = MikuBot.LavalinkNodeConnections?.First().Value ?? null;
+				var conn = MikuBot.LavalinkSessions?.First().Value ?? null;
 				LavalinkGuildConnection? client = null;
 				if (conn.ConnectedGuilds.Any())
 					client = conn.ConnectedGuilds.First().Value;
