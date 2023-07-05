@@ -110,7 +110,7 @@ public class Developer : ApplicationCommandsModule
 			await guildConnection.Value.StopAsync();
 			if (clearQueues)
 				_ = Task.Run(async () => await Database.ClearQueueAsync(guildConnection.Value.Guild), MikuBot._canellationTokenSource.Token);
-			await guildConnection.Value.DisconnectAsync(true);
+			await guildConnection.Value.DisconnectAsync();
 			connection.Discord.Logger.LogInformation("Forcefully disconnected lavalink voice from {guild}", guildConnection.Key);
 		}
 	}

@@ -84,7 +84,7 @@ public class MusicInstance
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading"));
 				client.UploadStream(ex, $"{nico_nico_id}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var Track = await this.NodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nico_nico_id}.mp3"));
+			var Track = await this.Session.LoadTracksAsync($"https://nnd.meek.moe/new/{nico_nico_id}.mp3");
 			if (position == -1)
 				await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
 			else
@@ -121,7 +121,7 @@ public class MusicInstance
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading..."));
 				client.UploadStream(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var Track = await this.NodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
+			var Track = await this.Session.LoadTracksAsync($"https://nnd.meek.moe/new/{nndID}.mp3");
 			if (position == -1)
 				await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
 			else
@@ -135,8 +135,8 @@ public class MusicInstance
 		{
 			try
 			{
-				var s = await this.NodeConnection.Rest.GetTracksAsync(new Uri(url_or_name));
-				switch (s.LoadResultType)
+				var s = await this.Session.LoadTracksAsync(url_or_name);
+				switch (s.LoadType)
 				{
 					case LavalinkLoadResultType.Error:
 					{
@@ -251,7 +251,7 @@ public class MusicInstance
 					// We play a single song
 					default:
 					{
-						await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {s.Tracks.First().Title}"));
+						await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {s.Tracks.First().Info.Title}"));
 						if (position == -1)
 							await Database.AddToQueueAsync(ctx.Guild, ctx.Member.Id, s.Tracks.First().TrackString);
 						else
@@ -294,8 +294,8 @@ public class MusicInstance
 				type = LavalinkSearchType.AppleMusic;
 			}
 
-			var s = await this.NodeConnection.Rest.GetTracksAsync(url_or_name, type);
-			switch (s.LoadResultType)
+			var s = await this.GuildPlayer.LoadTracksAsync(type, url_or_name);
+			switch (s.LoadType)
 			{
 				case LavalinkLoadResultType.Error:
 				{

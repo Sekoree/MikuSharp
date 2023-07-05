@@ -13,14 +13,14 @@ public class VoiceChat
 			var guild = MikuBot.Guilds[e.Guild.Id];
 			var musicInstance = guild.MusicInstance;
 
-			if (musicInstance == null || musicInstance.GuildConnection?.IsConnected == false)
+			if (musicInstance == null || musicInstance.GuildPlayer?.IsConnected == false)
 				return;
 
 			var currentUser = e.Guild.Members[client.CurrentUser.Id];
 
 			var afterChannelUserCount = e.After?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
 			var currentChannelUserCount = e.Channel?.Users.Count(x => !x.IsBot) ?? 0;
-			var guildConnectionUserCount = musicInstance.GuildConnection?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
+			var guildConnectionUserCount = musicInstance.GuildPlayer?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
 
 			var isCurrentUserInChannel = currentUser?.VoiceState?.ChannelId == e.Channel?.Id;
 
@@ -29,7 +29,7 @@ public class VoiceChat
 			{
 				if (musicInstance.Playstate == PlayState.Playing)
 				{
-					await musicInstance.GuildConnection.PauseAsync();
+					await musicInstance.GuildPlayer.PauseAsync();
 					musicInstance.Playstate = PlayState.Paused;
 
 					try

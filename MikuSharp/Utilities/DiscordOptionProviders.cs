@@ -74,9 +74,9 @@ internal class AutocompleteProviders
 			else if (int.TryParse(Convert.ToString(ctx.FocusedOption.Value), out var pos))
 				songs.AddRange(tracks.Where(x => x.Position.ToString().StartsWith(pos.ToString())).Take(25));
 			else
-				songs.AddRange(tracks.Where(x => x.Track.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
+				songs.AddRange(tracks.Where(x => x.Track.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
 
-			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Title}", x.Position.ToString()));
+			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Info.Title}", x.Position.ToString()));
 		}
 	}
 
@@ -91,9 +91,9 @@ internal class AutocompleteProviders
 			else if (int.TryParse(Convert.ToString(ctx.FocusedOption.Value), out var pos))
 				songs.AddRange(queue.Where(x => x.Position.ToString().StartsWith(pos.ToString())).Take(25));
 			else
-				songs.AddRange(queue.Where(x => x.Track.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
+				songs.AddRange(queue.Where(x => x.Track.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
 
-			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Title}", x.Position.ToString()));
+			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Info.Title}", x.Position.ToString()));
 		}
 	}
 }

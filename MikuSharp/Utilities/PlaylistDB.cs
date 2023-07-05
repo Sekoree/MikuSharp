@@ -96,9 +96,9 @@ public static partial class PlaylistDB
 				if (Music.GetExtService(extService) != ExtService.None)
 					try
 					{
-						var url = new Uri(Convert.ToString(playlistReader["url"]));
-						var ss = await MikuBot.LavalinkSessions.First().Value.Rest.GetTracksAsync(url);
-						entryCount = ss.Tracks.Count;
+						var url = Convert.ToString(playlistReader["url"]);
+						var ss = await MikuBot.LavalinkSessions.First().Value.LoadTracksAsync(url);
+						entryCount = ((LavalinkPlaylist)ss.Result).Tracks.Count;
 					}
 					catch { }
 				playlist = new Playlist(
@@ -390,7 +390,7 @@ public static partial class PlaylistDB
 
 	public static async Task<TrackResult> GetSong(string url_or_name, InteractionContext ctx)
 	{
-		var nodeConnection = MikuBot.LavalinkSessions.First().Value;
+		var session = MikuBot.LavalinkSessions.First().Value;
 		var inter = ctx.Client.GetInteractivity();
 		if (url_or_name.IsNndUrl())
 		{
@@ -411,7 +411,7 @@ public static partial class PlaylistDB
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading..."));
 				ftpClient.UploadStream(ex, $"{nico_nico_id}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nico_nico_id}.mp3"));
+			var Track = await session.LoadTracksAsync($"https://nnd.meek.moe/new/{nico_nico_id}.mp3");
 			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
 		}
 		// Bilibili
@@ -442,13 +442,13 @@ public static partial class PlaylistDB
 				await ctx.EditFollowupAsync(msg.Id, new DiscordWebhookBuilder().WithContent("Uploading..."));
 				client.UploadStream(ex, $"{nndID}.mp3", FtpRemoteExists.Skip, true);
 			}
-			var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
+			var Track = await session.LoadTracksAsync($"https://nnd.meek.moe/new/{nndID}.mp3");
 			return new TrackResult(Track.PlaylistInfo, Track.Tracks.First());
 		}
 		else if (url_or_name.StartsWith("http://") | url_or_name.StartsWith("https://"))
 		{
-			var s = await nodeConnection.Rest.GetTracksAsync(new Uri(url_or_name));
-			switch (s.LoadResultType)
+			var s = await session.LoadTracksAsync(url_or_name);
+			switch (s.LoadType)
 			{
 				case LavalinkLoadResultType.Error:
 				{
@@ -538,15 +538,15 @@ public static partial class PlaylistDB
 				};
 				default:
 				{
-					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {s.Tracks.First().Title}"));
+					await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AsEphemeral().WithContent($"Playing single song: {s.Tracks.First().Info.Title}"));
 					return new TrackResult(s.PlaylistInfo, s.Tracks.First());
 				};
 			}
 		}
 		else
 		{
-			var s = await nodeConnection.Rest.GetTracksAsync(url_or_name);
-			switch (s.LoadResultType)
+			var s = await session.LoadTracksAsync(url_or_name);
+			switch (s.LoadType)
 			{
 				case LavalinkLoadResultType.Error:
 				{

@@ -1,3 +1,5 @@
+using DisCatSharp.Lavalink.Entities;
+
 using MikuSharp.Enums;
 
 namespace MikuSharp.Entities;
@@ -48,14 +50,14 @@ public class Playlist
 			else
 			{
 				var conn = MikuBot.LavalinkSessions?.First().Value ?? null;
-				LavalinkGuildConnection? client = null;
-				if (conn.ConnectedGuilds.Any())
-					client = conn.ConnectedGuilds.First().Value;
+				LavalinkGuildPlayer? client = null;
+				if (conn.ConnectedPlayers.Any())
+					client = conn.ConnectedPlayers.First().Value;
 				if (client != null)
 				{
-					var trs = await client.GetTracksAsync(new Uri(this.Url));
+					var trs = await client.LoadTracksAsync(this.Url);
 					var i = 0;
-					foreach (var t in trs.Tracks)
+					foreach (var t in ((LavalinkPlaylist)trs.Result).Tracks)
 					{
 						entries.Add(new PlaylistEntry(t, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow, i));
 						i++;

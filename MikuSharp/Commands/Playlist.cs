@@ -1,3 +1,4 @@
+using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
 
 using MikuSharp.Attributes;
@@ -83,17 +84,17 @@ public class Playlists : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription("**Error** You already have a playlist with that playlist!").Build()));
 				return;
 			}
-			LavalinkLoadResult s = null;
+			LavalinkTrackLoadingResult s = null;
 			try
 			{
-				s = await MikuBot.LavalinkSessions[ctx.Client.ShardId].Rest.GetTracksAsync(new Uri(link));
+				s = await MikuBot.LavalinkSessions[ctx.Client.ShardId].LoadTracksAsync(link);
 			}
 			catch
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription("**Error** Reasons could be:\n> The provided link was not a playlist\n> The playlist is unavailable (for example set to private)").Build()));
 				return;
 			}
-			if (s.LoadResultType != LavalinkLoadResultType.Playlist)
+			if (s.LoadType != LavalinkLoadResultType.Playlist)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription("**Error** Reasons could be:\n> The provided link was not a playlist\n> The playlist is unavailable (for example set to private)").Build()));
 				return;
@@ -102,7 +103,7 @@ public class Playlists : ApplicationCommandsModule
 				await PlaylistDB.AddPlaylist(playlistName, ctx.Member.Id, ExtService.Youtube, link);
 			else
 				await PlaylistDB.AddPlaylist(playlistName, ctx.Member.Id, ExtService.Soundcloud, link);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription($"Fixed playlist created with playlist -> {playlistName} and {s.Tracks.Count} Songs!").Build()));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithTitle("Create Fixed Playlist").WithDescription($"Fixed playlist created with playlist -> {playlistName} and {((LavalinkPlaylist)s.Result).Tracks.Count} Songs!").Build()));
 		}
 	}
 

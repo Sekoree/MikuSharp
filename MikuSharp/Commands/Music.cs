@@ -57,8 +57,8 @@ public class Music : ApplicationCommandsModule
 			try
 			{
 				if (keep)
-					await g.MusicInstance.GuildConnection.StopAsync();
-				await g.MusicInstance.GuildConnection.DisconnectAsync();
+					await g.MusicInstance.GuildPlayer.StopAsync();
+				await g.MusicInstance.GuildPlayer.DisconnectAsync();
 				if (!keep)
 					await Database.ClearQueueAsync(ctx.Guild);
 				g.MusicInstance = null;
@@ -78,11 +78,11 @@ public class Music : ApplicationCommandsModule
 			var sb = new StringBuilder();
 			sb.Append("Lavalink resources usage statistics: ```")
 				.Append("Uptime:                    ").Append(stats.Uptime).AppendLine()
-				.Append("Players:                   ").AppendFormat("{0} active / {1} total", stats.ActivePlayers, stats.TotalPlayers).AppendLine()
-				.Append("CPU Cores:                 ").Append(stats.CpuCoreCount).AppendLine()
-				.Append("CPU Usage:                 ").AppendFormat("{0:#,##0.0%} lavalink / {1:#,##0.0%} system", stats.CpuLavalinkLoad, stats.CpuSystemLoad).AppendLine()
-				.Append("RAM Usage:                 ").AppendFormat("{0} allocated / {1} used / {2} free / {3} reservable", SizeToString(stats.RamAllocated), SizeToString(stats.RamUsed), SizeToString(stats.RamFree), SizeToString(stats.RamReservable)).AppendLine()
-				.Append("Audio frames (per minute): ").AppendFormat("{0:#,##0} sent / {1:#,##0} nulled / {2:#,##0} deficit", stats.AverageSentFramesPerMinute, stats.AverageNulledFramesPerMinute, stats.AverageDeficitFramesPerMinute).AppendLine()
+				.Append("Players:                   ").AppendFormat("{0} active / {1} total", stats.PlayingPlayers, stats.Players).AppendLine()
+				.Append("CPU Cores:                 ").Append(stats.Cpu.Cores).AppendLine()
+				.Append("CPU Usage:                 ").AppendFormat("{0:#,##0.0%} lavalink / {1:#,##0.0%} system", stats.Cpu.LavalinkLoad, stats.Cpu.SystemLoad).AppendLine()
+				.Append("RAM Usage:                 ").AppendFormat("{0} allocated / {1} used / {2} free / {3} reservable", SizeToString(stats.Memory.Allocated), SizeToString(stats.Memory.Used), SizeToString(stats.Memory.Free), SizeToString(stats.Memory.Reservable)).AppendLine()
+				.Append("Audio frames (per minute): ").AppendFormat("{0:#,##0} sent / {1:#,##0} nulled / {2:#,##0} deficit", stats.Frames?.Sent, stats.Frames?.Nulled, stats.Frames?.Deficit).AppendLine()
 				.Append("```");
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(sb.ToString()));
 		}
@@ -108,9 +108,9 @@ public class Music : ApplicationCommandsModule
 			}
 			g.MusicInstance.CommandChannel = ctx.Channel;
 			var ts = TimeSpan.FromSeconds(position);
-			await g.MusicInstance.GuildConnection.SeekAsync(ts);
+			await g.MusicInstance.GuildPlayer.SeekAsync(ts);
 			var pos = ts.Hours < 1 ? ts.ToString(@"mm\:ss") : ts.ToString(@"hh\:mm\:ss");
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Seeked {g.MusicInstance.CurrentSong.Track.Title} to {pos}"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Seeked {g.MusicInstance.CurrentSong.Track.Info.Title} to {pos}"));
 		}
 
 		[SlashCommand("play", "Play or queue a song")]
@@ -179,7 +179,7 @@ public class Music : ApplicationCommandsModule
 			var emb = new DiscordEmbedBuilder();
 			if (oldState == PlayState.Playing)
 			{
-				emb.AddField(new DiscordEmbedField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\n" +
+				emb.AddField(new DiscordEmbedField(q.Tracks.First().Info.Title + "[" + (q.Tracks.First().Info.Length.Hours != 0 ? q.Tracks.First().Info.Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Info.Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Info.Author}\n" +
 					$"Requested by {ctx.Member.Mention}"));
 				if (q.Tracks.Count != 1)
 					emb.AddField(new DiscordEmbedField("Playlist added:", $"added {q.Tracks.Count - 1} more"));
@@ -188,9 +188,9 @@ public class Music : ApplicationCommandsModule
 			else
 			{
 				if (q.PlaylistInfo.SelectedTrack == -1 || q.PlaylistInfo.Name == null)
-					emb.AddField(new DiscordEmbedField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\nRequested by {ctx.Member.Mention}"));
+					emb.AddField(new DiscordEmbedField(q.Tracks.First().Info.Title + "[" + (q.Tracks.First().Info.Length.Hours != 0 ? q.Tracks.First().Info.Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Info.Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Info.Author}\nRequested by {ctx.Member.Mention}"));
 				else
-					emb.AddField(new DiscordEmbedField(q.Tracks[q.PlaylistInfo.SelectedTrack].Title + "[" + (q.Tracks[q.PlaylistInfo.SelectedTrack].Length.Hours != 0 ? q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"hh\:mm\:ss") : q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks[q.PlaylistInfo.SelectedTrack].Author}\nRequested by {ctx.Member.Mention}"));
+					emb.AddField(new DiscordEmbedField(q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Title + "[" + (q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.Hours != 0 ? q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.ToString(@"hh\:mm\:ss") : q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Author}\nRequested by {ctx.Member.Mention}"));
 				if (q.Tracks.Count != 1)
 					emb.AddField(new DiscordEmbedField("Playlist added:", $"added {q.Tracks.Count - 1} more"));
 				await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(emb.WithTitle("Playing").Build()).AsEphemeral());
@@ -231,7 +231,7 @@ public class Music : ApplicationCommandsModule
 			var emb = new DiscordEmbedBuilder();
 			if (oldState == PlayState.Playing)
 			{
-				emb.AddField(new DiscordEmbedField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\n" +
+				emb.AddField(new DiscordEmbedField(q.Tracks.First().Info.Title + "[" + (q.Tracks.First().Info.Length.Hours != 0 ? q.Tracks.First().Info.Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Info.Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Info.Author}\n" +
 					$"Requested by {ctx.Member.Mention}\nAt position: {pos}"));
 				if (q.Tracks.Count != 1)
 					emb.AddField(new DiscordEmbedField("Playlist added:", $"added {q.Tracks.Count - 1} more"));
@@ -241,9 +241,9 @@ public class Music : ApplicationCommandsModule
 			else
 			{
 				if (q.PlaylistInfo.SelectedTrack == -1 || q.PlaylistInfo.Name == null)
-					emb.AddField(new DiscordEmbedField(q.Tracks.First().Title + "[" + (q.Tracks.First().Length.Hours != 0 ? q.Tracks.First().Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Author}\nRequested by {ctx.Member.Mention}"));
+					emb.AddField(new DiscordEmbedField(q.Tracks.First().Info.Title + "[" + (q.Tracks.First().Info.Length.Hours != 0 ? q.Tracks.First().Info.Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Info.Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Info.Author}\nRequested by {ctx.Member.Mention}"));
 				else
-					emb.AddField(new DiscordEmbedField(q.Tracks[q.PlaylistInfo.SelectedTrack].Title + "[" + (q.Tracks[q.PlaylistInfo.SelectedTrack].Length.Hours != 0 ? q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"hh\:mm\:ss") : q.Tracks[q.PlaylistInfo.SelectedTrack].Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks[q.PlaylistInfo.SelectedTrack].Author}\nRequested by {ctx.Member.Mention}At position: {pos}"));
+					emb.AddField(new DiscordEmbedField(q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Title + "[" + (q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.Hours != 0 ? q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.ToString(@"hh\:mm\:ss") : q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Author}\nRequested by {ctx.Member.Mention}At position: {pos}"));
 				if (q.Tracks.Count != 1)
 					emb.AddField(new DiscordEmbedField("Playlist added:", $"added {q.Tracks.Count - 1} more"));
 				emb.WithTitle("Added");
@@ -262,14 +262,14 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			g.MusicInstance.GuildConnection.PlaybackFinished -= Lavalink.LavalinkTrackFinished;
+			g.MusicInstance.GuildPlayer.TrackEnded -= Lavalink.LavalinkTrackFinished;
 			if (g.MusicInstance.CurrentSong != null)
 			{
 				if (g.MusicInstance.RepeatMode != RepeatMode.On && g.MusicInstance.RepeatMode != RepeatMode.All)
 					await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, ctx.Guild);
 				if (lastPlayedSongs.Count == 0)
 					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.MusicInstance.CurrentSong.Track.Encoded);
-				else if (lastPlayedSongs[0]?.Track.Uri != g.MusicInstance.CurrentSong.Track.Uri)
+				else if (lastPlayedSongs[0]?.Track.Info.Uri != g.MusicInstance.CurrentSong.Track.Info.Uri)
 					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.MusicInstance.CurrentSong.Track.Encoded);
 			}
 			queue = await Database.GetQueueAsync(ctx.Guild);
@@ -280,10 +280,10 @@ public class Music : ApplicationCommandsModule
 			else
 			{
 				g.MusicInstance.Playstate = PlayState.NotPlaying;
-				await g.MusicInstance.GuildConnection.StopAsync();
+				await g.MusicInstance.GuildPlayer.StopAsync();
 			}
 			if (g.MusicInstance.LastSong != null)
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Skipped:**\n{g.MusicInstance.LastSong.Track.Title}").Build()));
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Skipped:**\n{g.MusicInstance.LastSong.Track.Info.Title}").Build()));
 			else
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Continued!**").Build()));
 		}
@@ -297,7 +297,7 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			await Task.Run(g.MusicInstance.GuildConnection.StopAsync, MikuBot._canellationTokenSource.Token);
+			await Task.Run(g.MusicInstance.GuildPlayer.StopAsync, MikuBot._canellationTokenSource.Token);
 			var cmd_id = ctx.Client.GetApplicationCommands().GlobalCommands.First(x => x.Name == "music").Id;
 			await ctx.EditResponseAsync(builder: new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Stopped** (use </music playback resume:{cmd_id}> to start playback again)").Build()));
 		}
@@ -315,7 +315,7 @@ public class Music : ApplicationCommandsModule
 			g.MusicInstance.CommandChannel = ctx.Channel;
 			if (vol > 150)
 				vol = 150;
-			await g.MusicInstance.GuildConnection.SetVolumeAsync(vol);
+			await g.MusicInstance.GuildPlayer.SetVolumeAsync(vol);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Set volume to {vol}**").Build()));
 		}
 
@@ -330,7 +330,7 @@ public class Music : ApplicationCommandsModule
 			g.MusicInstance.CommandChannel = ctx.Channel;
 			if (g.MusicInstance.Playstate == PlayState.Playing)
 			{
-				await g.MusicInstance.GuildConnection.PauseAsync();
+				await g.MusicInstance.GuildPlayer.PauseAsync();
 				g.MusicInstance.Playstate = PlayState.Paused;
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Paused**").Build()));
 			}
@@ -354,7 +354,7 @@ public class Music : ApplicationCommandsModule
 			}
 			else
 			{
-				await g.MusicInstance.GuildConnection.ResumeAsync();
+				await g.MusicInstance.GuildPlayer.ResumeAsync();
 				g.MusicInstance.Playstate = PlayState.Playing;
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription("**Resumed**").Build()));
 			}
@@ -397,14 +397,14 @@ public class Music : ApplicationCommandsModule
 						{
 							emb.WithTitle("Current Queue");
 							g.GetPlayingState(out var time1, out var time2);
-							emb.AddField(new DiscordEmbedField($"**{songAmount}.{g.MusicInstance.CurrentSong.Track.Title.Replace("*", "").Replace("|", "")}** by {g.MusicInstance.CurrentSong.Track.Author.Replace("*", "").Replace("|", "")} [{time1}/{time2}]",
-								$"Requested by <@{g.MusicInstance.CurrentSong.AddedBy}> [Link]({g.MusicInstance.CurrentSong.Track.Uri.AbsoluteUri})\nˉˉˉˉˉ"));
+							emb.AddField(new DiscordEmbedField($"**{songAmount}.{g.MusicInstance.CurrentSong.Track.Info.Title.Replace("*", "").Replace("|", "")}** by {g.MusicInstance.CurrentSong.Track.Info.Author.Replace("*", "").Replace("|", "")} [{time1}/{time2}]",
+								$"Requested by <@{g.MusicInstance.CurrentSong.AddedBy}> [Link]({g.MusicInstance.CurrentSong.Track.Info.Uri.AbsoluteUri})\nˉˉˉˉˉ"));
 						}
 						else
 						{
 							queue.ElementAt(songAmount).GetPlayingState(out var time);
-							emb.AddField(new DiscordEmbedField($"**{songAmount}.{queue.ElementAt(songAmount).Track.Title.Replace("*", "").Replace("|", "")}** by {queue.ElementAt(songAmount).Track.Author.Replace("*", "").Replace("|", "")} [{time}]",
-								$"Requested by <@{queue.ElementAt(songAmount).AddedBy}> [Link]({queue.ElementAt(songAmount).Track.Uri.AbsoluteUri})"));
+							emb.AddField(new DiscordEmbedField($"**{songAmount}.{queue.ElementAt(songAmount).Track.Info.Title.Replace("*", "").Replace("|", "")}** by {queue.ElementAt(songAmount).Track.Info.Author.Replace("*", "").Replace("|", "")} [{time}]",
+								$"Requested by <@{queue.ElementAt(songAmount).AddedBy}> [Link]({queue.ElementAt(songAmount).Track.Info.Uri.AbsoluteUri})"));
 						}
 						songsPerPage++;
 						songAmount++;
@@ -437,14 +437,14 @@ public class Music : ApplicationCommandsModule
 						{
 							emb.WithTitle("Current Queue");
 							g.GetPlayingState(out var time1, out var time2);
-							emb.AddField(new DiscordEmbedField($"**{g.MusicInstance.CurrentSong.Track.Title.Replace("*", "").Replace("|", "")}** by {g.MusicInstance.CurrentSong.Track.Author.Replace("*", "").Replace("|", "")} [{time1}/{time2}]",
-								$"Requested by <@{g.MusicInstance.CurrentSong.AddedBy}> [Link]({g.MusicInstance.CurrentSong.Track.Uri.AbsoluteUri})\nˉˉˉˉˉ"));
+							emb.AddField(new DiscordEmbedField($"**{g.MusicInstance.CurrentSong.Track.Info.Title.Replace("*", "").Replace("|", "")}** by {g.MusicInstance.CurrentSong.Track.Info.Author.Replace("*", "").Replace("|", "")} [{time1}/{time2}]",
+								$"Requested by <@{g.MusicInstance.CurrentSong.AddedBy}> [Link]({g.MusicInstance.CurrentSong.Track.Info.Uri.AbsoluteUri})\nˉˉˉˉˉ"));
 						}
 						else
 						{
 							Track.GetPlayingState(out var time);
-							emb.AddField(new DiscordEmbedField($"**{songAmount}.{Track.Track.Title.Replace("*", "").Replace("|", "")}** by {Track.Track.Author.Replace("*", "").Replace("|", "")} [{time}]",
-								$"Requested by <@{Track.AddedBy}> [Link]({Track.Track.Uri.AbsoluteUri})"));
+							emb.AddField(new DiscordEmbedField($"**{songAmount}.{Track.Track.Info.Title.Replace("*", "").Replace("|", "")}** by {Track.Track.Info.Author.Replace("*", "").Replace("|", "")} [{time}]",
+								$"Requested by <@{Track.AddedBy}> [Link]({Track.Track.Info.Uri.AbsoluteUri})"));
 						}
 						songsPerPage++;
 						songAmount++;
@@ -521,7 +521,7 @@ public class Music : ApplicationCommandsModule
 				return;
 			var oldSong = queue[old_pos];
 			await Database.MoveQueueItemsAsync(ctx.Guild, old_pos, new_pos);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Moved**:\n **{oldSong.Track.Title}**\nby {oldSong.Track.Author}\n from position **{old_pos}** to **{new_pos}**!").Build()));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Moved**:\n **{oldSong.Track.Info.Title}**\nby {oldSong.Track.Info.Author}\n from position **{old_pos}** to **{new_pos}**!").Build()));
 		}
 
 		[SlashCommand("remove", "Removes a name_or_url from queue")]
@@ -538,7 +538,7 @@ public class Music : ApplicationCommandsModule
 			g.MusicInstance.CommandChannel = ctx.Channel;
 			var old = queue[position];
 			await Database.RemoveFromQueueAsync(position, ctx.Guild);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Removed:\n{old.Track.Title}**\nby {old.Track.Author}").Build()));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"**Removed:\n{old.Track.Info.Title}**\nby {old.Track.Info.Author}").Build()));
 		}
 	}
 
@@ -635,7 +635,7 @@ public class Music : ApplicationCommandsModule
 				foreach (var Track in lastPlayedSongs)
 				{
 					Track.GetPlayingState(out var time);
-					emb.AddField(new DiscordEmbedField($"{songAmount + 1}.{Track.Track.Title.Replace("*", "").Replace("|", "")}", $"by {Track.Track.Author.Replace("*", "").Replace("|", "")} [{time}] [Link]({Track.Track.Uri})"));
+					emb.AddField(new DiscordEmbedField($"{songAmount + 1}.{Track.Track.Info.Title.Replace("*", "").Replace("|", "")}", $"by {Track.Track.Info.Author.Replace("*", "").Replace("|", "")} [{time}] [Link]({Track.Track.Info.Uri})"));
 					songsPerPage++;
 					songAmount++;
 					if (songsPerPage == 10)

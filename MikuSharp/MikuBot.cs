@@ -290,7 +290,7 @@ internal class MikuBot : IDisposable
 		while (!_canellationTokenSource.IsCancellationRequested)
 		{
 			var al = Guilds.Where(x => x.Value?.MusicInstance != null);
-			ShardedClient.Logger.LogInformation("Voice Connections: {count}", al.Where(x => x.Value.MusicInstance.GuildConnection?.IsConnected == true).Count());
+			ShardedClient.Logger.LogInformation("Voice Connections: {count}", al.Where(x => x.Value.MusicInstance.GuildPlayer?.IsConnected == true).Count());
 			await Task.Delay(TimeSpan.FromMinutes(15), _canellationTokenSource.Token);
 		}
 	}
