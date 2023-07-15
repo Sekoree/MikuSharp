@@ -29,12 +29,43 @@ public class Music : ApplicationCommandsModule
 	[SlashCommandGroup("base", "Base commands")]
 	public class Base : ApplicationCommandsModule
 	{
+		[SlashCommand("play", "Experimental play")]
+		[RequireUserVoicechatConnection]
+		public static async Task PlayExAsync(InteractionContext ctx, [Option("playlist", "Playlist url")] string playlist)
+		{
+			try
+			{
+				await ctx.DeferAsync();
+				var g = MikuBot.Guilds[ctx.Guild.Id];
+				var i = g.MusicInstance;
+				var p = i.GuildPlayer;
+				var result = await p.LoadTracksAsync(playlist);
+				if (result.LoadType is not LavalinkLoadResultType.Playlist)
+					return;
+				var loadedPlaylist = result.GetResultAs<LavalinkPlaylist>();
+				foreach (var track in loadedPlaylist.Tracks)
+					p.AddToQueue(new MikuQueue(), track);
+				p.PlayQueueAsync();
+			}
+			catch (LavalinkRestException ex)
+			{
+				ctx.Client.Logger.LogDebug(ex.Error);
+				ctx.Client.Logger.LogDebug(ex.Message);
+				ctx.Client.Logger.LogDebug(ex.Json);
+			}
+			catch (Exception ex)
+			{
+				ctx.Client.Logger.LogDebug(ex.Message);
+				ctx.Client.Logger.LogDebug(ex.StackTrace);
+			}
+		}
+
 		[SlashCommand("join", "Joins the voice channel you're in")]
 		[RequireUserVoicechatConnection]
 		public static async Task JoinAsync(InteractionContext ctx)
 		{
 			await ctx.DeferAsync(true);
-			if (!MikuBot.Guilds.Any(x => x.Key == ctx.Guild.Id))
+			if (MikuBot.Guilds.All(x => x.Key != ctx.Guild.Id))
 				MikuBot.Guilds.TryAdd(ctx.Guild.Id, new Guild(ctx.Client.ShardId));
 			var g = MikuBot.Guilds[ctx.Guild.Id];
 			g.MusicInstance ??= new MusicInstance(MikuBot.LavalinkSessions[ctx.Client.ShardId], ctx.Client.ShardId);
@@ -187,13 +218,13 @@ public class Music : ApplicationCommandsModule
 			}
 			else
 			{
-				if (q.PlaylistInfo.SelectedTrack == -1 || q.PlaylistInfo.Name == null)
+				/*if (q.PlaylistInfo.SelectedTrack == -1 || q.PlaylistInfo.Name == null)
 					emb.AddField(new DiscordEmbedField(q.Tracks.First().Info.Title + "[" + (q.Tracks.First().Info.Length.Hours != 0 ? q.Tracks.First().Info.Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Info.Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Info.Author}\nRequested by {ctx.Member.Mention}"));
 				else
 					emb.AddField(new DiscordEmbedField(q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Title + "[" + (q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.Hours != 0 ? q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.ToString(@"hh\:mm\:ss") : q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Author}\nRequested by {ctx.Member.Mention}"));
 				if (q.Tracks.Count != 1)
 					emb.AddField(new DiscordEmbedField("Playlist added:", $"added {q.Tracks.Count - 1} more"));
-				await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(emb.WithTitle("Playing").Build()).AsEphemeral());
+				await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(emb.WithTitle("Playing").Build()).AsEphemeral());*/
 			}
 		}
 
@@ -240,14 +271,14 @@ public class Music : ApplicationCommandsModule
 			}
 			else
 			{
-				if (q.PlaylistInfo.SelectedTrack == -1 || q.PlaylistInfo.Name == null)
+				/*if (q.PlaylistInfo.SelectedTrack == -1 || q.PlaylistInfo.Name == null)
 					emb.AddField(new DiscordEmbedField(q.Tracks.First().Info.Title + "[" + (q.Tracks.First().Info.Length.Hours != 0 ? q.Tracks.First().Info.Length.ToString(@"hh\:mm\:ss") : q.Tracks.First().Info.Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks.First().Info.Author}\nRequested by {ctx.Member.Mention}"));
 				else
 					emb.AddField(new DiscordEmbedField(q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Title + "[" + (q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.Hours != 0 ? q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.ToString(@"hh\:mm\:ss") : q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Length.ToString(@"mm\:ss")) + "]", $"by {q.Tracks[q.PlaylistInfo.SelectedTrack].Info.Author}\nRequested by {ctx.Member.Mention}At position: {pos}"));
 				if (q.Tracks.Count != 1)
 					emb.AddField(new DiscordEmbedField("Playlist added:", $"added {q.Tracks.Count - 1} more"));
 				emb.WithTitle("Added");
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));*/
 			}
 		}
 
@@ -265,7 +296,7 @@ public class Music : ApplicationCommandsModule
 			g.MusicInstance.GuildPlayer.TrackEnded -= Lavalink.LavalinkTrackFinished;
 			if (g.MusicInstance.CurrentSong != null)
 			{
-				if (g.MusicInstance.RepeatMode != RepeatMode.On && g.MusicInstance.RepeatMode != RepeatMode.All)
+				if (g.MusicInstance.Config.RepeatMode != RepeatMode.On && g.MusicInstance.Config.RepeatMode != RepeatMode.All)
 					await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, ctx.Guild);
 				if (lastPlayedSongs.Count == 0)
 					await Database.AddToLastPlayingListAsync(ctx.Guild.Id, g.MusicInstance.CurrentSong.Track.Encoded);
@@ -388,7 +419,7 @@ public class Music : ApplicationCommandsModule
 					totalP++;
 				var emb = new DiscordEmbedBuilder();
 				List<Page> pages = new();
-				if (g.MusicInstance.RepeatMode == RepeatMode.All)
+				if (g.MusicInstance.Config.RepeatMode == RepeatMode.All)
 				{
 					songAmount = g.MusicInstance.RepeatAllPosition;
 					foreach (var track in queue)
@@ -555,8 +586,8 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			g.MusicInstance.RepeatMode = mode;
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"Set repeat mode to:\n **{g.MusicInstance.RepeatMode}**").Build()));
+			g.MusicInstance.Config.RepeatMode = mode;
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"Set repeat mode to:\n **{g.MusicInstance.Config.RepeatMode}**").Build()));
 		}
 
 		[SlashCommand("shuffle", "Play the queue in shuffle mode")]
@@ -567,8 +598,8 @@ public class Music : ApplicationCommandsModule
 			if (await g.IsNotConnected(ctx))
 				return;
 			g.MusicInstance.CommandChannel = ctx.Channel;
-			g.MusicInstance.ShuffleMode = g.MusicInstance.ShuffleMode == ShuffleMode.Off ? ShuffleMode.On : ShuffleMode.Off;
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"Set shuffle mode to:\n**{g.MusicInstance.ShuffleMode}**").Build()));
+			g.MusicInstance.Config.ShuffleMode = g.MusicInstance.Config.ShuffleMode == ShuffleMode.Off ? ShuffleMode.On : ShuffleMode.Off;
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithDescription($"Set shuffle mode to:\n**{g.MusicInstance.Config.ShuffleMode}**").Build()));
 		}
 	}
 

@@ -1,6 +1,3 @@
-using DisCatSharp.Lavalink.Entities;
-using DisCatSharp.Lavalink.Enums;
-
 using MikuSharp.Enums;
 using MikuSharp.Events;
 using MikuSharp.Utilities;
@@ -13,13 +10,12 @@ public class MusicInstance
 
 	public DiscordChannel CommandChannel { get; set; }
 
-	public DiscordChannel VoiceChannel { get; set; }
+	public DiscordChannel VoiceChannel
+		=> this.GuildPlayer.Channel;
+
+	public InstanceConfig Config { get; set; }
 
 	public PlayState PlayState { get; set; }
-
-	public RepeatMode RepeatMode { get; set; }
-
-	public ShuffleMode ShuffleMode { get; set; }
 
 	public int RepeatAllPosition { get; set; }
 
@@ -29,11 +25,11 @@ public class MusicInstance
 
 	public LavalinkSession Session { get; set; }
 
-	public LavalinkGuildPlayer GuildPlayer { get; set; }
+	public LavalinkGuildPlayer? GuildPlayer { get; set; }
 
-	public QueueEntry CurrentSong { get; set; }
+	public QueueEntry? CurrentSong { get; set; }
 
-	public QueueEntry LastSong { get; set; }
+	public QueueEntry? LastSong { get; set; }
 
 	public MusicInstance(LavalinkSession session, int shardId)
 	{
@@ -41,26 +37,19 @@ public class MusicInstance
 		this.Session = session;
 		this.CommandChannel = null;
 		this.PlayState = PlayState.NotPlaying;
-		this.RepeatMode = RepeatMode.Off;
+		this.Config = new() { RepeatMode = RepeatMode.Off, ShuffleMode = ShuffleMode.Off };
 		this.RepeatAllPosition = 0;
-		this.ShuffleMode = ShuffleMode.Off;
 	}
 
 	public async Task<LavalinkGuildPlayer> ConnectToChannel(DiscordChannel channel)
 	{
-		switch (channel.Type)
-		{
-			case ChannelType.Voice:
-			case ChannelType.Stage:
-			{
-				this.GuildPlayer = await this.Session.ConnectAsync(channel);
-				this.VoiceChannel = channel;
-				return this.GuildPlayer;
-			}
-			default:
-				return null;
-		}
+		if (this.GuildPlayer is not null)
+			return this.GuildPlayer;
+		this.GuildPlayer = await this.Session.ConnectAsync(channel);
+		return this.GuildPlayer;
 	}
+
+	// Throw away all of this
 	public async Task<TrackResult> QueueSong(string urlOrName, InteractionContext ctx, int position = -1)
 	{
 		var queue = await Database.GetQueueAsync(ctx.Guild);
@@ -372,14 +361,14 @@ public class MusicInstance
 	{
 		var queue = await Database.GetQueueAsync(this.VoiceChannel.Guild);
 		var cur = this.LastSong;
-		if (queue.Count != 1 && this.RepeatMode == RepeatMode.All)
+		if (queue.Count != 1 && this.Config.RepeatMode == RepeatMode.All)
 			this.RepeatAllPosition++;
 		if (this.RepeatAllPosition >= queue.Count)
 			this.RepeatAllPosition = 0;
-		this.CurrentSong = this.ShuffleMode == ShuffleMode.Off ? queue[0] : queue[new Random().Next(0, queue.Count)];
-		if (this.RepeatMode == RepeatMode.All)
+		this.CurrentSong = this.Config.ShuffleMode == ShuffleMode.Off ? queue[0] : queue[new Random().Next(0, queue.Count)];
+		if (this.Config.RepeatMode == RepeatMode.All)
 			this.CurrentSong = queue[this.RepeatAllPosition];
-		if (this.RepeatMode == RepeatMode.On)
+		if (this.Config.RepeatMode == RepeatMode.On)
 			this.CurrentSong = cur;
 		MikuBot.ShardedClient.Logger.LogDebug("PlaySong(): {track}", this.CurrentSong?.Track.Info.Identifier);
 		this.GuildPlayer.TrackEnded += Lavalink.LavalinkTrackFinished;

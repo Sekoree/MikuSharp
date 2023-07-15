@@ -50,7 +50,7 @@ public class Lavalink
 				case LavalinkTrackEndReason.Finished:
 				{
 					g.MusicInstance.GuildPlayer.TrackEnded -= LavalinkTrackFinished;
-					if (g.MusicInstance.RepeatMode != RepeatMode.On && g.MusicInstance.RepeatMode != RepeatMode.All)
+					if (g.MusicInstance.Config.RepeatMode != RepeatMode.On && g.MusicInstance.Config.RepeatMode != RepeatMode.All)
 						await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, eventArgs.Guild);
 					if (lastPlayedSongs.Count == 0)
 						await Database.AddToLastPlayingListAsync(eventArgs.Guild.Id, g.MusicInstance.CurrentSong.Track.Encoded);

@@ -9,7 +9,7 @@ using MikuSharp.Utilities;
 namespace MikuSharp.Commands;
 
 [SlashCommandGroup("playlists", "Manage your playlists", dmPermission: false)]
-public class Playlists : ApplicationCommandsModule
+public class Playlist : ApplicationCommandsModule
 {
 	[SlashCommandGroup("new", "Playlist creation")]
 	public class PlaylistCreation : ApplicationCommandsModule

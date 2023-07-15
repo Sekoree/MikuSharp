@@ -25,11 +25,11 @@ public static class Music
 	public static string GetPlaybackOptions(this MusicInstance instance)
 	{
 		var opts = string.Empty;
-		if (instance.RepeatMode == RepeatMode.On)
+		if (instance.Config.RepeatMode == RepeatMode.On)
 			opts += DiscordEmoji.FromUnicode("🔂");
-		if (instance.RepeatMode == RepeatMode.All)
+		if (instance.Config.RepeatMode == RepeatMode.All)
 			opts += DiscordEmoji.FromUnicode("🔁");
-		if (instance.ShuffleMode == ShuffleMode.On)
+		if (instance.Config.ShuffleMode == ShuffleMode.On)
 			opts += DiscordEmoji.FromUnicode("🔀");
 		return string.IsNullOrEmpty(opts) ? "None" : opts;
 	}
@@ -45,7 +45,7 @@ public static class Music
 	{
 		if (guild.MusicInstance == null || guild.MusicInstance.GuildPlayer?.IsConnected == false)
 		{
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Error: Not connected!"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Not connected to any channel QwQ"));
 			return true;
 		}
 		return false;

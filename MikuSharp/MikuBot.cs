@@ -185,7 +185,7 @@ internal class MikuBot : IDisposable
 
 		this.ApplicationCommandsModules = await ShardedClient.UseApplicationCommandsAsync(new()
 		{
-			DebugStartup = false,
+			DebugStartup = true,
 			ManualOverride = true
 		});
 
@@ -206,7 +206,8 @@ internal class MikuBot : IDisposable
 			SocketEndpoint = new() { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
 			RestEndpoint = new() { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
 			Password = Config.LavaConfig.Password,
-			DefaultVolume = 40
+			DefaultVolume = 40,
+			EnableBuiltInQueueSystem = true
 		};
 
 		this.LavalinkModules = await ShardedClient.UseLavalinkAsync();
@@ -366,20 +367,21 @@ internal class MikuBot : IDisposable
 	internal void RegisterCommands()
 	{
 		// Nsfw stuff needs to be hidden, that's why we use commands next
-		//this.CommandsNextModules.RegisterCommands<NSFW>();
+		//this.CommandsNextModules.RegisterCommands<Nsfw>();
 
-		this.ApplicationCommandsModules.RegisterGlobalCommands<ActionCommands>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Developer>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Fun>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<About>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Moderation>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Music>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Playlists>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Utility>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<WeebCommands>();
+		//this.ApplicationCommandsModules.RegisterGlobalCommands<ActionCommands>();
+		this.ApplicationCommandsModules.RegisterGuildCommands<Developer>(858089281214087179);
+		this.ApplicationCommandsModules.RegisterGuildCommands<Fun>(858089281214087179);
+		//this.ApplicationCommandsModules.RegisterGlobalCommands<About>();
+		//this.ApplicationCommandsModules.RegisterGlobalCommands<Moderation>();
+		//this.ApplicationCommandsModules.RegisterGlobalCommands<Music>();
+		this.ApplicationCommandsModules.RegisterGuildCommands<MusicV2>(858089281214087179);
+		//this.ApplicationCommandsModules.RegisterGlobalCommands<Playlist>();
+		//this.ApplicationCommandsModules.RegisterGlobalCommands<Utility>();
+		//this.ApplicationCommandsModules.RegisterGlobalCommands<WeebCommands>();
 
 		// Smolcar command, only guild command
-		this.ApplicationCommandsModules.RegisterGuildCommands<MikuGuild>(483279257431441410);
+		//this.ApplicationCommandsModules.RegisterGuildCommands<MikuGuild>(483279257431441410);
 	}
 
 	/// <summary>
