@@ -1,23 +1,5 @@
-﻿using DisCatSharp;
-using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.Exceptions;
-using DisCatSharp.Interactivity;
-using DisCatSharp.Interactivity.Enums;
-using DisCatSharp.Interactivity.Extensions;
-
 using Kitsu.Anime;
 using Kitsu.Manga;
-
-using Microsoft.Extensions.Logging;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Commands;
 
@@ -28,13 +10,13 @@ internal class Utility : ApplicationCommandsModule
 	internal class AnimeMangaUtility : ApplicationCommandsModule
 	{
 		[SlashCommand("anime_search", "Search for an anime")]
-		public static async Task SearchAnimeAsync(InteractionContext ctx, [Option("search_query", "Search query")] string search_query)
+		public static async Task SearchAnimeAsync(InteractionContext ctx, [Option("search_query", "Search query")] string searchQuery)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 			try
 			{
 				var ine = ctx.Client.GetInteractivity();
-				var a = await Anime.GetAnimeAsync(search_query);
+				var a = await Anime.GetAnimeAsync(searchQuery);
 				var emb = new DiscordEmbedBuilder();
 				List<DiscordEmbedBuilder> res = new();
 				List<Page> ress = new();
@@ -59,36 +41,37 @@ internal class Utility : ApplicationCommandsModule
 					if (aa.Attributes.AverageRating != null)
 						emb.AddField(new DiscordEmbedField("Score", $"{aa.Attributes.AverageRating}", true));
 					emb.AddField(new DiscordEmbedField("NSFW", $"{aa.Attributes.Nsfw}", true));
-					if (aa.Attributes.CoverImage?.Small != null) emb.WithThumbnail(aa.Attributes.CoverImage.Small);
+					if (aa.Attributes.CoverImage?.Small != null)
+						emb.WithThumbnail(aa.Attributes.CoverImage.Small);
 					res.Add(emb);
 					emb = new DiscordEmbedBuilder();
 				}
 				res.Sort((x, y) => x.Title.CompareTo(y.Title));
-				int i = 1;
+				var i = 1;
 				foreach (var aa in res)
 				{
 					aa.WithFooter($"via Kitsu.io -- Page {i}/{a.Data.Count}", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
 					ress.Add(new Page(embed: aa));
 					i++;
 				}
-				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable);
+				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable, token: MikuBot.CanellationTokenSource.Token);
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError("{ex}", ex.Message);
-				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
+				ctx.Client.Logger.LogError("{msg}", ex.Message);
+				ctx.Client.Logger.LogError("{stack}", ex.StackTrace);
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No Anime found!"));
 			}
 		}
 
 		[SlashCommand("manga_search", "Search for an manga")]
-		public static async Task SearchMangaAsync(InteractionContext ctx, [Option("search_query", "Search query")] string search_query)
+		public static async Task SearchMangaAsync(InteractionContext ctx, [Option("search_query", "Search query")] string searchQuery)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 			try
 			{
 				var ine = ctx.Client.GetInteractivity();
-				var a = await Manga.GetMangaAsync(search_query);
+				var a = await Manga.GetMangaAsync(searchQuery);
 				var emb = new DiscordEmbedBuilder();
 				List<DiscordEmbedBuilder> res = new();
 				List<Page> ress = new();
@@ -115,19 +98,19 @@ internal class Utility : ApplicationCommandsModule
 					emb = new DiscordEmbedBuilder();
 				}
 				res.Sort((x, y) => x.Title.CompareTo(y.Title));
-				int i = 1;
+				var i = 1;
 				foreach (var aa in res)
 				{
 					aa.WithFooter($"via Kitsu.io -- Page {i}/{a.Data.Count}", "https://kitsu.io/kitsu-256-ed442f7567271af715884ca3080e8240.png");
 					ress.Add(new Page(embed: aa));
 					i++;
 				}
-				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable);
+				await ine.SendPaginatedResponseAsync(ctx.Interaction, true, ctx.Guild != null, ctx.User, ress, behaviour: PaginationBehaviour.WrapAround, deletion: ButtonPaginationBehavior.Disable, token: MikuBot.CanellationTokenSource.Token);
 			}
 			catch (Exception ex)
 			{
-				ctx.Client.Logger.LogError("{ex}", ex.Message);
-				ctx.Client.Logger.LogError("{ex}", ex.StackTrace);
+				ctx.Client.Logger.LogError("{msg}", ex.Message);
+				ctx.Client.Logger.LogError("{stack}", ex.StackTrace);
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("No Manga found!"));
 			}
 		}
@@ -161,7 +144,7 @@ internal class Utility : ApplicationCommandsModule
 			emb.AddField(new DiscordEmbedField("Owner", ctx.Guild.Owner.Mention, true));
 			emb.AddField(new DiscordEmbedField("Language", ctx.Guild.PreferredLocale, true));
 			emb.AddField(new DiscordEmbedField("ID", ctx.Guild.Id.ToString(), true));
-			emb.AddField(new DiscordEmbedField("Created At", Formatter.Timestamp(ctx.Guild.CreationTimestamp, TimestampFormat.LongDateTime), true));
+			emb.AddField(new DiscordEmbedField("SendAt At", Formatter.Timestamp(ctx.Guild.CreationTimestamp, TimestampFormat.LongDateTime), true));
 			emb.AddField(new DiscordEmbedField("Emojis", ctx.Guild.Emojis.Count.ToString(), true));
 			emb.AddField(new DiscordEmbedField("Members (Bots)", $"{members.Count} ({bots})", true));
 
@@ -189,7 +172,7 @@ internal class Utility : ApplicationCommandsModule
 			var emb = new DiscordEmbedBuilder();
 			emb.WithColor(new DiscordColor(0212255));
 			emb.WithTitle("User Info");
-			emb.AddField(new DiscordEmbedField("Username", $"{user.Username}#{user.Discriminator}", true));
+			emb.AddField(new DiscordEmbedField("Username", $"{user.UsernameWithDiscriminator}", true));
 			if (member != null)
 				if (member.DisplayName != user.Username)
 					emb.AddField(new DiscordEmbedField("Nickname", $"{member.DisplayName}", true));
@@ -205,7 +188,7 @@ internal class Utility : ApplicationCommandsModule
 		public static async Task EmojiListAsync(InteractionContext ctx)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-			string wat = "You have to execute this command in a server!";
+			var wat = "You have to execute this command in a server!";
 			if (ctx.Guild != null && ctx.Guild.Emojis.Any())
 			{
 				wat = "**Emojies:** ";

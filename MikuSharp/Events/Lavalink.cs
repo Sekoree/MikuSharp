@@ -1,88 +1,76 @@
-﻿using DisCatSharp.Entities;
-using DisCatSharp.Lavalink;
-using DisCatSharp.Lavalink.EventArgs;
-
-using Microsoft.Extensions.Logging;
+using DisCatSharp.Lavalink.Enums;
 
 using MikuSharp.Enums;
 using MikuSharp.Utilities;
-
-using System;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Events;
 
 public class Lavalink
 {
-	public static async Task LavalinkTrackFinish(LavalinkGuildConnection lava, TrackFinishEventArgs e)
+	public static async Task LavalinkTrackFinished(LavalinkGuildPlayer guildConnection, LavalinkTrackEndedEventArgs eventArgs)
 	{
 		try
 		{
-			var g = MikuBot.Guilds[e.Player.Guild.Id];
-			var lastPlayedSongs = await Database.GetLastPlayingListAsync(e.Player.Guild);
-			if (g.musicInstance == null)
+			var g = MikuBot.Guilds[eventArgs.Guild.Id];
+			var lastPlayedSongs = await Database.GetLastPlayingListAsync(eventArgs.Guild);
+			if (g.MusicInstance == null)
 				return;
-			switch (e.Reason)
+			switch (eventArgs.Reason)
 			{
-				case TrackEndReason.Stopped:
-					{
-						g.musicInstance.playstate = Playstate.Stopped;
-						g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-						g.musicInstance.lastSong = g.musicInstance.currentSong;
-						g.musicInstance.currentSong = null;
-						break;
-					}
-				case TrackEndReason.Replaced:
-					{
-						break;
-					}
-				case TrackEndReason.LoadFailed:
-					{
-						await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithTitle("Track failed to play")
-							.WithDescription($"**{g.musicInstance.currentSong.track.Title}**\nby {g.musicInstance.currentSong.track.Author}\n" +
-							$"**Failed to load, Skipping to next track**"));
-						g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-						await Database.RemoveFromQueueAsync(g.musicInstance.currentSong.position, e.Player.Guild);
-						if (lastPlayedSongs.Count == 0)
-						{
-							await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-						}
-						else if (lastPlayedSongs[0].track.Uri != g.musicInstance.currentSong.track.Uri)
-						{
-							await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-						}
-						g.musicInstance.lastSong = g.musicInstance.currentSong;
-						g.musicInstance.currentSong = null;
-						var queue = await Database.GetQueueAsync(e.Player.Guild);
-						if (queue.Count != 0) await g.musicInstance.PlaySong();
-						else g.musicInstance.playstate = Playstate.NotPlaying;
-						break;
-					}
-				case TrackEndReason.Finished:
-					{
-						g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-						if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All) await Database.RemoveFromQueueAsync(g.musicInstance.currentSong.position, e.Player.Guild);
-						if (lastPlayedSongs.Count == 0)
-						{
-							await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-						}
-						else if (lastPlayedSongs[0].track.Uri != g.musicInstance.currentSong.track.Uri)
-						{
-							await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-						}
-						g.musicInstance.lastSong = g.musicInstance.currentSong;
-						g.musicInstance.currentSong = null;
-						var queue = await Database.GetQueueAsync(e.Player.Guild);
-						if (queue.Count != 0) await g.musicInstance.PlaySong();
-						else g.musicInstance.playstate = Playstate.NotPlaying;
-						break;
-					}
+				case LavalinkTrackEndReason.Stopped:
+				{
+					g.MusicInstance.PlayState = PlayState.Stopped;
+					g.MusicInstance.GuildPlayer.TrackEnded -= LavalinkTrackFinished;
+					g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
+					g.MusicInstance.CurrentSong = null;
+					break;
+				}
+				case LavalinkTrackEndReason.Replaced:
+					break;
+				case LavalinkTrackEndReason.LoadFailed:
+				{
+					await g.MusicInstance.CommandChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithTitle("Track failed to play")
+						.WithDescription($"**{g.MusicInstance.CurrentSong.Track.Info.Title}**\nby {g.MusicInstance.CurrentSong.Track.Info.Author}\n" +
+						$"**Failed to load, Skipping to next track**"));
+					g.MusicInstance.GuildPlayer.TrackEnded -= LavalinkTrackFinished;
+					await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, eventArgs.Guild);
+					if (lastPlayedSongs.Count == 0)
+						await Database.AddToLastPlayingListAsync(eventArgs.Guild.Id, g.MusicInstance.CurrentSong.Track.Encoded);
+					else if (lastPlayedSongs[0].Track.Info.Uri != g.MusicInstance.CurrentSong.Track.Info.Uri)
+						await Database.AddToLastPlayingListAsync(eventArgs.Guild.Id, g.MusicInstance.CurrentSong.Track.Encoded);
+					g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
+					g.MusicInstance.CurrentSong = null;
+					var queue = await Database.GetQueueAsync(eventArgs.Guild);
+					if (queue.Count != 0)
+						await g.MusicInstance.PlaySong();
+					else
+						g.MusicInstance.PlayState = PlayState.NotPlaying;
+					break;
+				}
+				case LavalinkTrackEndReason.Finished:
+				{
+					g.MusicInstance.GuildPlayer.TrackEnded -= LavalinkTrackFinished;
+					if (g.MusicInstance.Config.RepeatMode != RepeatMode.On && g.MusicInstance.Config.RepeatMode != RepeatMode.All)
+						await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, eventArgs.Guild);
+					if (lastPlayedSongs.Count == 0)
+						await Database.AddToLastPlayingListAsync(eventArgs.Guild.Id, g.MusicInstance.CurrentSong.Track.Encoded);
+					else if (lastPlayedSongs[0].Track.Info.Uri != g.MusicInstance.CurrentSong.Track.Info.Uri)
+						await Database.AddToLastPlayingListAsync(eventArgs.Guild.Id, g.MusicInstance.CurrentSong.Track.Encoded);
+					g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
+					g.MusicInstance.CurrentSong = null;
+					var queue = await Database.GetQueueAsync(eventArgs.Guild);
+					if (queue.Count != 0)
+						await g.MusicInstance.PlaySong();
+					else
+						g.MusicInstance.PlayState = PlayState.NotPlaying;
+					break;
+				}
 			}
 		}
 		catch (Exception ex)
 		{
-			MikuBot.ShardedClient.Logger.LogError(ex.Message);
-			MikuBot.ShardedClient.Logger.LogError(ex.StackTrace);
+			MikuBot.ShardedClient.Logger.LogError("{msg}", ex.Message);
+			MikuBot.ShardedClient.Logger.LogError("{stack}", ex.StackTrace);
 		}
 	}
 

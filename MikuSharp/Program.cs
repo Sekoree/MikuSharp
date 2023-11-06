@@ -1,18 +1,22 @@
-﻿using Serilog;
-
 namespace MikuSharp;
 
-class Program
+public class Program
 {
-	static void Main(string[] args)
+	internal static CancellationTokenSource GlobalCancellationTokenSource { get; set; } = new();
+
+	public static async Task Main(string[] args = null)
 	{
-		using (var bot = new MikuBot())
+		while(!GlobalCancellationTokenSource.IsCancellationRequested)
 		{
-			MikuBot.RegisterEvents().Wait();
-			bot.RegisterCommands();
-			bot.RunAsync().Wait();
+			Log.Logger.Information("Starting up Miku");
+			using MikuBot bot = new(GlobalCancellationTokenSource);
+			await bot.SetupAsync();
+			await bot.RunAsync();
 			bot.Dispose();
+			Log.Logger.Information("Shutdown!");
+			if (!GlobalCancellationTokenSource.IsCancellationRequested)
+				Log.Logger.Information("Restarting soon..");
+			await Task.Delay(5000);
 		}
-		Log.Logger.Information("Shutdown!");
 	}
 }

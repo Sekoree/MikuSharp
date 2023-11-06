@@ -1,14 +1,18 @@
-﻿using Newtonsoft.Json;
-
-namespace MikuSharp.Entities;
+﻿namespace MikuSharp.Entities;
 
 public partial class BotConfig
 {
 	[JsonProperty("discordToken")]
 	public string DiscordToken { get; set; }
 
+	[JsonProperty("discordTokenDev")]
+	public string DiscordTokenDev { get; set; }
+
 	[JsonProperty("discordBotListToken")]
 	public string DiscordBotListToken { get; set; }
+
+	[JsonProperty("motionBotListToken")]
+	public string MotionBotListToken { get; set; }
 
 	[JsonProperty("weebShToken")]
 	public string WeebShToken { get; set; }
@@ -30,6 +34,9 @@ public partial class BotConfig
 
 	[JsonProperty("nndConfig")]
 	public NndConfig NndConfig { get; set; }
+
+	[JsonProperty("sentryDsn")]
+	public string SentryDsn { get; set; }
 }
 
 public partial class DatabaseConfig

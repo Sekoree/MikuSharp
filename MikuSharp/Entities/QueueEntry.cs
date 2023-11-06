@@ -1,16 +1,17 @@
-﻿using DisCatSharp.Lavalink;
-
-using System;
+using DisCatSharp.Lavalink.Entities;
 
 namespace MikuSharp.Entities;
 
 public class QueueEntry : Entry
 {
-	public int position { get; set; }
-	public ulong addedBy { set; get; }
-	public QueueEntry(LavalinkTrack t, ulong m, DateTimeOffset adddate, int pos) : base(t, adddate)
+	public int Position { get; set; }
+
+	public ulong AddedBy { set; get; }
+
+	public QueueEntry(LavalinkTrack track, ulong memberId, DateTimeOffset additionDate, int position)
+		: base(track, additionDate)
 	{
-		position = pos;
-		addedBy = m;
+		this.Position = position;
+		this.AddedBy = memberId;
 	}
 }

@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <StartupObject>MikuSharp.Program</StartupObject>
     <ApplicationIcon>miku.ico</ApplicationIcon>
     <Version>4.0.0</Version>
@@ -18,6 +18,7 @@
     <PackageIcon>miku.jpg</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>discord bot; discatsharp; hatsune miku; miku; bot</PackageTags>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,9 +28,11 @@
   </ItemGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<NoWarn>1701;1702;DV2001;CS8603;CS8604;CS8618;CS8601;CS8602;CS8600;CS8625</NoWarn>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<NoWarn>1701;1702;DV2001;CS8603;CS8604;CS8618;CS8601;CS8602;CS8600;CS8625</NoWarn>
+		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="nnd.python" />
@@ -43,36 +46,40 @@
 
 	<ItemGroup>
     <PackageReference Include="AlbumArtExtraction" Version="1.0.2" />
-    <PackageReference Include="AngleSharp" Version="1.0.2-alpha-278" />
-	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
-	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.5.0" />
-	<PackageReference Include="DisCatSharp" Version="10.3.3-nightly-031" />
-	<PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.3.3-nightly-031" />
-	<PackageReference Include="DisCatSharp.CommandsNext" Version="10.3.3-nightly-031" />
-	<PackageReference Include="DisCatSharp.Interactivity" Version="10.3.3-nightly-031" />
-	<PackageReference Include="DisCatSharp.Lavalink" Version="10.3.3-nightly-031" />
-	<!--<ProjectReference Include="..\..\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
+    <PackageReference Include="AngleSharp" Version="1.0.5" />
+    <PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="6.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
+	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.7.0" />
+  <!--<PackageReference Include="DisCatSharp" Version="10.4.2-nightly-003" />
+	<PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.4.2-nightly-003" />
+	<PackageReference Include="DisCatSharp.CommandsNext" Version="10.4.2-nightly-003" />
+	<PackageReference Include="DisCatSharp.Interactivity" Version="10.4.2-nightly-003" />
+	<PackageReference Include="DisCatSharp.Lavalink" Version="10.4.2-nightly-003" />-->
+  <ProjectReference Include="..\..\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
 	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj" />
-	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />-->
+	<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
 	<PackageReference Include="DiscordBotsList.Api" Version="1.5.0" />
-	<PackageReference Include="FluentFTP" Version="46.0.2" />
-	<PackageReference Include="Google.Apis" Version="1.60.0" />
-	<PackageReference Include="Google.Apis.YouTube.v3" Version="1.60.0.2945" />
+	<PackageReference Include="FluentFTP" Version="48.0.3" />
+	<PackageReference Include="Google.Apis" Version="1.63.0" />
+	<PackageReference Include="Google.Apis.YouTube.v3" Version="1.63.0.3205" />
 	<PackageReference Include="Kitsu" Version="1.4.2" />
 	<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
 	<PackageReference Include="Mime" Version="3.5.2" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	<ProjectReference Include="..\NicoNicoNii\NicoNicoNii\NicoNicoNii.csproj" />
-	<PackageReference Include="Npgsql" Version="7.0.2" />
+	<PackageReference Include="Npgsql" Version="7.0.6" />
     	<PackageReference Include="NYoutubeDL" Version="0.11.2" />
-	<PackageReference Include="Serilog" Version="2.12.0" />
-	<PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+	<PackageReference Include="Serilog" Version="3.0.1" />
+	<PackageReference Include="Serilog.Extensions.Logging" Version="7.0.0" />
 	<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
 	<PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00947" />
 	<PackageReference Include="Weeb.net" Version="1.0.7" />
-	<PackageReference Include="YoutubeExplode" Version="6.2.12" />
+	<PackageReference Include="YoutubeExplode" Version="6.3.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -128,6 +135,43 @@
     <None Update="youtube-dl.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="DisCatSharp" />
+    <Using Include="DisCatSharp.ApplicationCommands" />
+    <Using Include="DisCatSharp.ApplicationCommands.Attributes" />
+    <Using Include="DisCatSharp.ApplicationCommands.Context" />
+    <Using Include="DisCatSharp.CommandsNext" />
+    <Using Include="DisCatSharp.CommandsNext.Attributes" />
+    <Using Include="DisCatSharp.Entities" />
+    <Using Include="DisCatSharp.Enums" />
+    <Using Include="DisCatSharp.EventArgs" />
+    <Using Include="DisCatSharp.Exceptions" />
+    <Using Include="DisCatSharp.Exceptions" />
+    <Using Include="DisCatSharp.Interactivity" />
+    <Using Include="DisCatSharp.Interactivity.Enums" />
+    <Using Include="DisCatSharp.Interactivity.Extensions" />
+    <Using Include="DisCatSharp.Lavalink" />
+    <Using Include="DisCatSharp.Lavalink.Entities" />
+    <Using Include="DisCatSharp.Lavalink.Enums" />
+	<Using Include="DisCatSharp.Lavalink.EventArgs" />
+	<Using Include="DisCatSharp.Lavalink.Exceptions" />
+    <Using Include="DiscordBotsList.Api" />
+    <Using Include="FluentFTP" />
+    <Using Include="Microsoft.Extensions.Logging" />
+    <Using Include="Newtonsoft.Json" />
+    <Using Include="Npgsql" />
+    <Using Include="Npgsql" />
+    <Using Include="Serilog" />
+    <Using Include="Serilog.Events" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.Net" />
+    <Using Include="System.Net" />
+    <Using Include="System.Net.Http.Headers" />
+    <Using Include="System.Reflection" />
+    <Using Include="System.Text" />
+    <Using Include="Weeb.net" />
   </ItemGroup>
 
 </Project>

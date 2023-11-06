@@ -1,14 +1,5 @@
-﻿using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-
 using MikuSharp.Entities;
 using MikuSharp.Enums;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Utilities;
 
@@ -50,16 +41,16 @@ internal class AutocompleteProviders
 	{
 		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
 		{
-			var plls = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
+			var plls = await PlaylistDb.GetPlaylistsSimple(ctx.Member.Id);
 			if (plls.Count == 0)
 				return new List<DiscordApplicationCommandAutocompleteChoice>() { new("You have no songs", "error") };
-			var DbPlaylists = await PlaylistDB.GetPlaylists(ctx.Guild, ctx.Member.Id);
+			var dbPlaylists = await PlaylistDb.GetPlaylists(ctx.Guild, ctx.Member.Id);
 
 			List<KeyValuePair<string, Playlist>> playlists = new(25);
 			if (ctx.FocusedOption.Value == null)
-				playlists.AddRange(DbPlaylists.Take(25));
+				playlists.AddRange(dbPlaylists.Take(25));
 			else
-				playlists.AddRange(DbPlaylists.Where(x => x.Value.Name.Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
+				playlists.AddRange(dbPlaylists.Where(x => x.Value.Name.Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
 
 			return playlists.Select(x => new DiscordApplicationCommandAutocompleteChoice(x.Value.Name, x.Key));
 		}
@@ -75,17 +66,17 @@ internal class AutocompleteProviders
 			if (playlist == "error")
 				return new List<DiscordApplicationCommandAutocompleteChoice>() { new("You have no valid playlist selected", "error") };
 
-			var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
-			var tracks = await pls.GetEntries();
+			var pls = await PlaylistDb.GetPlaylistAsync(ctx.Guild, ctx.Member.Id, playlist);
+			var tracks = await pls.GetEntriesAsync();
 			List<PlaylistEntry> songs = new(25);
 			if (ctx.FocusedOption.Value == null)
 				songs.AddRange(tracks.Take(25));
 			else if (int.TryParse(Convert.ToString(ctx.FocusedOption.Value), out var pos))
 				songs.AddRange(tracks.Where(x => x.Position.ToString().StartsWith(pos.ToString())).Take(25));
 			else
-				songs.AddRange(tracks.Where(x => x.track.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
+				songs.AddRange(tracks.Where(x => x.Track.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
 
-			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.track.Title}", x.Position.ToString()));
+			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Info.Title}", x.Position.ToString()));
 		}
 	}
 
@@ -98,11 +89,11 @@ internal class AutocompleteProviders
 			if (ctx.FocusedOption.Value == null)
 				songs.AddRange(queue.Take(25));
 			else if (int.TryParse(Convert.ToString(ctx.FocusedOption.Value), out var pos))
-				songs.AddRange(queue.Where(x => x.position.ToString().StartsWith(pos.ToString())).Take(25));
+				songs.AddRange(queue.Where(x => x.Position.ToString().StartsWith(pos.ToString())).Take(25));
 			else
-				songs.AddRange(queue.Where(x => x.track.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
+				songs.AddRange(queue.Where(x => x.Track.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
 
-			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.position}: {x.track.Title}", x.position.ToString()));
+			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Info.Title}", x.Position.ToString()));
 		}
 	}
 }

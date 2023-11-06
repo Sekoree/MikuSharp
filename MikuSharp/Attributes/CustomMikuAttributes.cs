@@ -1,11 +1,3 @@
-﻿using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
-
-using System;
-using System.Threading.Tasks;
-
 namespace MikuSharp.Attributes;
 
 /// <summary>
@@ -15,12 +7,7 @@ namespace MikuSharp.Attributes;
 public sealed class RequireUserVoicechatConnection : ApplicationCommandCheckBaseAttribute
 {
 	public override Task<bool> ExecuteChecksAsync(BaseContext ctx)
-	{
-		if (ctx.Member.VoiceState?.Channel != null)
-			return Task.FromResult(true);
-
-		return Task.FromResult(false);
-	}
+		=> ctx.Member.VoiceState?.Channel != null ? Task.FromResult(true) : Task.FromResult(false);
 }
 
 /// <summary>
@@ -32,18 +19,18 @@ public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandChe
 	public override async Task<bool> ExecuteChecksAsync(BaseContext ctx)
 	{
 		var bot = await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id);
-		if (ctx.Member.VoiceState?.Channel != null && bot.VoiceState?.Channel != null)
-			return await Task.FromResult(true);
-
-		return await Task.FromResult(false);
+		return ctx.Member.VoiceState?.Channel != null && bot.VoiceState?.Channel != null
+			? await Task.FromResult(true)
+			: await Task.FromResult(false);
 	}
 }
 
+/// <summary>
+/// Defines that the usage is restricted to non staffs.
+/// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Class, AllowMultiple = false)]
 public sealed class NotStaffAttribute : CheckBaseAttribute
 {
 	public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
-	{
-		return Task.FromResult(!ctx.User.IsStaff);
-	}
+		=> Task.FromResult(!ctx.User.IsStaff);
 }

@@ -1,25 +1,21 @@
-﻿using DisCatSharp.Lavalink;
-
-using System.Collections.Generic;
+using DisCatSharp.Lavalink.Entities;
 
 namespace MikuSharp.Entities;
 
 public class TrackResult
 {
-	public LavalinkPlaylistInfo PlaylistInfo { get; set; }
-	public List<LavalinkTrack> Tracks { get; set; }
-	public TrackResult(LavalinkPlaylistInfo pl, IEnumerable<LavalinkTrack> tr)
+	public string Name { get; set; }
+
+	public List<LavalinkTrack> Tracks { get; set; } = new();
+
+	public TrackResult(string name, IEnumerable<LavalinkTrack> tracks)
 	{
-		PlaylistInfo = pl;
-		Tracks = new List<LavalinkTrack>();
-		Tracks.AddRange(tr);
+		this.Name = name;
+		this.Tracks.AddRange(tracks);
 	}
-	public TrackResult(LavalinkPlaylistInfo pl, LavalinkTrack tr)
+	public TrackResult(string name, LavalinkTrack track)
 	{
-		PlaylistInfo = pl;
-		Tracks = new List<LavalinkTrack>
-			{
-				tr
-			};
+		this.Name = name;
+		this.Tracks.Add(track);
 	}
 }

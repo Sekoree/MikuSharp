@@ -1,9 +1,12 @@
 {
   "discordToken": "",
+  "discordTokenDev": "",
   "discordBotListToken": "",
+  "motionBotListToken": "",
   "weebShToken": "",
   "youtubeApiToken": "",
   "ksoftSiToken": "",
+  "sentryDsn": "",
   "dbConfig": {
     "hostname": "",
     "user": "",

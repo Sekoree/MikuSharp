@@ -1,55 +1,51 @@
-﻿using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-
-using Microsoft.Extensions.Logging;
-
 using NYoutubeDL;
-
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Utilities;
 
 public static class Bilibili
 {
-	public static async Task<MemoryStream> GetBilibiliAsync(this InteractionContext ctx, string s, ulong msg_id)
+	public static async Task<MemoryStream> GetBilibiliAsync(this InteractionContext ctx, string songId, ulong messageId)
 	{
 		try
 		{
-			await ctx.EditFollowupAsync(msg_id, new DiscordWebhookBuilder().WithContent("Downloading video(this may take up to 5 min)"));
-			var youtubeDl = new YoutubeDL(@"youtube-dl.exe");
-			youtubeDl.Options.FilesystemOptions.Output = $@"{s}.mp4";
+			await ctx.EditFollowupAsync(messageId, new DiscordWebhookBuilder().WithContent("Downloading video (this may take up to 5 minutes)"));
+
+			var youtubeDlPath = OperatingSystem.IsLinux() ? "youtube-dl" : "youtube-dl.exe";
+			var ffmpegPath = OperatingSystem.IsLinux() ? "ffmpeg" : "ffmpeg.exe";
+			var outputFilePath = $@"{songId}.mp4";
+			var audioFilePath = $@"{songId}.mp3";
+
+			var youtubeDl = new YoutubeDL(youtubeDlPath);
+			youtubeDl.Options.FilesystemOptions.Output = outputFilePath;
 			youtubeDl.Options.PostProcessingOptions.ExtractAudio = true;
-			youtubeDl.Options.PostProcessingOptions.FfmpegLocation = @"ffmpeg.exe";
+			youtubeDl.Options.PostProcessingOptions.FfmpegLocation = ffmpegPath;
 			youtubeDl.Options.PostProcessingOptions.AudioFormat = NYoutubeDL.Helpers.Enums.AudioFormat.mp3;
 			youtubeDl.Options.PostProcessingOptions.AddMetadata = true;
 			youtubeDl.Options.PostProcessingOptions.KeepVideo = false;
-			youtubeDl.StandardOutputEvent += (e, f) =>
-			{
-				ctx.Client.Logger.LogDebug("{data}", f);
-			};
-			youtubeDl.StandardErrorEvent += (e, f) =>
-			{
-				ctx.Client.Logger.LogDebug("{data}", f);
-			};
-			youtubeDl.VideoUrl = "https://www.bilibili.com/video/" + s;
+
+			youtubeDl.StandardOutputEvent += (sender, output) => ctx.Client.Logger.LogDebug("{data}", output);
+
+			youtubeDl.StandardErrorEvent += (sender, error) => ctx.Client.Logger.LogDebug("{data}", error);
+
+			youtubeDl.VideoUrl = "https://www.bilibili.com/video/" + songId;
 			await youtubeDl.DownloadAsync();
-			var ms = new MemoryStream();
-			if (File.Exists($@"{s}.mp3"))
+
+			if (File.Exists(audioFilePath))
 			{
-				var song = File.Open($@"{s}.mp3", FileMode.Open);
-				await song.CopyToAsync(ms);
+				using var audioFile = File.Open(audioFilePath, FileMode.Open);
+				var ms = new MemoryStream();
+				await audioFile.CopyToAsync(ms, MikuBot.CanellationTokenSource.Token);
 				ms.Position = 0;
-				song.Close();
-				File.Delete($@"{s}.mp3");
+				File.Delete(audioFilePath);
+				return ms;
 			}
-			return ms;
+			else
+				return null;
 		}
 		catch (Exception ex)
 		{
-			ctx.Client.Logger.LogDebug("{ex}", ex.Message);
-			ctx.Client.Logger.LogDebug("{ex}", ex.StackTrace);
+			ctx.Client.Logger.LogDebug("{msg}", ex.Message);
+			ctx.Client.Logger.LogDebug("{stack}", ex.StackTrace);
 			return null;
 		}
 	}

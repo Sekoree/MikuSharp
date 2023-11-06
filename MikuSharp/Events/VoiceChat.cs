@@ -1,15 +1,4 @@
-﻿using DisCatSharp;
-using DisCatSharp.Entities;
-using DisCatSharp.EventArgs;
-
-using Microsoft.Extensions.Logging;
-
 using MikuSharp.Enums;
-
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Events;
 
@@ -19,25 +8,35 @@ public class VoiceChat
 	{
 		try
 		{
-			if (!MikuBot.Guilds.Any(x => x.Key == e.Guild.Id)) return;
-			var g = MikuBot.Guilds[e.Guild.Id];
-			if (g.musicInstance == null
-				|| g.musicInstance?.guildConnection?.IsConnected == false) return;
-			if ((e.After?.Channel?.Users.Where(x => !x.IsBot).Count() == 0
-			|| e.Before?.Channel?.Users.Where(x => !x.IsBot).Count() == 0
-			|| e.Channel?.Users.Where(x => !x.IsBot).Count() == 0)
-			&& (e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true
-			|| e.Before?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true
-			|| e.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
-			&& g.musicInstance?.guildConnection?.Channel?.Users.Where(x => !x.IsBot).Count() == 0)
+			if (!MikuBot.Guilds.ContainsKey(e.Guild.Id))
+				return;
+			var guild = MikuBot.Guilds[e.Guild.Id];
+			var musicInstance = guild.MusicInstance;
+
+			if (musicInstance == null || musicInstance.GuildPlayer?.IsConnected == false)
+				return;
+
+			var currentUser = e.Guild.Members[client.CurrentUser.Id];
+
+			var afterChannelUserCount = e.After?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
+			var currentChannelUserCount = e.Channel?.Users.Count(x => !x.IsBot) ?? 0;
+			var guildConnectionUserCount = musicInstance.GuildPlayer?.Channel?.Users.Count(x => !x.IsBot) ?? 0;
+
+			var isCurrentUserInChannel = currentUser?.VoiceState?.ChannelId == e.Channel?.Id;
+
+			if ((afterChannelUserCount == 0 || currentChannelUserCount == 0)
+				&& !isCurrentUserInChannel && guildConnectionUserCount == 0)
 			{
-				if (g.musicInstance.playstate == Playstate.Playing)
+				if (musicInstance.PlayState == PlayState.Playing)
 				{
-					await g.musicInstance.guildConnection.PauseAsync();
-					g.musicInstance.playstate = Playstate.Paused;
+					await musicInstance.GuildPlayer.PauseAsync();
+					musicInstance.PlayState = PlayState.Paused;
+
 					try
 					{
-						await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("**Paused** since everyone left the VC, connect back and use m%resume to continue playback otherwise I will disconnect in 5 min").Build());
+						await musicInstance.CommandChannel.SendMessageAsync(new DiscordEmbedBuilder()
+							.WithDescription("**Paused** since everyone left the VC, connect back and use m%resume to continue playback otherwise I will disconnect in 5 min")
+							.Build());
 					}
 					catch { }
 				}
@@ -45,26 +44,35 @@ public class VoiceChat
 				{
 					try
 					{
-						await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("Since everyone left the VC I will disconnect too in 5 min").Build());
+						await musicInstance.CommandChannel.SendMessageAsync(new DiscordEmbedBuilder()
+							.WithDescription("Since everyone left the VC I will disconnect too in 5 min")
+							.Build());
 					}
 					catch { }
 				}
-				g.musicInstance.aloneTime = DateTime.UtcNow;
-				g.musicInstance.aloneCTS = new CancellationTokenSource();
-				g.AloneCheckThread = Task.Run(g.CheckAlone);
+
+				musicInstance.AloneTime = DateTime.UtcNow;
+				musicInstance.AloneCheckCancellationToken = new();
+				guild.AloneCheckThread = Task.Run(guild.CheckAlone, MikuBot.CanellationTokenSource.Token);
 			}
-			else if (e.After?.Channel?.Users.Where(x => !x.IsBot).Count() != 0 && e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
+			else if (afterChannelUserCount != 0 && isCurrentUserInChannel)
 			{
-				if (g.musicInstance != null && g.musicInstance?.aloneCTS != null)
+				if (musicInstance is { AloneCheckCancellationToken: not null })
 				{
-					g.musicInstance.aloneCTS.Cancel();
+					musicInstance.AloneCheckCancellationToken.Cancel(); try
+					{
+						await musicInstance.CommandChannel.SendMessageAsync(new DiscordEmbedBuilder()
+							.WithDescription("Aborted the 5 minuten alone check :3")
+							.Build());
+					}
+					catch { }
 				}
 			}
 		}
 		catch (Exception ex)
 		{
-			client.Logger.LogError(ex.Message);
-			client.Logger.LogError(ex.StackTrace);
+			client.Logger.LogError("{msg}", ex.Message);
+			client.Logger.LogError("{stack}", ex.StackTrace);
 		}
 	}
 }

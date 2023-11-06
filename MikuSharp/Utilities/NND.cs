@@ -1,64 +1,67 @@
-﻿using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-
-using Microsoft.Extensions.Logging;
-
 using NicoNicoNii;
-
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace MikuSharp.Utilities;
 
-public static class NND
+public static class Nnd
 {
-	public static async Task<MemoryStream> GetNNDAsync(this InteractionContext ctx,string n, string s, ulong msg_id)
+	public static bool IsNndUrl(this string urlOrName)
+		=> urlOrName.ToLower().StartsWith("http://nicovideo.jp")
+			|| urlOrName.ToLower().StartsWith("http://sp.nicovideo.jp")
+			|| urlOrName.ToLower().StartsWith("https://nicovideo.jp")
+			|| urlOrName.ToLower().StartsWith("https://sp.nicovideo.jp")
+			|| urlOrName.ToLower().StartsWith("http://www.nicovideo.jp")
+			|| urlOrName.ToLower().StartsWith("https://www.nicovideo.jp");
+
+	public static async Task<MemoryStream> GetNndAsync(this InteractionContext ctx, string urlOrName, string nicoNicoId, ulong messageId)
 	{
 		try
 		{
 			NNDClient nndClient = new();
 			NicoVideoClient videoClient = new(nndClient);
-			var videoPage = await videoClient.GetWatchPageInfoAsync(s);
-			var download_exe = "nnd.exe";
-			var linux_exe = "nndownload.py";
-			string cmd = download_exe;
-			await ctx.EditFollowupAsync(msg_id, new DiscordWebhookBuilder().WithContent("Downloading video (this may take up to 10 min)"));
+			var videoPage = await videoClient.GetWatchPageInfoAsync(nicoNicoId);
+			var downloadExe = "nnd.exe";
+			var linuxExe = "nndownload.py";
+			var cmd = downloadExe;
+			await ctx.EditFollowupAsync(messageId, new DiscordWebhookBuilder().WithContent("Downloading video (this may take up to 10 min)"));
+
 			if (OperatingSystem.IsLinux())
-				cmd = linux_exe;
-			Process downloadProcess = new();
-			downloadProcess.StartInfo.FileName = cmd;
-			downloadProcess.StartInfo.Arguments = $"-g -o {$@"{s}"}.mp4 {$@"{n}"}";
-			downloadProcess.OutputDataReceived += (d, f) =>
+				cmd = linuxExe;
+
+			using (Process downloadProcess = new())
 			{
-				ctx.Client.Logger.LogDebug("{data}", $"\n{f.Data}\n");
-			};
-			downloadProcess.Start();
-			await downloadProcess.WaitForExitAsync();
+				downloadProcess.StartInfo.FileName = cmd;
+				downloadProcess.StartInfo.Arguments = $"-g -o {$@"{nicoNicoId}"}.mp4 {$@"{urlOrName}"}";
+				downloadProcess.OutputDataReceived += (sender, receiveArgs) => ctx.Client.Logger.LogDebug("{data}", $"\n{receiveArgs.Data}\n");
+
+				downloadProcess.Start();
+				await downloadProcess.WaitForExitAsync(MikuBot.CanellationTokenSource.Token);
+			}
+
 			var songTitle = videoPage?.Video?.Title ?? "[NND] Unknown Title";
 			var songArtist = videoPage?.Owner?.Nickname ?? "Unknown Artist";
-			await ctx.EditFollowupAsync(msg_id, new DiscordWebhookBuilder().WithContent("Converting"));
-			Process convertProgress = new();
-			convertProgress.StartInfo.FileName = "ffmpeg";
-			convertProgress.StartInfo.Arguments = $"-i {$@"{s}"}.mp4 -metadata title=\"{songTitle}\" -metadata artist=\"{songArtist}\" {$@"{s}"}.mp3";
-			convertProgress.OutputDataReceived += (d, f) =>
+			await ctx.EditFollowupAsync(messageId, new DiscordWebhookBuilder().WithContent("Converting"));
+
+			using (Process convertProcess = new())
 			{
-				ctx.Client.Logger.LogDebug("{data}", f.Data);
-			};
-			convertProgress.Start();
-			await convertProgress.WaitForExitAsync();
-			File.Delete($@"{s}.mp4");
-			MemoryStream ms = new(await File.ReadAllBytesAsync($@"{s}.mp3"));
-			File.Delete($@"{s}.mp3");
+				convertProcess.StartInfo.FileName = "ffmpeg";
+				convertProcess.StartInfo.Arguments = $"-i {$@"{nicoNicoId}"}.mp4 -metadata title=\"{songTitle}\" -metadata artist=\"{songArtist}\" {$@"{nicoNicoId}"}.mp3";
+				convertProcess.OutputDataReceived += (sender, receiveArgs) => ctx.Client.Logger.LogDebug("{data}", receiveArgs.Data);
+
+				convertProcess.Start();
+				await convertProcess.WaitForExitAsync(MikuBot.CanellationTokenSource.Token);
+			}
+
+			MemoryStream ms = new(await File.ReadAllBytesAsync($@"{nicoNicoId}.mp3", MikuBot.CanellationTokenSource.Token));
+			File.Delete($@"{nicoNicoId}.mp4");
+			File.Delete($@"{nicoNicoId}.mp3");
 			ms.Position = 0;
 			return ms;
 		}
 		catch (Exception ex)
 		{
-			ctx.Client.Logger.LogDebug("{ex}", ex.Message);
-			ctx.Client.Logger.LogDebug("{ex}", ex.StackTrace);
-			await ctx.EditFollowupAsync(msg_id, new DiscordWebhookBuilder().WithContent("Encountered error"));
+			ctx.Client.Logger.LogDebug("{msg}", ex.Message);
+			ctx.Client.Logger.LogDebug("{stack}", ex.StackTrace);
+			await ctx.EditFollowupAsync(messageId, new DiscordWebhookBuilder().WithContent("Encountered error"));
 			return null;
 		}
 	}

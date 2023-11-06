@@ -1,8 +1,4 @@
-﻿using DisCatSharp.Entities;
-
-using System.IO;
-
-namespace MikuSharp.Entities;
+﻿namespace MikuSharp.Entities;
 
 public class WeebSh
 {
