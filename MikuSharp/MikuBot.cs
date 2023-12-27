@@ -94,7 +94,11 @@ internal class MikuBot : IDisposable
 			LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger),
 			ShowReleaseNotesInUpdateCheck = false,
 			IncludePrereleaseInUpdateCheck = true,
-			DisableUpdateCheck = true
+			DisableUpdateCheck = true,
+			EnableSentry = true,
+			FeedbackEmail = "aiko@aitsys.dev",
+			DeveloperUserId = 856780995629154305,
+			AttachUserInfo = true
 		});
 
 		InteractivityModules = ShardedClient.UseInteractivityAsync(new()
