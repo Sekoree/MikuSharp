@@ -98,7 +98,8 @@ internal class MikuBot : IDisposable
 			EnableSentry = true,
 			FeedbackEmail = "aiko@aitsys.dev",
 			DeveloperUserId = 856780995629154305,
-			AttachUserInfo = true
+			AttachUserInfo = true,
+			ReconnectIndefinitely = true
 		});
 
 		InteractivityModules = ShardedClient.UseInteractivityAsync(new()
