@@ -46,6 +46,7 @@ internal class AutocompleteProviders
 		}
 	}
 
+/*
 	internal class PlaylistProvider : IAutocompleteProvider
 	{
 		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
@@ -64,7 +65,6 @@ internal class AutocompleteProviders
 			return playlists.Select(x => new DiscordApplicationCommandAutocompleteChoice(x.Value.Name, x.Key));
 		}
 	}
-
 	internal class SongProvider : IAutocompleteProvider
 	{
 		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
@@ -104,5 +104,5 @@ internal class AutocompleteProviders
 
 			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.position}: {x.track.Title}", x.position.ToString()));
 		}
-	}
+	}*/
 }

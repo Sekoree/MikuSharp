@@ -1,4 +1,4 @@
-﻿using DisCatSharp;
+﻿/*using DisCatSharp;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
@@ -365,3 +365,4 @@ public class MusicInstance
 }
 
 //     B/S(｀・ω・´) ❤️ (´ω｀)U/C
+*/

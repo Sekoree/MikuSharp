@@ -200,7 +200,7 @@ public class SGTestVariables
 	/// </summary>
 	public ContextMenuContext Context { get; set; }
 
-	public Dictionary<ulong, Guild> Bot = MikuBot.Guilds;
+	//public Dictionary<ulong, Guild> Bot = MikuBot.Guilds;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="TestVariables"/> class.

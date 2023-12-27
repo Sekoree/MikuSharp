@@ -1,4 +1,4 @@
-﻿using DisCatSharp;
+﻿/*using DisCatSharp;
 using DisCatSharp.Entities;
 using DisCatSharp.EventArgs;
 
@@ -68,3 +68,4 @@ public class VoiceChat
 		}
 	}
 }
+*/

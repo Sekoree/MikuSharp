@@ -1,4 +1,4 @@
-﻿using DisCatSharp.Entities;
+﻿/*using DisCatSharp.Entities;
 using DisCatSharp.Lavalink;
 
 using MikuSharp.Entities;
@@ -332,3 +332,4 @@ public class Database
 		return queue;
 	}
 }
+*/

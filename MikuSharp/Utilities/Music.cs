@@ -1,4 +1,4 @@
-﻿using AlbumArtExtraction;
+﻿/*using AlbumArtExtraction;
 
 using DisCatSharp;
 using DisCatSharp.ApplicationCommands.Context;
@@ -215,3 +215,4 @@ public static class Music
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(builder.Build()));
 	}
 }
+*/

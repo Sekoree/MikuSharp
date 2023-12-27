@@ -1,4 +1,4 @@
-﻿using DisCatSharp.Entities;
+﻿/*using DisCatSharp.Entities;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.EventArgs;
 
@@ -87,3 +87,4 @@ public class Lavalink
 	}
 
 }
+*/
