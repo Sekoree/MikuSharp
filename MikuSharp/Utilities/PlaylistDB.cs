@@ -1,4 +1,4 @@
-﻿using DisCatSharp.ApplicationCommands.Context;
+﻿/*using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Interactivity.Extensions;
@@ -620,3 +620,4 @@ public class PlaylistDB
 		}
 	}
 }
+*/

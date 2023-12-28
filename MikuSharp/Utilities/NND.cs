@@ -1,4 +1,4 @@
-﻿using DisCatSharp.ApplicationCommands.Context;
+﻿/*using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
 
 using Microsoft.Extensions.Logging;
@@ -64,3 +64,4 @@ public static class NND
 	}
 
 }
+*/
