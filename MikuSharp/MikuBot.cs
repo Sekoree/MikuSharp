@@ -170,7 +170,15 @@ internal class MikuBot : IDisposable
 
 			discordClientKvp.Value.GetApplicationCommands().ApplicationCommandsModuleStartupFinished += (sender, args) =>
 			{
-				sender.Client.Logger.LogInformation("Shard {shard} finished application command startup.", sender.Client.ShardId);
+				sender.Client.Logger.LogInformation("Shard {shard} finished application command startup.", args.ShardId);
+				args.Handled = true;
+				return Task.CompletedTask;
+			};
+
+			discordClientKvp.Value.GetApplicationCommands().ApplicationCommandsModuleReady += (sender, args) =>
+			{
+				sender.Client.Logger.LogInformation("Application commands module is ready");
+				args.Handled = true;
 				return Task.CompletedTask;
 			};
 
