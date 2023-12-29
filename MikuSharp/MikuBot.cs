@@ -133,7 +133,7 @@ internal class MikuBot : IDisposable
 
 		CommandsNextModules = ShardedClient.UseCommandsNextAsync(new()
 		{
-			CaseSensitive = true,
+			CaseSensitive = false,
 			EnableMentionPrefix = true,
 			DmHelp = false,
 			EnableDefaultHelp = true,

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace MikuSharp.Commands
 {
 	[RequireNsfw]
-	class NSFW : BaseCommandModule
+	public class NSFW : BaseCommandModule
 	{
 		[Command("4k")]
 		[Description("lewd")]
