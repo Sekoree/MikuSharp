@@ -46,11 +46,11 @@
     <PackageReference Include="AngleSharp" Version="1.0.7" />
 	<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
 	<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.8.0" />
-	<PackageReference Include="DisCatSharp" Version="10.5.0-nightly-012" />
-	<PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.5.0-nightly-012" />
-	<PackageReference Include="DisCatSharp.CommandsNext" Version="10.5.0-nightly-012" />
-	<PackageReference Include="DisCatSharp.Interactivity" Version="10.5.0-nightly-012" />
-	<PackageReference Include="DisCatSharp.Lavalink" Version="10.5.0-nightly-012" />
+	<PackageReference Include="DisCatSharp" Version="10.5.0-nightly-013" />
+	<PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.5.0-nightly-013" />
+	<PackageReference Include="DisCatSharp.CommandsNext" Version="10.5.0-nightly-013" />
+	<PackageReference Include="DisCatSharp.Interactivity" Version="10.5.0-nightly-013" />
+	<PackageReference Include="DisCatSharp.Lavalink" Version="10.5.0-nightly-013" />
 	<PackageReference Include="DiscordBotsList.Api" Version="1.5.0" />
 	<PackageReference Include="FluentFTP" Version="49.0.1" />
 	<PackageReference Include="Google.Apis" Version="1.64.0" />
