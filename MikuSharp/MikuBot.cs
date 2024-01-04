@@ -127,7 +127,6 @@ internal class MikuBot : IDisposable
 			EnableDefaultHelp = true,
 			DebugStartup = true,
 			EnableLocalization = false,
-			ManualOverride = true,
 			GenerateTranslationFilesOnly = false
 		}).Result;
 
