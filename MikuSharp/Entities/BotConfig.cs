@@ -4,7 +4,11 @@ namespace MikuSharp.Entities;
 
 public partial class BotConfig
 {
+#if DEBUG
+	[JsonProperty("discordTokenDev")]
+#else
 	[JsonProperty("discordToken")]
+#endif
 	public string DiscordToken { get; set; }
 
 	[JsonProperty("discordBotListToken")]
