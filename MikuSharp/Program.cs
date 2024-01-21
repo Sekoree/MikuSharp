@@ -11,7 +11,6 @@ internal class Program
 			MikuBot.RegisterEvents().Wait();
 			bot.RegisterCommands();
 			bot.RunAsync().Wait();
-			bot.Dispose();
 		}
 
 		Log.Logger.Information("Shutdown!");
