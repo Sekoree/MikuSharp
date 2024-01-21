@@ -1,6 +1,6 @@
 ﻿namespace MikuSharp.Entities;
 
-public sealed class Nekos_Life : Img_Data
+public sealed class NekosLife : ImgData
 {
 	public string Url { get; set; }
 }

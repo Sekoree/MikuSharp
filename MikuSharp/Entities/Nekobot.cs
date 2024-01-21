@@ -1,8 +1,8 @@
 ﻿namespace MikuSharp.Entities;
 
-public sealed class NekoBot : Img_Data
+public sealed class NekoBot : ImgData
 {
-	public string message { get; set; }
-	public int status { get; set; }
-	public bool success { get; set; }
+	public string Message { get; set; }
+	public int Status { get; set; }
+	public bool Success { get; set; }
 }

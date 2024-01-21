@@ -2,7 +2,7 @@
 
 namespace MikuSharp.Entities;
 
-public sealed partial class BotConfig
+public sealed class BotConfig
 {
 #if DEBUG
 	[JsonProperty("discordTokenDev")]
@@ -28,7 +28,7 @@ public sealed partial class BotConfig
 	[JsonProperty("nndConfig")] public NndConfig NndConfig { get; set; }
 }
 
-public sealed partial class DatabaseConfig
+public sealed class DatabaseConfig
 {
 	[JsonProperty("hostname")] public string Hostname { get; set; }
 
@@ -39,7 +39,7 @@ public sealed partial class DatabaseConfig
 	[JsonProperty("database")] public string Database { get; set; }
 }
 
-public sealed partial class LavalinkConfig
+public sealed class LavalinkConfig
 {
 	[JsonProperty("hostname")] public string Hostname { get; set; }
 
@@ -48,7 +48,7 @@ public sealed partial class LavalinkConfig
 	[JsonProperty("port")] public int Port { get; set; }
 }
 
-public sealed partial class NndConfig
+public sealed class NndConfig
 {
 	[JsonProperty("mail")] public string Mail { get; set; }
 
