@@ -27,16 +27,15 @@ public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandChe
 	public async override Task<bool> ExecuteChecksAsync(BaseContext ctx)
 	{
 		var bot = await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id);
-		if (ctx.Member.VoiceState?.Channel != null && bot.VoiceState?.Channel != null)
-			return await Task.FromResult(true);
-
-		return await Task.FromResult(false);
+		return ctx.Member.VoiceState?.Channel is not null && bot.VoiceState?.Channel is not null
+			? await Task.FromResult(true)
+			: await Task.FromResult(false);
 	}
 }
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Class)]
 public sealed class NotStaffAttribute : CheckBaseAttribute
 {
-	public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help) =>
-		Task.FromResult(!ctx.User.IsStaff);
+	public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
+		=> Task.FromResult(!ctx.User.IsStaff);
 }
