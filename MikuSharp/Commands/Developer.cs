@@ -23,13 +23,13 @@ namespace MikuSharp.Commands;
 public class Developer : ApplicationCommandsModule
 {
 	[SlashCommand("test", "Testing")]
-	public async static Task TestAsync(InteractionContext ctx)
+	public static async Task TestAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
 	}
 
 	[SlashCommand("guild_shard_test", "Testing")]
-	public async static Task GuildTestAsync(InteractionContext ctx)
+	public static async Task GuildTestAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
 		foreach (var shard in MikuBot.ShardedClient.ShardClients.Values)
@@ -37,7 +37,7 @@ public class Developer : ApplicationCommandsModule
 	}
 
 	[ContextMenu(ApplicationCommandType.Message, "Remove message - Miku Dev")]
-	public async static Task DeleteMessageAsync(ContextMenuContext ctx)
+	public static async Task DeleteMessageAsync(ContextMenuContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Log request").AsEphemeral());
 		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
@@ -55,7 +55,7 @@ public class Developer : ApplicationCommandsModule
 	/// </summary>
 	/// <param name="ctx">The interaction context.</param>
 	[SlashCommand("dbg", "Get the logs of today")]
-	public async static Task GetDebugLogAsync(InteractionContext ctx)
+	public static async Task GetDebugLogAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Log request"));
 		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
@@ -88,7 +88,7 @@ public class Developer : ApplicationCommandsModule
 			FileStream log = new($"temp-{targetFile}", FileMode.Open, FileAccess.Read);
 			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddFile(targetFile, log, true).WithContent($"Log {targetFile.Bold()}").AsEphemeral());
 			log.Close();
-			log.Dispose();
+			await log.DisposeAsync();
 			File.Delete($"temp-{targetFile}");
 		}
 		catch (Exception ex)
@@ -105,7 +105,7 @@ public class Developer : ApplicationCommandsModule
 	/// </summary>
 	/// <param name="ctx">The context menu context.</param>
 	[ContextMenu(ApplicationCommandType.Message, "Eval - Miku Dev")]
-	public async static Task EvalCsAsync(ContextMenuContext ctx)
+	public static async Task EvalCsAsync(ContextMenuContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Eval request").AsEphemeral());
 		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
@@ -133,7 +133,7 @@ public class Developer : ApplicationCommandsModule
 			.WithColor(new("#FF007F"))
 			.WithDescription("Evaluating...\n\nMeanwhile: https://eval-deez-nuts.xyz/")
 			.Build())).ConfigureAwait(false);
-		msg = await ctx.GetOriginalResponseAsync();
+		await ctx.GetOriginalResponseAsync();
 		try
 		{
 			var globals = new SgTestVariables(ctx.TargetMessage, ctx.Client, ctx, MikuBot.ShardedClient);

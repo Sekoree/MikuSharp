@@ -152,7 +152,7 @@ internal sealed class MikuBot : IDisposable
 		LavalinkModules = ShardedClient.UseLavalinkAsync().Result;*/
 	}
 
-	internal async static Task RegisterEvents()
+	internal static async Task RegisterEvents()
 	{
 		ShardedClient.ClientErrored += (sender, args) =>
 		{
@@ -222,7 +222,7 @@ internal sealed class MikuBot : IDisposable
 		}
 	}
 */
-	internal async static Task UpdateBotList()
+	internal static async Task UpdateBotList()
 	{
 		await Task.Delay(15000);
 		while (true)

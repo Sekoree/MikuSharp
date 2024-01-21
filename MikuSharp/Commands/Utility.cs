@@ -28,7 +28,7 @@ internal class Utility : ApplicationCommandsModule
 	internal class AnimeMangaUtility : ApplicationCommandsModule
 	{
 		[SlashCommand("anime_search", "Search for an anime")]
-		public async static Task SearchAnimeAsync(InteractionContext ctx, [Option("search_query", "Search query")] string searchQuery)
+		public static async Task SearchAnimeAsync(InteractionContext ctx, [Option("search_query", "Search query")] string searchQuery)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 			try
@@ -84,7 +84,7 @@ internal class Utility : ApplicationCommandsModule
 		}
 
 		[SlashCommand("manga_search", "Search for an manga")]
-		public async static Task SearchMangaAsync(InteractionContext ctx, [Option("search_query", "Search query")] string searchQuery)
+		public static async Task SearchMangaAsync(InteractionContext ctx, [Option("search_query", "Search query")] string searchQuery)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 			try
@@ -141,11 +141,11 @@ internal class Utility : ApplicationCommandsModule
 	internal class DiscordUtility : ApplicationCommandsModule
 	{
 		[SlashCommand("avatar", "Get the avatar of someone or yourself")]
-		public async static Task GetAvatarAsync(InteractionContext ctx, [Option("user", "User to get the avatar from")] DiscordUser? user = null)
+		public static async Task GetAvatarAsync(InteractionContext ctx, [Option("user", "User to get the avatar from")] DiscordUser? user = null)
 			=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().AddEmbed(new DiscordEmbedBuilder().WithImageUrl(user != null ? user.AvatarUrl : ctx.User.AvatarUrl).Build()));
 
 		[SlashCommand("server_info", "Get information about the server")]
-		public async static Task GuildInfoAsync(InteractionContext ctx)
+		public static async Task GuildInfoAsync(InteractionContext ctx)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 
@@ -173,7 +173,7 @@ internal class Utility : ApplicationCommandsModule
 		}
 
 		[SlashCommand("user_info", "Get information about a user")]
-		public async static Task UserInfoAsync(InteractionContext ctx, [Option("user", "The user to view")] DiscordUser? user = null)
+		public static async Task UserInfoAsync(InteractionContext ctx, [Option("user", "The user to view")] DiscordUser? user = null)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 
@@ -205,7 +205,7 @@ internal class Utility : ApplicationCommandsModule
 		}
 
 		[SlashCommand("emojilist", "Lists all custom emoji on this server")]
-		public async static Task EmojiListAsync(InteractionContext ctx)
+		public static async Task EmojiListAsync(InteractionContext ctx)
 		{
 			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 			var wat = "You have to execute this command in a server!";

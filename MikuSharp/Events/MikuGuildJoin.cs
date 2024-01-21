@@ -15,7 +15,7 @@ public class MikuGuild
 	/// </summary>
 	/// <param name="sender">The client.</param>
 	/// <param name="args">The event args.</param>
-	public async static Task OnJoinAsync(DiscordClient sender, GuildMemberAddEventArgs args)
+	public static async Task OnJoinAsync(DiscordClient sender, GuildMemberAddEventArgs args)
 	{
 		await Task.FromResult(true);
 	}
@@ -25,7 +25,7 @@ public class MikuGuild
 	/// </summary>
 	/// <param name="sender">The discord client.</param>
 	/// <param name="args">The event args.</param>
-	public async static Task OnUpdateAsync(DiscordClient sender, GuildMemberUpdateEventArgs args)
+	public static async Task OnUpdateAsync(DiscordClient sender, GuildMemberUpdateEventArgs args)
 	{
 		if (args is { PendingBefore: true, PendingAfter: false })
 		{

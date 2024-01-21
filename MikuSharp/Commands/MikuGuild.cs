@@ -13,7 +13,7 @@ namespace MikuSharp.Commands;
 public class MikuGuild : ApplicationCommandsModule
 {
 	[SlashCommand("smolcar", "#SmolArmy")]
-	public async static Task SmolCarAsync(InteractionContext ctx)
+	public static async Task SmolCarAsync(InteractionContext ctx)
 	{
 		if (ctx.Member.Roles.Any(x => x.Id == 607989212696018945))
 		{

@@ -16,7 +16,7 @@ namespace MikuSharp.Utilities;
 
 public static class Web
 {
-	public async static Task<NekosLife> GetNekosLifeAsync(this HttpClient client, string url)
+	public static async Task<NekosLife> GetNekosLifeAsync(this HttpClient client, string url)
 	{
 		var dl = JsonConvert.DeserializeObject<NekosLife>(await client.GetStringAsync(url));
 		MemoryStream str = new(await client.GetByteArrayAsync(Other.ResizeLink(dl.Url)))
@@ -32,7 +32,7 @@ public static class Web
 		return dl;
 	}
 
-	public async static Task<KsoftSiRanImg> GetKsoftSiRanImgAsync(this HttpClient client, string tag, bool nsfw = false)
+	public static async Task<KsoftSiRanImg> GetKsoftSiRanImgAsync(this HttpClient client, string tag, bool nsfw = false)
 	{
 		client.DefaultRequestHeaders.Authorization = new("Bearer", MikuBot.Config.KsoftSiToken);
 		var v = JsonConvert.DeserializeObject<KsoftSiRanImg>(await client.GetStringAsync("https://api.ksoft.si/images/random-image?tag=hentai_gif&nsfw=true"));
@@ -46,7 +46,7 @@ public static class Web
 		return v;
 	}
 
-	public async static Task<NekoBot> GetNekobotAsync(this HttpClient client, string url)
+	public static async Task<NekoBot> GetNekobotAsync(this HttpClient client, string url)
 	{
 		var dl = JsonConvert.DeserializeObject<NekoBot>(await client.GetStringAsync(url));
 		MemoryStream str = new(await client.GetByteArrayAsync(Other.ResizeLink(dl.Message)))
@@ -62,7 +62,7 @@ public static class Web
 		return dl;
 	}
 
-	public async static Task<WeebSh> GetWeebShAsync(this HttpClient client, string query, string[] tags = null, NsfwSearch nsfw = NsfwSearch.False)
+	public static async Task<WeebSh> GetWeebShAsync(this HttpClient client, string query, string[] tags = null, NsfwSearch nsfw = NsfwSearch.False)
 	{
 		var weeurl = await MikuBot.WeebClient.GetRandomAsync(query, tags, nsfw: nsfw);
 		MemoryStream img = new(await client.GetByteArrayAsync(weeurl.Url))

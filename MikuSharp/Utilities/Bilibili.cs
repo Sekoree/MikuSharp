@@ -13,7 +13,7 @@ namespace MikuSharp.Utilities;
 
 public static class Bilibili
 {
-	public async static Task<MemoryStream> GetBilibiliAsync(this InteractionContext ctx, string s, ulong msgId)
+	public static async Task<MemoryStream> GetBilibiliAsync(this InteractionContext ctx, string s, ulong msgId)
 	{
 		try
 		{

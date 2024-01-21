@@ -22,7 +22,7 @@ namespace MikuSharp.Commands;
 internal class Fun : ApplicationCommandsModule
 {
 	[SlashCommand("8ball", "Yes? No? Maybe?")]
-	public async static Task EightBallAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
+	public static async Task EightBallAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var responses = new[]
@@ -34,7 +34,7 @@ internal class Fun : ApplicationCommandsModule
 	}
 
 	[SlashCommand("cat", "Get a random cat image!")]
-	public async static Task CatAsync(InteractionContext ctx)
+	public static async Task CatAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var imgUrl = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/v2/img/meow");
@@ -46,7 +46,7 @@ internal class Fun : ApplicationCommandsModule
 	}
 
 	[SlashCommand("clyde", "Say something as clyde bot")]
-	public async static Task ClydeAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
+	public static async Task ClydeAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}"));
@@ -58,7 +58,7 @@ internal class Fun : ApplicationCommandsModule
 	}
 
 	[SlashCommand("coinflip", "Flip a coin lol")]
-	public async static Task CoinflipAsync(InteractionContext ctx)
+	public static async Task CoinflipAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var flip = new[] { $"Heads {DiscordEmoji.FromName(ctx.Client, ":arrow_up_small:")}", $"Tails {DiscordEmoji.FromName(ctx.Client, ":arrow_down_small:")}" };
@@ -66,7 +66,7 @@ internal class Fun : ApplicationCommandsModule
 	}
 
 	[SlashCommand("dog", "Random Dog Image")]
-	public async static Task DogAsync(InteractionContext ctx)
+	public static async Task DogAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var dc = JsonConvert.DeserializeObject<DogCeo>(await ctx.Client.RestClient.GetStringAsync("https://dog.ceo/api/breeds/image/random"));
@@ -110,7 +110,7 @@ internal class Fun : ApplicationCommandsModule
     }*/
 
 	[SlashCommand("lizard", "Get a random lizard image")]
-	public async static Task LizardAsync(InteractionContext ctx)
+	public static async Task LizardAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var get = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/lizard");
@@ -156,7 +156,7 @@ internal class Fun : ApplicationCommandsModule
     }*/
 
 	[SlashCommand("rps", "Play rock paper scissors!")]
-	public async static Task RpsAsync(InteractionContext ctx, [Option("rps", "Your rock paper scissor choice")] string rps)
+	public static async Task RpsAsync(InteractionContext ctx, [Option("rps", "Your rock paper scissor choice")] string rps)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var rock = new[] { $"Rock {DiscordEmoji.FromName(ctx.Client, ":black_circle:")}", $"Paper {DiscordEmoji.FromName(ctx.Client, ":pencil:")}", $"Scissors {DiscordEmoji.FromName(ctx.Client, ":scissors:")}" };

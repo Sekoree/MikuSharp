@@ -11,22 +11,17 @@ namespace MikuSharp.Attributes;
 /// <summary>
 /// Defines that usage of this command is restricted to users in a vc.
 /// </summary>
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false)]
 public sealed class RequireUserVoicechatConnection : ApplicationCommandCheckBaseAttribute
 {
 	public override Task<bool> ExecuteChecksAsync(BaseContext ctx)
-	{
-		if (ctx.Member.VoiceState?.Channel != null)
-			return Task.FromResult(true);
-
-		return Task.FromResult(false);
-	}
+		=> Task.FromResult(ctx.Member.VoiceState?.Channel != null);
 }
 
 /// <summary>
 /// Defines that usage of this command is restricted to users & the bot in a vc.
 /// </summary>
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false)]
 public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandCheckBaseAttribute
 {
 	public async override Task<bool> ExecuteChecksAsync(BaseContext ctx)
@@ -39,7 +34,7 @@ public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandChe
 	}
 }
 
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Class, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Class)]
 public sealed class NotStaffAttribute : CheckBaseAttribute
 {
 	public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help) =>

@@ -17,7 +17,7 @@ namespace MikuSharp.Commands;
 internal class Moderation : ApplicationCommandsModule
 {
 	[SlashCommand("disable_invites", "Disable invites usage for guild")]
-	public async static Task DisableInvitesAsync(InteractionContext ctx, [Option("reason", "Auditlog reason")] string? reason = null)
+	public static async Task DisableInvitesAsync(InteractionContext ctx, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
 		await ctx.DeferAsync(false);
 		try
@@ -32,7 +32,7 @@ internal class Moderation : ApplicationCommandsModule
 	}
 
 	[SlashCommand("enable_invites", "Enable invites usage for guild")]
-	public async static Task EnableInvitesAsync(InteractionContext ctx, [Option("reason", "Auditlog reason")] string? reason = null)
+	public static async Task EnableInvitesAsync(InteractionContext ctx, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
 		await ctx.DeferAsync(false);
 		try
@@ -47,7 +47,7 @@ internal class Moderation : ApplicationCommandsModule
 	}
 
 	[SlashCommand("ban", "Ban someone")]
-	public async static Task BanAsync(InteractionContext ctx, [Option("user", "User to ban")] DiscordUser user, [Option("deletion_days", "Delete messages of x days"), MaximumValue(7)] int deletionDays = 0, [Option("reason", "Auditlog reason")] string? reason = null)
+	public static async Task BanAsync(InteractionContext ctx, [Option("user", "User to ban")] DiscordUser user, [Option("deletion_days", "Delete messages of x days"), MaximumValue(7)] int deletionDays = 0, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
 		await ctx.DeferAsync(false);
 		try
@@ -62,7 +62,7 @@ internal class Moderation : ApplicationCommandsModule
 	}
 
 	[SlashCommand("unban", "Unban someone")]
-	public async static Task UnbanAsync(InteractionContext ctx, [Option("username", "User to unban", true), Autocomplete(typeof(AutocompleteProviders.BanProvider))] string id, [Option("reason", "Auditlog reason")] string? reason = null)
+	public static async Task UnbanAsync(InteractionContext ctx, [Option("username", "User to unban", true), Autocomplete(typeof(AutocompleteProviders.BanProvider))] string id, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
 		await ctx.DeferAsync(false);
 		var userId = Convert.ToUInt64(id);
@@ -72,7 +72,7 @@ internal class Moderation : ApplicationCommandsModule
 	}
 
 	[SlashCommand("kick", "Kick someone")]
-	public async static Task KickAsync(InteractionContext ctx, [Option("user", "User to kick")] DiscordUser user, [Option("reason", "Auditlog reason")] string? reason = null)
+	public static async Task KickAsync(InteractionContext ctx, [Option("user", "User to kick")] DiscordUser user, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
 		await ctx.DeferAsync(false);
 		try
@@ -88,7 +88,7 @@ internal class Moderation : ApplicationCommandsModule
 	}
 
 	[SlashCommand("purge", "Delete a large amount of messages fast")]
-	public async static Task PurgeAsync(InteractionContext ctx, [Option("amount", "Amount of messages to purge"), MinimumValue(1), MaximumValue(100)] int amount, [Option("reason", "Auditlog reason")] string? reason = null)
+	public static async Task PurgeAsync(InteractionContext ctx, [Option("amount", "Amount of messages to purge"), MinimumValue(1), MaximumValue(100)] int amount, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
 		await ctx.DeferAsync(true);
 		try

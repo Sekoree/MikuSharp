@@ -17,7 +17,7 @@ namespace MikuSharp.Commands;
 internal class Action : ApplicationCommandsModule
 {
 	[SlashCommand("hug", "Hug someone!")]
-	public async static Task HugAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public static async Task HugAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"{ctx.User.Mention} hugs {user.Mention} uwu"));
 		var wsh = await ctx.Client.RestClient.GetWeebShAsync("hug", new[] { "" });
@@ -30,7 +30,7 @@ internal class Action : ApplicationCommandsModule
 	}
 
 	[SlashCommand("kiss", "Kiss someone!")]
-	public async static Task KissAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public static async Task KissAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"{ctx.User.Mention} kisses {user.Mention} >~<"));
 		var wsh = await ctx.Client.RestClient.GetWeebShAsync("kiss", new[] { "" });
@@ -43,7 +43,7 @@ internal class Action : ApplicationCommandsModule
 	}
 
 	[SlashCommand("lick", "Lick someone!")]
-	public async static Task LickAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public static async Task LickAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"{ctx.User.Mention} licks {user.Mention} owo"));
 		var wsh = await ctx.Client.RestClient.GetWeebShAsync("lick", new[] { "" });
@@ -56,7 +56,7 @@ internal class Action : ApplicationCommandsModule
 	}
 
 	[SlashCommand("pat", "Pat someone!")]
-	public async static Task PatAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public static async Task PatAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"{ctx.User.Mention} pats {user.Mention} #w#"));
 		var weeurl = await MikuBot.WeebClient.GetRandomAsync("pat", new[] { "" });
@@ -73,7 +73,7 @@ internal class Action : ApplicationCommandsModule
 	}
 
 	[SlashCommand("poke", "Poke someone!")]
-	public async static Task PokeAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public static async Task PokeAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"{ctx.User.Mention} pokes {user.Mention} ÓwÒ"));
 		var weeurl = await MikuBot.WeebClient.GetRandomAsync("poke", new[] { "" });
@@ -90,7 +90,7 @@ internal class Action : ApplicationCommandsModule
 	}
 
 	[SlashCommand("slap", "Slap someone!")]
-	public async static Task SlapAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public static async Task SlapAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent($"{ctx.User.Mention} slaps {user.Mention} ÒwÓ"));
 		var weeurl = await MikuBot.WeebClient.GetRandomAsync("slap", new[] { "" });
