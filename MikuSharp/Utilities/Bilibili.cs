@@ -13,11 +13,11 @@ namespace MikuSharp.Utilities;
 
 public static class Bilibili
 {
-	public async static Task<MemoryStream> GetBilibiliAsync(this InteractionContext ctx, string s, ulong msg_id)
+	public async static Task<MemoryStream> GetBilibiliAsync(this InteractionContext ctx, string s, ulong msgId)
 	{
 		try
 		{
-			await ctx.EditFollowupAsync(msg_id, new DiscordWebhookBuilder().WithContent("Downloading video(this may take up to 5 min)"));
+			await ctx.EditFollowupAsync(msgId, new DiscordWebhookBuilder().WithContent("Downloading video(this may take up to 5 min)"));
 			var youtubeDl = new YoutubeDL(@"youtube-dl.exe");
 			youtubeDl.Options.FilesystemOptions.Output = $@"{s}.mp4";
 			youtubeDl.Options.PostProcessingOptions.ExtractAudio = true;

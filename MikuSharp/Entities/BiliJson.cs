@@ -4,27 +4,27 @@ namespace MikuSharp.Entities;
 
 public class Durl2
 {
-	public int order { get; set; }
-	public int length { get; set; }
-	public int size { get; set; }
-	public string ahead { get; set; }
-	public string vhead { get; set; }
-	public string url { get; set; }
+	public int Order { get; set; }
+	public int Length { get; set; }
+	public int Size { get; set; }
+	public string Ahead { get; set; }
+	public string Vhead { get; set; }
+	public string Url { get; set; }
 }
 
 public class BiliJson
 {
-	public string from { get; set; }
-	public string result { get; set; }
-	public int quality { get; set; }
-	public string format { get; set; }
-	public int timelength { get; set; }
-	public string accept_format { get; set; }
-	public List<string> accept_description { get; set; }
-	public List<int> accept_quality { get; set; }
-	public int video_codecid { get; set; }
-	public bool video_project { get; set; }
-	public string seek_param { get; set; }
-	public string seek_type { get; set; }
-	public List<Durl2> durl { get; set; }
+	public string From { get; set; }
+	public string Result { get; set; }
+	public int Quality { get; set; }
+	public string Format { get; set; }
+	public int Timelength { get; set; }
+	public string AcceptFormat { get; set; }
+	public List<string> AcceptDescription { get; set; }
+	public List<int> AcceptQuality { get; set; }
+	public int VideoCodecid { get; set; }
+	public bool VideoProject { get; set; }
+	public string SeekParam { get; set; }
+	public string SeekType { get; set; }
+	public List<Durl2> Durl { get; set; }
 }

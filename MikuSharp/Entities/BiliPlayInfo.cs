@@ -4,40 +4,40 @@ namespace MikuSharp.Entities;
 
 public class BiliPlayinfo
 {
-	public int code { get; set; }
-	public string message { get; set; }
-	public int ttl { get; set; }
-	public Data data { get; set; }
-	public string session { get; set; }
-	public VideoFrame videoFrame { get; set; }
+	public int Code { get; set; }
+	public string Message { get; set; }
+	public int Ttl { get; set; }
+	public Data Data { get; set; }
+	public string Session { get; set; }
+	public VideoFrame VideoFrame { get; set; }
 }
 
 public class Durl
 {
-	public int order { get; set; }
-	public int length { get; set; }
-	public int size { get; set; }
-	public string ahead { get; set; }
-	public string vhead { get; set; }
-	public string url { get; set; }
-	public object backup_url { get; set; }
+	public int Order { get; set; }
+	public int Length { get; set; }
+	public int Size { get; set; }
+	public string Ahead { get; set; }
+	public string Vhead { get; set; }
+	public string Url { get; set; }
+	public object BackupUrl { get; set; }
 }
 
 public class Data
 {
-	public string from { get; set; }
-	public string result { get; set; }
-	public string message { get; set; }
-	public int quality { get; set; }
-	public string format { get; set; }
-	public int timelength { get; set; }
-	public string accept_format { get; set; }
-	public List<string> accept_description { get; set; }
-	public List<int> accept_quality { get; set; }
-	public int video_codecid { get; set; }
-	public string seek_param { get; set; }
-	public string seek_type { get; set; }
-	public List<Durl> durl { get; set; }
+	public string From { get; set; }
+	public string Result { get; set; }
+	public string Message { get; set; }
+	public int Quality { get; set; }
+	public string Format { get; set; }
+	public int Timelength { get; set; }
+	public string AcceptFormat { get; set; }
+	public List<string> AcceptDescription { get; set; }
+	public List<int> AcceptQuality { get; set; }
+	public int VideoCodecid { get; set; }
+	public string SeekParam { get; set; }
+	public string SeekType { get; set; }
+	public List<Durl> Durl { get; set; }
 }
 
 public class VideoFrame

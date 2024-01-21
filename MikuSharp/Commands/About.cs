@@ -42,7 +42,7 @@ internal class About : ApplicationCommandsModule
 	public async static Task FollowNewsAsync(InteractionContext ctx, [Option("target_channel", "Target channel to post updates."), ChannelTypes(ChannelType.Text)] DiscordChannel channel, [Option("name", "Name of webhook")] string name = "Miku Bot Announcements")
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
-		if (!ctx.Client.CurrentApplication.Team.Members.Any(x => x.User == ctx.User) && ctx.User.Id != ctx.Guild.OwnerId)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != ctx.Guild.OwnerId)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
@@ -86,11 +86,10 @@ internal class About : ApplicationCommandsModule
 			if (ctx.Guild != null)
 				emb.AddField(new("Guild", $"{ctx.Guild.Id}", true));
 			var forum = guild.GetChannel(1020433162662322257);
-			List<ForumPostTag> tags = new();
-			if (ctx.Guild != null)
-				tags.Add(forum.AvailableTags.First(x => x.Id == 1020434799493648404));
-			else
-				tags.Add(forum.AvailableTags.First(x => x.Id == 1020434935502360576));
+			List<ForumPostTag> tags = new()
+			{
+				ctx.Guild != null ? forum.AvailableTags.First(x => x.Id == 1020434799493648404) : forum.AvailableTags.First(x => x.Id == 1020434935502360576)
+			};
 			var thread = await forum.CreatePostAsync("Feedback", new DiscordMessageBuilder().AddEmbed(emb.Build()).WithContent($"Feedback from {ctx.User.UsernameWithDiscriminator}"), null, tags, "Feedback");
 			var msg = await thread.GetMessageAsync(thread.Id);
 			await msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsdown:"));
@@ -113,20 +112,20 @@ internal class About : ApplicationCommandsModule
 	public async static Task StatsAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-		var GuildCount = 0;
-		var UserCount = 0;
-		var ChannelCount = 0;
+		var guildCount = 0;
+		var userCount = 0;
+		var channelCount = 0;
 		foreach (var client in MikuBot.ShardedClient.ShardClients)
 		{
-			GuildCount += client.Value.Guilds.Count;
+			guildCount += client.Value.Guilds.Count;
 			foreach (var guild in client.Value.Guilds)
 			{
-				UserCount += guild.Value.MemberCount;
-				ChannelCount += guild.Value.Channels.Count;
+				userCount += guild.Value.MemberCount;
+				channelCount += guild.Value.Channels.Count;
 			}
 		}
 
-		var emb = new DiscordEmbedBuilder().WithTitle("Stats").WithDescription("Some stats of the MikuBot!").AddField(new("Guilds", GuildCount.ToString(), true)).AddField(new("Users", UserCount.ToString(), true)).AddField(new("Channels", ChannelCount.ToString(), true)).AddField(new("Ping", ctx.Client.Ping.ToString(), true))
+		var emb = new DiscordEmbedBuilder().WithTitle("Stats").WithDescription("Some stats of the MikuBot!").AddField(new("Guilds", guildCount.ToString(), true)).AddField(new("Users", userCount.ToString(), true)).AddField(new("Channels", channelCount.ToString(), true)).AddField(new("Ping", ctx.Client.Ping.ToString(), true))
 			.AddField(new("Lib (Version)", ctx.Client.BotLibrary + " " + ctx.Client.VersionString, true)).WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
 	}

@@ -27,13 +27,12 @@ public class MikuGuild
 	/// <param name="args">The event args.</param>
 	public async static Task OnUpdateAsync(DiscordClient sender, GuildMemberUpdateEventArgs args)
 	{
-		if (args.PendingBefore is true)
-			if (args.PendingAfter is false)
-			{
-				ulong member_role_id = 483280207927574528;
-				var member_role = args.Guild.GetRole(member_role_id);
-				await args.Member.GrantRoleAsync(member_role);
-			}
+		if (args is { PendingBefore: true, PendingAfter: false })
+		{
+			ulong memberRoleId = 483280207927574528;
+			var memberRole = args.Guild.GetRole(memberRoleId);
+			await args.Member.GrantRoleAsync(memberRole);
+		}
 
 		await Task.FromResult(true);
 	}

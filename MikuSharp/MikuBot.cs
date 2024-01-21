@@ -38,7 +38,7 @@ namespace MikuSharp;
 
 internal sealed class MikuBot : IDisposable
 {
-	internal static CancellationTokenSource _cts { get; set; }
+	internal static CancellationTokenSource Cts { get; set; }
 
 	internal static BotConfig Config { get; set; }
 	//internal LavalinkConfiguration LavalinkConfig { get; set; }
@@ -47,7 +47,7 @@ internal sealed class MikuBot : IDisposable
 	internal Task StatusThread { get; set; }
 	internal Task BotListThread { get; set; }
 
-	internal static WeebClient _weebClient = new("Hatsune Miku Bot", "4.0.0");
+	internal static WeebClient WeebClient = new("Hatsune Miku Bot", "4.0.0");
 	internal static AuthDiscordBotListApi DiscordBotListApi { get; set; }
 	internal static DiscordShardedClient ShardedClient { get; set; }
 
@@ -60,8 +60,8 @@ internal sealed class MikuBot : IDisposable
 	//internal static Dictionary<int, LavalinkNodeConnection> LavalinkNodeConnections = new();
 	//internal static Dictionary<ulong, Guild> Guilds = new();
 
-	internal static Playstate ps = Playstate.Playing;
-	internal static Stopwatch psc = new();
+	internal static Playstate Ps = Playstate.Playing;
+	internal static Stopwatch Psc = new();
 
 	internal MikuBot()
 	{
@@ -72,7 +72,7 @@ internal sealed class MikuBot : IDisposable
 			throw new ArgumentNullException(null, "config.json is null");
 
 		Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database={Config.DbConfig.Database}";
-		_cts = new();
+		Cts = new();
 
 		Log.Logger = new LoggerConfiguration()
 			.MinimumLevel.Debug()
@@ -268,7 +268,7 @@ internal sealed class MikuBot : IDisposable
 	internal void RegisterCommands()
 	{
 		// Nsfw stuff needs to be hidden, that's why we use commands next
-		this.CommandsNextModules.RegisterCommands<Commands.NSFW>();
+		this.CommandsNextModules.RegisterCommands<Commands.Nsfw>();
 
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Action>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Developer>();
@@ -286,7 +286,7 @@ internal sealed class MikuBot : IDisposable
 
 	internal async Task RunAsync()
 	{
-		await _weebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
+		await WeebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
 		await ShardedClient.StartAsync();
 		await Task.Delay(5000);
 		/*foreach (var lavalinkShard in LavalinkModules)
@@ -298,7 +298,7 @@ internal sealed class MikuBot : IDisposable
 		//StatusThread = Task.Run(ShowConnections);
 		//DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
 		//BotListThread = Task.Run(UpdateBotList);
-		while (!_cts.IsCancellationRequested)
+		while (!Cts.IsCancellationRequested)
 			await Task.Delay(25);
 		await ShardedClient.StopAsync();
 	}

@@ -4,7 +4,7 @@ using System.IO;
 
 namespace MikuSharp.Entities;
 
-public class Img_Data
+public class ImgData
 {
 	public Stream Data { get; set; }
 	public string Filetype { get; set; }

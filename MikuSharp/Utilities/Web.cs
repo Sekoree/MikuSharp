@@ -17,10 +17,10 @@ namespace MikuSharp.Utilities;
 
 public static class Web
 {
-	public async static Task<Nekos_Life> GetNekosLifeAsync(this HttpClient client, string url)
+	public async static Task<NekosLife> GetNekosLifeAsync(this HttpClient client, string url)
 	{
-		var dl = JsonConvert.DeserializeObject<Nekos_Life>(await client.GetStringAsync(url));
-		MemoryStream str = new(await client.GetByteArrayAsync(Other.resizeLink(dl.Url)))
+		var dl = JsonConvert.DeserializeObject<NekosLife>(await client.GetStringAsync(url));
+		MemoryStream str = new(await client.GetByteArrayAsync(Other.ResizeLink(dl.Url)))
 		{
 			Position = 0
 		};
@@ -37,7 +37,7 @@ public static class Web
 	{
 		client.DefaultRequestHeaders.Authorization = new("Bearer", MikuBot.Config.KsoftSiToken);
 		var v = JsonConvert.DeserializeObject<KsoftSiRanImg>(await client.GetStringAsync("https://api.ksoft.si/images/random-image?tag=hentai_gif&nsfw=true"));
-		MemoryStream img = new(await client.GetByteArrayAsync(Other.resizeLink(v.url)));
+		MemoryStream img = new(await client.GetByteArrayAsync(Other.ResizeLink(v.Url)));
 		v.Data = img;
 		v.Filetype = MimeGuesser.GuessExtension(img);
 		var em = new DiscordEmbedBuilder();
@@ -50,7 +50,7 @@ public static class Web
 	public async static Task<NekoBot> GetNekobotAsync(this HttpClient client, string url)
 	{
 		var dl = JsonConvert.DeserializeObject<NekoBot>(await client.GetStringAsync(url));
-		MemoryStream str = new(await client.GetByteArrayAsync(Other.resizeLink(dl.message)))
+		MemoryStream str = new(await client.GetByteArrayAsync(Other.ResizeLink(dl.Message)))
 		{
 			Position = 0
 		};
@@ -65,7 +65,7 @@ public static class Web
 
 	public async static Task<WeebSh> GetWeebShAsync(this HttpClient client, string query, string[] tags = null, NsfwSearch nsfw = NsfwSearch.False)
 	{
-		var weeurl = await MikuBot._weebClient.GetRandomAsync(query, tags, nsfw: nsfw);
+		var weeurl = await MikuBot.WeebClient.GetRandomAsync(query, tags, nsfw: nsfw);
 		MemoryStream img = new(await client.GetByteArrayAsync(weeurl.Url))
 		{
 			Position = 0
