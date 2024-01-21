@@ -1,6 +1,6 @@
 ﻿namespace MikuSharp.Entities;
 
-public class KsoftSiRanImg : Img_Data
+public sealed class KsoftSiRanImg : Img_Data
 {
 	public string url { get; set; }
 	public string snowflake { get; set; }

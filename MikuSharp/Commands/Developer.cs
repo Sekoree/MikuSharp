@@ -10,10 +10,7 @@ using DisCatSharp.Interactivity.Extensions;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 
-using MikuSharp.Entities;
-
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,7 +40,7 @@ public class Developer : ApplicationCommandsModule
 	public async static Task DeleteMessageAsync(ContextMenuContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Log request").AsEphemeral());
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
@@ -61,7 +58,7 @@ public class Developer : ApplicationCommandsModule
 	public async static Task GetDebugLogAsync(InteractionContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Log request"));
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
@@ -69,30 +66,30 @@ public class Developer : ApplicationCommandsModule
 
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Trying to get log"));
 		var now = DateTime.Now;
-		var target_file = $"miku_log{now.ToString("yyyy/MM/dd").Replace("/", "")}.txt";
-		if (!File.Exists(target_file))
+		var targetFile = $"miku_log{now.ToString("yyyy/MM/dd").Replace("/", "")}.txt";
+		if (!File.Exists(targetFile))
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Failed to get log"));
 			return;
 		}
 		else
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Found log {Formatter.Bold(target_file)}"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Found log {targetFile.Bold()}"));
 
 		try
 		{
-			if (!File.Exists($"temp-{target_file}"))
-				File.Copy(target_file, $"temp-{target_file}");
+			if (!File.Exists($"temp-{targetFile}"))
+				File.Copy(targetFile, $"temp-{targetFile}");
 			else
 			{
-				File.Delete($"temp-{target_file}");
-				File.Copy(target_file, $"temp-{target_file}");
+				File.Delete($"temp-{targetFile}");
+				File.Copy(targetFile, $"temp-{targetFile}");
 			}
 
-			FileStream log = new($"temp-{target_file}", FileMode.Open, FileAccess.Read);
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddFile(target_file, log, true).WithContent($"Log {Formatter.Bold(target_file)}").AsEphemeral());
+			FileStream log = new($"temp-{targetFile}", FileMode.Open, FileAccess.Read);
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddFile(targetFile, log, true).WithContent($"Log {targetFile.Bold()}").AsEphemeral());
 			log.Close();
 			log.Dispose();
-			File.Delete($"temp-{target_file}");
+			File.Delete($"temp-{targetFile}");
 		}
 		catch (Exception ex)
 		{
@@ -108,10 +105,10 @@ public class Developer : ApplicationCommandsModule
 	/// </summary>
 	/// <param name="ctx">The context menu context.</param>
 	[ContextMenu(ApplicationCommandType.Message, "Eval - Miku Dev")]
-	public async static Task EvalCSAsync(ContextMenuContext ctx)
+	public async static Task EvalCsAsync(ContextMenuContext ctx)
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Eval request").AsEphemeral());
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != 856780995629154305)
+		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != 856780995629154305)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;
@@ -119,9 +116,9 @@ public class Developer : ApplicationCommandsModule
 
 		var msg = ctx.TargetMessage;
 		var code = ctx.TargetMessage.Content;
-		var cs1 = code.IndexOf("```") + 3;
+		var cs1 = code.IndexOf("```", StringComparison.Ordinal) + 3;
 		cs1 = code.IndexOf('\n', cs1) + 1;
-		var cs2 = code.LastIndexOf("```");
+		var cs2 = code.LastIndexOf("```", StringComparison.Ordinal);
 		var c = await ctx.Guild.GetActiveThreadsAsync();
 
 		if (cs1 == -1 || cs2 == -1)
@@ -139,18 +136,18 @@ public class Developer : ApplicationCommandsModule
 		msg = await ctx.GetOriginalResponseAsync();
 		try
 		{
-			var globals = new SGTestVariables(ctx.TargetMessage, ctx.Client, ctx, MikuBot.ShardedClient);
+			var globals = new SgTestVariables(ctx.TargetMessage, ctx.Client, ctx, MikuBot.ShardedClient);
 
 			var sopts = ScriptOptions.Default;
 			sopts = sopts.WithImports("System", "System.Collections.Generic", "System.Linq", "System.Text", "System.Threading.Tasks", "DisCatSharp", "DisCatSharp.Entities", "DisCatSharp.CommandsNext", "DisCatSharp.CommandsNext.Attributes", "DisCatSharp.Interactivity", "DisCatSharp.Interactivity.Extensions", "DisCatSharp.Enums", "Microsoft.Extensions.Logging", "MikuSharp.Entities",
 				"DisCatSharp.Lavalink");
 			sopts = sopts.WithReferences(AppDomain.CurrentDomain.GetAssemblies().Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
 
-			var script = CSharpScript.Create(cs, sopts, typeof(SGTestVariables));
+			var script = CSharpScript.Create(cs, sopts, typeof(SgTestVariables));
 			script.Compile();
 			var result = await script.RunAsync(globals).ConfigureAwait(false);
 
-			if (result != null && result.ReturnValue != null && !string.IsNullOrWhiteSpace(result.ReturnValue.ToString()))
+			if (result is { ReturnValue: not null } && !string.IsNullOrWhiteSpace(result.ReturnValue.ToString()))
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder { Title = "Evaluation Result", Description = result.ReturnValue.ToString(), Color = new DiscordColor("#007FFF") }.Build())).ConfigureAwait(false);
 			else
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder { Title = "Evaluation Successful", Description = "No result was returned.", Color = new DiscordColor("#007FFF") }.Build())).ConfigureAwait(false);
@@ -165,7 +162,7 @@ public class Developer : ApplicationCommandsModule
 /// <summary>
 /// The test variables.
 /// </summary>
-public class SGTestVariables
+public sealed class SgTestVariables
 {
 	/// <summary>
 	/// Gets or sets the message.
@@ -202,12 +199,12 @@ public class SGTestVariables
 	//public Dictionary<ulong, Guild> Bot = MikuBot.Guilds;
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="TestVariables"/> class.
+	/// Initializes a new instance of the <see cref="SgTestVariables"/> class.
 	/// </summary>
 	/// <param name="msg">The message.</param>
 	/// <param name="client">The client.</param>
 	/// <param name="ctx">The context menu context.</param>
-	public SGTestVariables(DiscordMessage msg, DiscordClient client, ContextMenuContext ctx, DiscordShardedClient shard)
+	public SgTestVariables(DiscordMessage msg, DiscordClient client, ContextMenuContext ctx, DiscordShardedClient shard)
 	{
 		this.Client = client;
 		this.ShardClient = shard;

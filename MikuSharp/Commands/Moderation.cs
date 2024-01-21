@@ -101,7 +101,7 @@ internal class Moderation : ApplicationCommandsModule
 		}
 		catch (DisCatSharp.Exceptions.BadRequestException ex)
 		{
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(Formatter.BlockCode(ex.JsonMessage, "json")));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(ex.JsonMessage.BlockCode("json")));
 		}
 	}
 }

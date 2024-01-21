@@ -42,7 +42,7 @@ internal class About : ApplicationCommandsModule
 	public async static Task FollowNewsAsync(InteractionContext ctx, [Option("target_channel", "Target channel to post updates."), ChannelTypes(ChannelType.Text)] DiscordChannel channel, [Option("name", "Name of webhook")] string name = "Miku Bot Announcements")
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
-		if (!ctx.Client.CurrentApplication.Team.Members.Where(x => x.User == ctx.User).Any() && ctx.User.Id != ctx.Guild.OwnerId)
+		if (!ctx.Client.CurrentApplication.Team.Members.Any(x => x.User == ctx.User) && ctx.User.Id != ctx.Guild.OwnerId)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
 			return;

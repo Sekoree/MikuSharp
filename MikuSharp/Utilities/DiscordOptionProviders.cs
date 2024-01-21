@@ -31,7 +31,7 @@ internal class FixedOptionProviders
 
 internal class AutocompleteProviders
 {
-	internal class BanProvider : IAutocompleteProvider
+	internal sealed class BanProvider : IAutocompleteProvider
 	{
 		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
 		{

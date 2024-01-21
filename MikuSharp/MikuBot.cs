@@ -36,7 +36,7 @@ using Weeb.net;
 
 namespace MikuSharp;
 
-internal class MikuBot : IDisposable
+internal sealed class MikuBot : IDisposable
 {
 	internal static CancellationTokenSource _cts { get; set; }
 
@@ -53,6 +53,7 @@ internal class MikuBot : IDisposable
 
 	internal IReadOnlyDictionary<int, InteractivityExtension> InteractivityModules { get; set; }
 	internal IReadOnlyDictionary<int, ApplicationCommandsExtension> ApplicationCommandsModules { get; set; }
+
 	internal IReadOnlyDictionary<int, CommandsNextExtension> CommandsNextModules { get; set; }
 	//internal IReadOnlyDictionary<int, LavalinkExtension> LavalinkModules { get; set; }
 
@@ -64,11 +65,11 @@ internal class MikuBot : IDisposable
 
 	internal MikuBot()
 	{
-		var fileData = File.ReadAllText(@"config.json") ?? throw new ArgumentNullException("config.json is null or missing");
+		var fileData = File.ReadAllText(@"config.json") ?? throw new ArgumentNullException(null, "config.json is null or missing");
 
 		Config = JsonConvert.DeserializeObject<BotConfig>(fileData);
 		if (Config == null)
-			throw new ArgumentNullException("config.json is null");
+			throw new ArgumentNullException(null, "config.json is null");
 
 		Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database={Config.DbConfig.Database}";
 		_cts = new();
@@ -182,7 +183,7 @@ internal class MikuBot : IDisposable
 
 			discordClientKvp.Value.GuildMemberAdded += async (sender, args) =>
 			{
-				if (sender.CurrentApplication.Team.Members.Where(x => x.User.Id == args.Member.Id).Any())
+				if (sender.CurrentApplication.Team.Members.Any(x => x.User.Id == args.Member.Id))
 				{
 					var text = $"Heywo <:MikuWave:655783221942026271>!"
 					           + $"\n\nOne of my developers joined your server!"
@@ -300,6 +301,11 @@ internal class MikuBot : IDisposable
 		while (!_cts.IsCancellationRequested)
 			await Task.Delay(25);
 		await ShardedClient.StopAsync();
+	}
+
+	~MikuBot()
+	{
+		this.Dispose();
 	}
 
 	public void Dispose()

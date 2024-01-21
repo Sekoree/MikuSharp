@@ -64,7 +64,7 @@ internal class Utility : ApplicationCommandsModule
 					emb = new();
 				}
 
-				res.Sort((x, y) => x.Title.CompareTo(y.Title));
+				res.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
 				var i = 1;
 				foreach (var aa in res)
 				{
@@ -117,7 +117,7 @@ internal class Utility : ApplicationCommandsModule
 					emb = new();
 				}
 
-				res.Sort((x, y) => x.Title.CompareTo(y.Title));
+				res.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.Ordinal));
 				var i = 1;
 				foreach (var aa in res)
 				{
@@ -156,7 +156,7 @@ internal class Utility : ApplicationCommandsModule
 			}
 
 			var members = await ctx.Guild.GetAllMembersAsync();
-			var bots = members.Where(x => x.IsBot).Count();
+			var bots = members.Count(x => x.IsBot);
 
 			var emb = new DiscordEmbedBuilder();
 			emb.WithTitle(ctx.Guild.Name);
@@ -165,7 +165,7 @@ internal class Utility : ApplicationCommandsModule
 			emb.AddField(new("Owner", ctx.Guild.Owner.Mention, true));
 			emb.AddField(new("Language", ctx.Guild.PreferredLocale, true));
 			emb.AddField(new("ID", ctx.Guild.Id.ToString(), true));
-			emb.AddField(new("Created At", Formatter.Timestamp(ctx.Guild.CreationTimestamp, TimestampFormat.LongDateTime), true));
+			emb.AddField(new("Created At", ctx.Guild.CreationTimestamp.Timestamp(TimestampFormat.LongDateTime), true));
 			emb.AddField(new("Emojis", ctx.Guild.Emojis.Count.ToString(), true));
 			emb.AddField(new("Members (Bots)", $"{members.Count} ({bots})", true));
 
@@ -197,9 +197,9 @@ internal class Utility : ApplicationCommandsModule
 				if (member.DisplayName != user.Username)
 					emb.AddField(new("Nickname", $"{member.DisplayName}", true));
 			emb.AddField(new("ID", $"{user.Id}", true));
-			emb.AddField(new("Account Creation", $"{Formatter.Timestamp(user.CreationTimestamp)}", true));
+			emb.AddField(new("Account Creation", $"{user.CreationTimestamp.Timestamp()}", true));
 			if (member != null)
-				emb.AddField(new("Join Date", $"{Formatter.Timestamp(member.JoinedAt)}", true));
+				emb.AddField(new("Join Date", $"{member.JoinedAt.Timestamp()}", true));
 			emb.WithThumbnail(user.AvatarUrl);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
 		}
