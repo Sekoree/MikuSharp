@@ -21,7 +21,7 @@ namespace MikuSharp.Commands;
 internal class Weeb : ApplicationCommandsModule
 {
 	[SlashCommand("awooify", "Awooify your or someones avatar!")]
-	public static async Task AwooifyAsync(InteractionContext ctx, [Option("user", "User to awooify")] DiscordUser? user = null)
+	public async static Task AwooifyAsync(InteractionContext ctx, [Option("user", "User to awooify")] DiscordUser? user = null)
 	{
 		await ctx.DeferAsync(false);
 		var url = (await (user ?? ctx.User).ConvertToMember(ctx.Guild)).GuildAvatarUrl;
@@ -30,7 +30,7 @@ internal class Weeb : ApplicationCommandsModule
 	}
 
 	[SlashCommand("diva", "Radnom PJD Loading image")]
-	public static async Task DivaPic(InteractionContext ctx)
+	public async static Task DivaPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/diva"));
@@ -43,7 +43,7 @@ internal class Weeb : ApplicationCommandsModule
 			Description = $"[Full Source Image Link]({res.url})",
 			ImageUrl = $"attachment://image.{MimeGuesser.GuessExtension(img)}"
 		};
-		emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+		emim.WithAuthor("via api.meek.moe", "https://api.meek.moe/");
 		emim.WithFooter("Requested by " + ctx.User.UsernameWithDiscriminator, ctx.User.AvatarUrl);
 		//ctx.Client.Logger.LogDebug(MimeGuesser.GuessExtension(img));
 
@@ -54,7 +54,7 @@ internal class Weeb : ApplicationCommandsModule
 	}
 
 	[SlashCommand("gumi", "Random Gumi image")]
-	public static async Task GumiPic(InteractionContext ctx)
+	public async static Task GumiPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/gumi"));
@@ -68,10 +68,8 @@ internal class Weeb : ApplicationCommandsModule
 			ImageUrl = $"attachment://image.{MimeGuesser.GuessExtension(img)}"
 		};
 		if (res.creator.Length != 0)
-		{
-			emim.AddField(new DiscordEmbedField("Creator", res.creator));
-		}
-		emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+			emim.AddField(new("Creator", res.creator));
+		emim.WithAuthor("via api.meek.moe", "https://api.meek.moe/");
 		emim.WithFooter("Requested by " + ctx.User.UsernameWithDiscriminator, ctx.User.AvatarUrl);
 
 		DiscordWebhookBuilder builder = new();
@@ -81,7 +79,7 @@ internal class Weeb : ApplicationCommandsModule
 	}
 
 	[SlashCommand("kaito", "Random Kaito image")]
-	public static async Task KaitoPic(InteractionContext ctx)
+	public async static Task KaitoPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/kaito"));
@@ -95,10 +93,8 @@ internal class Weeb : ApplicationCommandsModule
 			ImageUrl = $"attachment://image.{MimeGuesser.GuessExtension(img)}"
 		};
 		if (res.creator.Length != 0)
-		{
-			emim.AddField(new DiscordEmbedField("Creator", res.creator));
-		}
-		emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+			emim.AddField(new("Creator", res.creator));
+		emim.WithAuthor("via api.meek.moe", "https://api.meek.moe/");
 		emim.WithFooter("Requested by " + ctx.User.UsernameWithDiscriminator, ctx.User.AvatarUrl);
 
 		DiscordWebhookBuilder builder = new();
@@ -108,7 +104,7 @@ internal class Weeb : ApplicationCommandsModule
 	}
 
 	[SlashCommand("len", "Random Len image")]
-	public static async Task KLenPic(InteractionContext ctx)
+	public async static Task KLenPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/len"));
@@ -122,10 +118,8 @@ internal class Weeb : ApplicationCommandsModule
 			ImageUrl = $"attachment://image.{MimeGuesser.GuessExtension(img)}"
 		};
 		if (res.creator.Length != 0)
-		{
-			emim.AddField(new DiscordEmbedField("Creator", res.creator));
-		}
-		emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+			emim.AddField(new("Creator", res.creator));
+		emim.WithAuthor("via api.meek.moe", "https://api.meek.moe/");
 		emim.WithFooter("Requested by " + ctx.User.UsernameWithDiscriminator, ctx.User.AvatarUrl);
 
 		DiscordWebhookBuilder builder = new();
@@ -135,7 +129,7 @@ internal class Weeb : ApplicationCommandsModule
 	}
 
 	[SlashCommand("luka", "Random Luka image")]
-	public static async Task LukaPic(InteractionContext ctx)
+	public async static Task LukaPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/luka"));
@@ -149,10 +143,8 @@ internal class Weeb : ApplicationCommandsModule
 			ImageUrl = $"attachment://image.{MimeGuesser.GuessExtension(img)}"
 		};
 		if (res.creator.Length != 0)
-		{
-			emim.AddField(new DiscordEmbedField("Creator", res.creator));
-		}
-		emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+			emim.AddField(new("Creator", res.creator));
+		emim.WithAuthor("via api.meek.moe", "https://api.meek.moe/");
 		emim.WithFooter("Requested by " + ctx.User.UsernameWithDiscriminator, ctx.User.AvatarUrl);
 
 		DiscordWebhookBuilder builder = new();
@@ -162,7 +154,7 @@ internal class Weeb : ApplicationCommandsModule
 	}
 
 	[SlashCommand("meiko", "Random Meiko image")]
-	public static async Task MeikoPic(InteractionContext ctx)
+	public async static Task MeikoPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/meiko"));
@@ -176,10 +168,8 @@ internal class Weeb : ApplicationCommandsModule
 			ImageUrl = $"attachment://image.{MimeGuesser.GuessExtension(img)}"
 		};
 		if (res.creator.Length != 0)
-		{
-			emim.AddField(new DiscordEmbedField("Creator", res.creator));
-		}
-		emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+			emim.AddField(new("Creator", res.creator));
+		emim.WithAuthor("via api.meek.moe", "https://api.meek.moe/");
 		emim.WithFooter("Requested by " + ctx.User.UsernameWithDiscriminator, ctx.User.AvatarUrl);
 
 		DiscordWebhookBuilder builder = new();
@@ -189,7 +179,7 @@ internal class Weeb : ApplicationCommandsModule
 	}
 
 	[SlashCommand("miku", "Random Miku image")]
-	public static async Task HMikuPic(InteractionContext ctx)
+	public async static Task HMikuPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/miku"));
@@ -203,10 +193,8 @@ internal class Weeb : ApplicationCommandsModule
 			ImageUrl = $"attachment://image.{MimeGuesser.GuessExtension(img)}"
 		};
 		if (res.creator.Length != 0)
-		{
-			emim.AddField(new DiscordEmbedField("Creator", res.creator));
-		}
-		emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+			emim.AddField(new("Creator", res.creator));
+		emim.WithAuthor("via api.meek.moe", "https://api.meek.moe/");
 		emim.WithFooter("Requested by " + ctx.User.UsernameWithDiscriminator, ctx.User.AvatarUrl);
 
 		DiscordWebhookBuilder builder = new();
@@ -216,7 +204,7 @@ internal class Weeb : ApplicationCommandsModule
 	}
 
 	[SlashCommand("neko", "Get a random neko image")]
-	public static async Task Cat(InteractionContext ctx)
+	public async static Task Cat(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
 		var ImgURL = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/v2/img/neko");
@@ -232,7 +220,7 @@ internal class Weeb : ApplicationCommandsModule
 	}
 
 	[SlashCommand("rin", "Random Rin image")]
-	public static async Task KRinPic(InteractionContext ctx)
+	public async static Task KRinPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/rin"));
@@ -246,10 +234,8 @@ internal class Weeb : ApplicationCommandsModule
 			ImageUrl = $"attachment://image.{MimeGuesser.GuessExtension(img)}"
 		};
 		if (res.creator.Length != 0)
-		{
-			emim.AddField(new DiscordEmbedField("Creator", res.creator));
-		}
-		emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+			emim.AddField(new("Creator", res.creator));
+		emim.WithAuthor("via api.meek.moe", "https://api.meek.moe/");
 		emim.WithFooter("Requested by " + ctx.User.UsernameWithDiscriminator, ctx.User.AvatarUrl);
 
 		DiscordWebhookBuilder builder = new();
@@ -259,7 +245,7 @@ internal class Weeb : ApplicationCommandsModule
 	}
 
 	[SlashCommand("teto", "Random Teto image")]
-	public static async Task KTetoPic(InteractionContext ctx)
+	public async static Task KTetoPic(InteractionContext ctx)
 	{
 		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<Entities.MeekMoe>(await ctx.Client.RestClient.GetStringAsync($"https://api.meek.moe/teto"));
@@ -273,10 +259,8 @@ internal class Weeb : ApplicationCommandsModule
 			ImageUrl = $"attachment://image.{MimeGuesser.GuessExtension(img)}"
 		};
 		if (res.creator.Length != 0)
-		{
-			emim.AddField(new DiscordEmbedField("Creator", res.creator));
-		}
-		emim.WithAuthor(name: "via api.meek.moe", url: "https://api.meek.moe/");
+			emim.AddField(new("Creator", res.creator));
+		emim.WithAuthor("via api.meek.moe", "https://api.meek.moe/");
 		emim.WithFooter("Requested by " + ctx.User.UsernameWithDiscriminator, ctx.User.AvatarUrl);
 
 		DiscordWebhookBuilder builder = new();

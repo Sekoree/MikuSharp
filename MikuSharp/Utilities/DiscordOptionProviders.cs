@@ -20,9 +20,9 @@ internal class FixedOptionProviders
 		{
 			var list = new List<DiscordApplicationCommandOptionChoice>(3)
 			{
-				new DiscordApplicationCommandOptionChoice("Off", $"{(int)RepeatMode.Off}"),
-				new DiscordApplicationCommandOptionChoice("On", $"{(int)RepeatMode.On}"),
-				new DiscordApplicationCommandOptionChoice("All", $"{(int)RepeatMode.All}"),
+				new("Off", $"{(int)RepeatMode.Off}"),
+				new("On", $"{(int)RepeatMode.On}"),
+				new("All", $"{(int)RepeatMode.All}")
 			};
 			return Task.FromResult<IEnumerable<DiscordApplicationCommandOptionChoice>>(list);
 		}

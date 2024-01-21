@@ -1,27 +1,27 @@
 {
-  "discordToken": "",
-  "discordBotListToken": "",
-  "weebShToken": "",
-  "youtubeApiToken": "",
-  "ksoftSiToken": "",
-  "dbConfig": {
-    "hostname": "",
-    "user": "",
-    "password": "",
-    "database": ""
-  },
-  "lavaConfig": {
-    "hostname": "",
-    "password": "",
-    "port": 2333
-  },
-  "nndConfig": {
-    "mail": "",
-    "password": "",
-    "ftpConfig": {
-      "hostname": "",
-      "user": "",
-      "password": ""
-    }
-  }
+	"discordToken": "",
+	"discordBotListToken": "",
+	"weebShToken": "",
+	"youtubeApiToken": "",
+	"ksoftSiToken": "",
+	"dbConfig": {
+		"hostname": "",
+		"user": "",
+		"password": "",
+		"database": ""
+	},
+	"lavaConfig": {
+		"hostname": "",
+		"password": "",
+		"port": 2333
+	},
+	"nndConfig": {
+		"mail": "",
+		"password": "",
+		"ftpConfig": {
+			"hostname": "",
+			"user": "",
+			"password": ""
+		}
+	}
 }

@@ -13,7 +13,7 @@ namespace MikuSharp.Utilities;
 
 public static class Bilibili
 {
-	public static async Task<MemoryStream> GetBilibiliAsync(this InteractionContext ctx, string s, ulong msg_id)
+	public async static Task<MemoryStream> GetBilibiliAsync(this InteractionContext ctx, string s, ulong msg_id)
 	{
 		try
 		{
@@ -25,14 +25,8 @@ public static class Bilibili
 			youtubeDl.Options.PostProcessingOptions.AudioFormat = NYoutubeDL.Helpers.Enums.AudioFormat.mp3;
 			youtubeDl.Options.PostProcessingOptions.AddMetadata = true;
 			youtubeDl.Options.PostProcessingOptions.KeepVideo = false;
-			youtubeDl.StandardOutputEvent += (e, f) =>
-			{
-				ctx.Client.Logger.LogDebug("{data}", f);
-			};
-			youtubeDl.StandardErrorEvent += (e, f) =>
-			{
-				ctx.Client.Logger.LogDebug("{data}", f);
-			};
+			youtubeDl.StandardOutputEvent += (e, f) => { ctx.Client.Logger.LogDebug("{data}", f); };
+			youtubeDl.StandardErrorEvent += (e, f) => { ctx.Client.Logger.LogDebug("{data}", f); };
 			youtubeDl.VideoUrl = "https://www.bilibili.com/video/" + s;
 			await youtubeDl.DownloadAsync();
 			var ms = new MemoryStream();
@@ -44,6 +38,7 @@ public static class Bilibili
 				song.Close();
 				File.Delete($@"{s}.mp3");
 			}
+
 			return ms;
 		}
 		catch (Exception ex)

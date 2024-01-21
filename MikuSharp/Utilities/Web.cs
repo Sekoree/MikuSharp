@@ -17,7 +17,7 @@ namespace MikuSharp.Utilities;
 
 public static class Web
 {
-	public static async Task<Nekos_Life> GetNekosLifeAsync(this HttpClient client, string url)
+	public async static Task<Nekos_Life> GetNekosLifeAsync(this HttpClient client, string url)
 	{
 		var dl = JsonConvert.DeserializeObject<Nekos_Life>(await client.GetStringAsync(url));
 		MemoryStream str = new(await client.GetByteArrayAsync(Other.resizeLink(dl.Url)))
@@ -33,9 +33,9 @@ public static class Web
 		return dl;
 	}
 
-	public static async Task<KsoftSiRanImg> GetKsoftSiRanImgAsync(this HttpClient client, string tag, bool nsfw = false)
+	public async static Task<KsoftSiRanImg> GetKsoftSiRanImgAsync(this HttpClient client, string tag, bool nsfw = false)
 	{
-		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", MikuBot.Config.KsoftSiToken);
+		client.DefaultRequestHeaders.Authorization = new("Bearer", MikuBot.Config.KsoftSiToken);
 		var v = JsonConvert.DeserializeObject<KsoftSiRanImg>(await client.GetStringAsync("https://api.ksoft.si/images/random-image?tag=hentai_gif&nsfw=true"));
 		MemoryStream img = new(await client.GetByteArrayAsync(Other.resizeLink(v.url)));
 		v.Data = img;
@@ -47,7 +47,7 @@ public static class Web
 		return v;
 	}
 
-	public static async Task<NekoBot> GetNekobotAsync(this HttpClient client, string url)
+	public async static Task<NekoBot> GetNekobotAsync(this HttpClient client, string url)
 	{
 		var dl = JsonConvert.DeserializeObject<NekoBot>(await client.GetStringAsync(url));
 		MemoryStream str = new(await client.GetByteArrayAsync(Other.resizeLink(dl.message)))
@@ -63,7 +63,7 @@ public static class Web
 		return dl;
 	}
 
-	public static async Task<WeebSh> GetWeebShAsync(this HttpClient client, string query, string[] tags = null, NsfwSearch nsfw = NsfwSearch.False)
+	public async static Task<WeebSh> GetWeebShAsync(this HttpClient client, string query, string[] tags = null, NsfwSearch nsfw = NsfwSearch.False)
 	{
 		var weeurl = await MikuBot._weebClient.GetRandomAsync(query, tags, nsfw: nsfw);
 		MemoryStream img = new(await client.GetByteArrayAsync(weeurl.Url))
@@ -73,7 +73,7 @@ public static class Web
 		var em = new DiscordEmbedBuilder();
 		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
 		em.WithFooter("by weeb.sh");
-		return new WeebSh
+		return new()
 		{
 			ImgData = img,
 			Extension = MimeGuesser.GuessExtension(img),

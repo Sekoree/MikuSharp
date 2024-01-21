@@ -2,9 +2,9 @@
 
 namespace MikuSharp;
 
-class Program
+internal class Program
 {
-	static void Main(string[] args)
+	private static void Main(string[] args)
 	{
 		using (var bot = new MikuBot())
 		{
@@ -13,6 +13,7 @@ class Program
 			bot.RunAsync().Wait();
 			bot.Dispose();
 		}
+
 		Log.Logger.Information("Shutdown!");
 	}
 }

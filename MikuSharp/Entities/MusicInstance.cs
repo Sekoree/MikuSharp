@@ -126,7 +126,7 @@ public class MusicInstance
 			var Track = await nodeConnection.Rest.GetTracksAsync(new Uri($"https://nnd.meek.moe/new/{nndID}.mp3"));
 			if (pos == -1)
 				await Database.AddToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString);
-			else 
+			else
 				await Database.InsertToQueue(ctx.Guild, ctx.Member.Id, Track.Tracks.First().TrackString, pos);
 			if (guildConnection.IsConnected && (playstate == Playstate.NotPlaying || playstate == Playstate.Stopped))
 				await PlaySong();
@@ -366,3 +366,4 @@ public class MusicInstance
 
 //     B/S(｀・ω・´) ❤️ (´ω｀)U/C
 */
+

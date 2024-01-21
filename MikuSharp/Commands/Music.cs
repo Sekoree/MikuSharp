@@ -131,8 +131,8 @@ public class Music : ApplicationCommandsModule
 
 		[SlashCommand("play", "Play or queue a song")]
 		[RequireUserVoicechatConnection]
-		public static async Task PlayAsync(InteractionContext ctx, 
-			[Option("song", "Song name or url to play")] string name_or_url = null, 
+		public static async Task PlayAsync(InteractionContext ctx,
+			[Option("song", "Song name or url to play")] string name_or_url = null,
 			[Option("music_file", "Music file to play")] DiscordAttachment music_file = null
 		)
 		{
@@ -174,7 +174,7 @@ public class Music : ApplicationCommandsModule
 					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Cleared").AddComponents(buttons));
 				}
 			}
-			
+
 			await g.ConditionalConnect(ctx);
 
 			if (music_file == null && name_or_url == null)
@@ -212,7 +212,7 @@ public class Music : ApplicationCommandsModule
 				await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(emb.WithTitle("Playing").Build()).AsEphemeral());
 			}
 		}
-		
+
 		[SlashCommand("insert", "Queue a song at a specific position!")]
 		[RequireUserVoicechatConnection]
 		public static async Task InsertToQueueAsync(InteractionContext ctx,
@@ -266,7 +266,7 @@ public class Music : ApplicationCommandsModule
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
 			}
 		}
-		
+
 		[SlashCommand("skip", "Skip the current song")]
 		[RequireUserAndBotVoicechatConnection]
 		public static async Task SkipSongAsync(InteractionContext ctx)
@@ -320,7 +320,7 @@ public class Music : ApplicationCommandsModule
 
 		[SlashCommand("volume", "Change the music volume")]
 		[RequireUserAndBotVoicechatConnection]
-		public static async Task ModifyVolumeAsync(InteractionContext ctx, 
+		public static async Task ModifyVolumeAsync(InteractionContext ctx,
 			[Option("volume", "Level of volume to set (Percentage)"), MinimumValue(0), MaximumValue(150)] int vol = 100
 		)
 		{
@@ -693,3 +693,4 @@ public class Music : ApplicationCommandsModule
 	}
 }
 */
+

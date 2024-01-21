@@ -17,9 +17,9 @@ namespace MikuSharp.Commands;
 internal class Action : ApplicationCommandsModule
 {
 	[SlashCommand("hug", "Hug someone!")]
-	public static async Task HugAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public async static Task HugAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var WSH = await ctx.Client.RestClient.GetWeebShAsync("hug", new[] { "" });
 		WSH.Embed.WithDescription($"{ctx.User.Mention} hugs {user.Mention} uwu");
 
@@ -30,9 +30,9 @@ internal class Action : ApplicationCommandsModule
 	}
 
 	[SlashCommand("kiss", "Kiss someone!")]
-	public static async Task KissAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public async static Task KissAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var WSH = await ctx.Client.RestClient.GetWeebShAsync("kiss", new[] { "" });
 		WSH.Embed.WithDescription($"{ctx.User.Mention} kisses {user.Mention} >~<");
 
@@ -43,9 +43,9 @@ internal class Action : ApplicationCommandsModule
 	}
 
 	[SlashCommand("lick", "Lick someone!")]
-	public static async Task LickAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public async static Task LickAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var WSH = await ctx.Client.RestClient.GetWeebShAsync("lick", new[] { "" });
 		WSH.Embed.WithDescription($"{ctx.User.Mention} licks {user.Mention} owo");
 
@@ -56,9 +56,9 @@ internal class Action : ApplicationCommandsModule
 	}
 
 	[SlashCommand("pat", "Pat someone!")]
-	public static async Task PatAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public async static Task PatAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var weeurl = await MikuBot._weebClient.GetRandomAsync("pat", new[] { "" });
 		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
 		var em = new DiscordEmbedBuilder();
@@ -73,9 +73,9 @@ internal class Action : ApplicationCommandsModule
 	}
 
 	[SlashCommand("poke", "Poke someone!")]
-	public static async Task PokeAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public async static Task PokeAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var weeurl = await MikuBot._weebClient.GetRandomAsync("poke", new[] { "" });
 		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
 		var em = new DiscordEmbedBuilder();
@@ -90,9 +90,9 @@ internal class Action : ApplicationCommandsModule
 	}
 
 	[SlashCommand("slap", "Slap someone!")]
-	public static async Task SlapAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
+	public async static Task SlapAsync(InteractionContext ctx, [Option("user", "The user to execute the action with")] DiscordUser user)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder());
+		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var weeurl = await MikuBot._weebClient.GetRandomAsync("slap", new[] { "" });
 		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.resizeLink(weeurl.Url)));
 		var em = new DiscordEmbedBuilder();

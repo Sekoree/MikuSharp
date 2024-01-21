@@ -41,5 +41,4 @@ public class Data
 }
 
 public class VideoFrame
-{
-}
+{ }
