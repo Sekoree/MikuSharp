@@ -1,12 +1,9 @@
-﻿using DisCatSharp;
-using DisCatSharp.ApplicationCommands;
+﻿using DisCatSharp.ApplicationCommands;
 using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Interactivity.Extensions;
-
-using Google.Apis.YouTube.v3.Data;
 
 using System;
 using System.Collections.Generic;
@@ -32,9 +29,9 @@ internal class About : ApplicationCommandsModule
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 		var emb = new DiscordEmbedBuilder();
-		emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl).WithTitle($"About {ctx.Client.CurrentUser.UsernameWithDiscriminator}!").WithAuthor("Miku MikuBot uwu").WithUrl("https://meek.moe/").WithColor(new("#348573")).WithDescription(ctx.Client.CurrentApplication.Description);
+		emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl).WithTitle($"About {ctx.Client.CurrentUser.UsernameWithGlobalName}!").WithAuthor("Miku MikuBot uwu").WithUrl("https://meek.moe/").WithColor(new("#348573")).WithDescription(ctx.Client.CurrentApplication.Description);
 		foreach (var member in ctx.Client.CurrentApplication.Team.Members.OrderByDescending(x => x.User.Username))
-			emb.AddField(new(member.User.Id == ctx.Client.CurrentApplication.Team.Owner.Id ? "Owner" : "Developer", member.User.UsernameWithDiscriminator));
+			emb.AddField(new(member.User.Id == ctx.Client.CurrentApplication.Team.Owner.Id ? "Owner" : "Developer", member.User.UsernameWithGlobalName));
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
 	}
 
@@ -82,7 +79,7 @@ internal class About : ApplicationCommandsModule
 			var body = res.Result.Interaction.Data.Components.First(x => x.CustomId == "feedbackbody").Value;
 			var guild = await MikuBot.ShardedClient.GetShard(483279257431441410).GetGuildAsync(483279257431441410);
 			var emb = new DiscordEmbedBuilder();
-			emb.WithAuthor($"{ctx.User.UsernameWithDiscriminator}", iconUrl: ctx.User.AvatarUrl).WithTitle(title).WithDescription(body);
+			emb.WithAuthor($"{ctx.User.UsernameWithGlobalName}", iconUrl: ctx.User.AvatarUrl).WithTitle(title).WithDescription(body);
 			if (ctx.Guild != null)
 				emb.AddField(new("Guild", $"{ctx.Guild.Id}", true));
 			var forum = guild.GetChannel(1020433162662322257);
@@ -90,14 +87,14 @@ internal class About : ApplicationCommandsModule
 			{
 				ctx.Guild != null ? forum.AvailableTags.First(x => x.Id == 1020434799493648404) : forum.AvailableTags.First(x => x.Id == 1020434935502360576)
 			};
-			var thread = await forum.CreatePostAsync("Feedback", new DiscordMessageBuilder().AddEmbed(emb.Build()).WithContent($"Feedback from {ctx.User.UsernameWithDiscriminator}"), null, tags, "Feedback");
+			var thread = await forum.CreatePostAsync("Feedback", new DiscordMessageBuilder().AddEmbed(emb.Build()).WithContent($"Feedback from {ctx.User.UsernameWithGlobalName}"), null, tags, "Feedback");
 			var msg = await thread.GetMessageAsync(thread.Id);
 			await msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsdown:"));
 			await msg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":thumbsup:"));
 			await res.Result.Interaction.EditOriginalResponseAsync(new DiscordWebhookBuilder().WithContent($"Feedback sent {DiscordEmoji.FromGuildEmote(MikuBot.ShardedClient.GetShard(483279257431441410), 623933340520546306)}"));
 		}
 		else
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent($"You were too slow :(\nThe time limit is one minute.").AsEphemeral());
+			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent("You were too slow :(\nThe time limit is one minute.").AsEphemeral());
 	}
 
 	[SlashCommand("ping", "Current ping to discord's services")]

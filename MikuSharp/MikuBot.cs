@@ -47,7 +47,7 @@ internal sealed class MikuBot : IDisposable
 	internal Task StatusThread { get; set; }
 	internal Task BotListThread { get; set; }
 
-	internal static WeebClient WeebClient = new("Hatsune Miku Bot", "4.0.0");
+	internal static readonly WeebClient WeebClient = new("Hatsune Miku Bot", "4.0.0");
 	internal static AuthDiscordBotListApi DiscordBotListApi { get; set; }
 	internal static DiscordShardedClient ShardedClient { get; set; }
 
@@ -190,10 +190,10 @@ internal sealed class MikuBot : IDisposable
 					           + $"\nAs you're the owner of the server ({args.Guild.Name}) I want to inform you about that. But don't worry, they won't disturb anyone!"
 					           + $"\nThey're here to debug me on different servers to transition to slash commands because discord forces us bots to use it (Read more here: https://support-dev.discord.com/hc/en-us/articles/4404772028055)."
 					           + $"\nThe problem is the _message content intent_ which means I can't listen to my `m%` prefix anymore :(."
-					           + $"\n\nIf you have a problem please contact my developer {args.Member.UsernameWithDiscriminator}!"
+					           + $"\n\nIf you have a problem please contact my developer {args.Member.UsernameWithGlobalName}!"
 					           + $"\n\n\nI wish you a happy day <:mikuthumbsup:623933340520546306>";
 					var message = await args.Guild.Owner.SendMessageAsync(text);
-					sender.Logger.LogInformation("I wrote {owner} a message", args.Guild.Owner.UsernameWithDiscriminator);
+					sender.Logger.LogInformation("I wrote {owner} a message", args.Guild.Owner.UsernameWithGlobalName);
 					sender.Logger.LogInformation("Message content: {content}", message.Content);
 				}
 				else

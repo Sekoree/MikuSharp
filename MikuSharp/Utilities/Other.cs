@@ -8,8 +8,8 @@ namespace MikuSharp.Utilities;
 
 public static class Other
 {
-	public static string ResizeLink(string url) =>
-		$"https://api.meek.moe/im/?image={url}&resize=500";
+	public static string ResizeLink(string url)
+		=> $"https://api.meek.moe/im/?image={url}&resize=500";
 
 	public async static Task DeferAsync(this InteractionContext ctx, bool ephemeral = true)
 	{

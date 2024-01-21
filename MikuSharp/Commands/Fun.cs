@@ -53,7 +53,7 @@ internal class Fun : ApplicationCommandsModule
 		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.Message));
 
 		DiscordWebhookBuilder builder = new();
-		builder.AddFile($"clyde.png", img);
+		builder.AddFile("clyde.png", img);
 		await ctx.EditResponseAsync(builder);
 	}
 

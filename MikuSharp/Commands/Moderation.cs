@@ -23,11 +23,11 @@ internal class Moderation : ApplicationCommandsModule
 		try
 		{
 			await ctx.Guild.DisableInvitesAsync(reason);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Disabled invites"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Disabled invites"));
 		}
 		catch (Exception)
 		{
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Could not disable invites"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Could not disable invites"));
 		}
 	}
 
@@ -38,11 +38,11 @@ internal class Moderation : ApplicationCommandsModule
 		try
 		{
 			await ctx.Guild.EnableInvitesAsync(reason);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Enabled invites"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Enabled invites"));
 		}
 		catch (Exception)
 		{
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Could not enable invites"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Could not enable invites"));
 		}
 	}
 
@@ -53,11 +53,11 @@ internal class Moderation : ApplicationCommandsModule
 		try
 		{
 			await ctx.Guild.BanMemberAsync(user.Id, deletionDays, reason);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Banned {user.UsernameWithDiscriminator}"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Banned {user.UsernameWithGlobalName}"));
 		}
 		catch (Exception)
 		{
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Could not ban {user.UsernameWithDiscriminator}"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Could not ban {user.UsernameWithGlobalName}"));
 		}
 	}
 
@@ -68,7 +68,7 @@ internal class Moderation : ApplicationCommandsModule
 		var userId = Convert.ToUInt64(id);
 		var user = await ctx.Client.GetUserAsync(userId, true);
 		await ctx.Guild.UnbanMemberAsync(user, reason);
-		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Unbanned {user.UsernameWithDiscriminator}"));
+		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Unbanned {user.UsernameWithGlobalName}"));
 	}
 
 	[SlashCommand("kick", "Kick someone")]
@@ -79,11 +79,11 @@ internal class Moderation : ApplicationCommandsModule
 		{
 			var member = await user.ConvertToMember(ctx.Guild);
 			await member.RemoveAsync(reason);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Kicked {user.UsernameWithDiscriminator}"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Kicked {user.UsernameWithGlobalName}"));
 		}
 		catch (Exception)
 		{
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Could not kick {user.UsernameWithDiscriminator}"));
+			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Could not kick {user.UsernameWithGlobalName}"));
 		}
 	}
 

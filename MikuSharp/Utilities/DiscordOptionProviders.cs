@@ -39,7 +39,7 @@ internal class AutocompleteProviders
 			List<DiscordBan> bannedUsers = new(25);
 			bannedUsers.AddRange(ctx.FocusedOption.Value is null ? bans.Take(25) : bans.Where(x => x.User.Username.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value))).Take(25));
 
-			return bannedUsers.Select(x => new DiscordApplicationCommandAutocompleteChoice(x.User.UsernameWithDiscriminator, x.User.Id.ToString()));
+			return bannedUsers.Select(x => new DiscordApplicationCommandAutocompleteChoice(x.User.UsernameWithGlobalName, x.User.Id.ToString()));
 		}
 	}
 
