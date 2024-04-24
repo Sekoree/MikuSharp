@@ -18,19 +18,20 @@ public class VoiceChat
 	{
 		try
 		{
-			if (MikuBot.Guilds.All(x => x.Key != e.Guild.Id)) return;
+			if (MikuBot.Guilds.All(x => x.Key != e.Guild.Id))
+				return;
 
 			var g = MikuBot.Guilds[e.Guild.Id];
 			if (g.MusicInstance == null
 			    || g.MusicInstance?.GuildConnection?.IsConnected == false) return;
 
-			if (((e.After?.Channel?.Users).Count(x => !x.IsBot) == 0
-			     || (e.Before?.Channel?.Users).Count(x => !x.IsBot) == 0
-			     || (e.Channel?.Users).Count(x => !x.IsBot) == 0)
+			if (((e.After?.Channel?.Users)?.Count(x => !x.IsBot) == 0
+			     || (e.Before?.Channel?.Users)?.Count(x => !x.IsBot) == 0
+			     || (e.Channel?.Users)?.Count(x => !x.IsBot) == 0)
 			    && (e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true
 			        || e.Before?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true
 			        || e.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
-			    && (g.MusicInstance?.GuildConnection?.Channel?.Users).Count(x => !x.IsBot) == 0)
+			    && (g.MusicInstance?.GuildConnection?.Channel?.Users)?.Count(x => !x.IsBot) == 0)
 			{
 				if (g.MusicInstance.Playstate == Playstate.Playing)
 				{
@@ -56,7 +57,7 @@ public class VoiceChat
 				g.MusicInstance.AloneCts = new();
 				g.AloneCheckThread = Task.Run(g.CheckAlone);
 			}
-			else if ((e.After?.Channel?.Users).Count(x => !x.IsBot) != 0 && e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
+			else if ((e.After?.Channel?.Users)?.Count(x => !x.IsBot) != 0 && e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
 				if (g.MusicInstance is { AloneCts: not null })
 					g.MusicInstance.AloneCts.Cancel();
 		}

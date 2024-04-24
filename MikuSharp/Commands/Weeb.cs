@@ -2,6 +2,7 @@
 using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
+using DisCatSharp.Enums;
 
 using HeyRed.Mime;
 
@@ -17,7 +18,13 @@ using System.Threading.Tasks;
 
 namespace MikuSharp.Commands;
 
-[SlashCommandGroup("weeb", "Weeb Stuff!", dmPermission: false)]
+[SlashCommandGroup("weeb", "Weeb Stuff!", false, new[]
+{
+	InteractionContextType.Guild, InteractionContextType.PrivateChannel
+}, new[]
+{
+	ApplicationCommandIntegrationTypes.GuildInstall, ApplicationCommandIntegrationTypes.UserInstall
+})]
 internal class Weeb : ApplicationCommandsModule
 {
 	[SlashCommand("awooify", "Awooify your or someones avatar!")]

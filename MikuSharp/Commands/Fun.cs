@@ -18,7 +18,13 @@ using System.Threading.Tasks;
 
 namespace MikuSharp.Commands;
 
-[SlashCommandGroup("fun", "Fun commands")]
+[SlashCommandGroup("fun", "Fun commands", false, new[]
+{
+	InteractionContextType.Guild, InteractionContextType.PrivateChannel
+}, new[]
+{
+	ApplicationCommandIntegrationTypes.GuildInstall, ApplicationCommandIntegrationTypes.UserInstall
+})]
 internal class Fun : ApplicationCommandsModule
 {
 	[SlashCommand("8ball", "Yes? No? Maybe?")]

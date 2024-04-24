@@ -13,7 +13,13 @@ using System.Threading.Tasks;
 
 namespace MikuSharp.Commands;
 
-[SlashCommandGroup("action", "Actions", dmPermission: false)]
+[SlashCommandGroup("action", "Actions", false, new[]
+{
+	InteractionContextType.Guild, InteractionContextType.PrivateChannel
+}, new[]
+{
+	ApplicationCommandIntegrationTypes.GuildInstall, ApplicationCommandIntegrationTypes.UserInstall
+})]
 internal class Action : ApplicationCommandsModule
 {
 	[SlashCommand("hug", "Hug someone!")]

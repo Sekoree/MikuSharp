@@ -127,7 +127,7 @@ internal sealed class MikuBot : IDisposable
 			EnableDefaultHelp = true,
 			DebugStartup = true,
 			EnableLocalization = false,
-			GenerateTranslationFilesOnly = false
+			GenerateTranslationFilesOnly = false,
 		}).Result;
 
 		this.CommandsNextModules = ShardedClient.UseCommandsNextAsync(new()

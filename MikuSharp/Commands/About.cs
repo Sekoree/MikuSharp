@@ -39,6 +39,7 @@ internal class About : ApplicationCommandsModule
 	public static async Task FollowNewsAsync(InteractionContext ctx, [Option("target_channel", "Target channel to post updates."), ChannelTypes(ChannelType.Text)] DiscordChannel channel, [Option("name", "Name of webhook")] string name = "Miku Bot Announcements")
 	{
 		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
+
 		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != ctx.Guild.OwnerId)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
@@ -72,6 +73,7 @@ internal class About : ApplicationCommandsModule
 		await ctx.CreateModalResponseAsync(modalBuilder);
 
 		var res = await ctx.Client.GetInteractivity().WaitForModalAsync(modalBuilder.CustomId, TimeSpan.FromMinutes(1));
+
 		if (!res.TimedOut)
 		{
 			await res.Result.Interaction.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
@@ -112,9 +114,11 @@ internal class About : ApplicationCommandsModule
 		var guildCount = 0;
 		var userCount = 0;
 		var channelCount = 0;
+
 		foreach (var client in MikuBot.ShardedClient.ShardClients)
 		{
 			guildCount += client.Value.Guilds.Count;
+
 			foreach (var guild in client.Value.Guilds)
 			{
 				userCount += guild.Value.MemberCount;

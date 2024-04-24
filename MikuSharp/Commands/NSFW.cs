@@ -2,13 +2,14 @@ using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
 
+using MikuSharp.Attributes;
 using MikuSharp.Utilities;
 
 using System.Threading.Tasks;
 
 namespace MikuSharp.Commands;
 
-[RequireNsfw]
+[RequireNsfw, NotStaff]
 public class Nsfw : BaseCommandModule
 {
 	[Command("4k"), Description("lewd")]
