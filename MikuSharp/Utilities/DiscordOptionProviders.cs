@@ -14,7 +14,7 @@ namespace MikuSharp.Utilities;
 
 internal class FixedOptionProviders
 {
-	internal class RepeatModeProvider : ChoiceProvider
+	internal sealed class RepeatModeProvider : ChoiceProvider
 	{
 		public override Task<IEnumerable<DiscordApplicationCommandOptionChoice>> Provider()
 		{
@@ -43,7 +43,7 @@ internal class AutocompleteProviders
 		}
 	}
 
-/*
+	/*
 	internal class PlaylistProvider : IAutocompleteProvider
 	{
 		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
@@ -51,6 +51,7 @@ internal class AutocompleteProviders
 			var plls = await PlaylistDB.GetPlaylistsSimple(ctx.Member.Id);
 			if (plls.Count == 0)
 				return new List<DiscordApplicationCommandAutocompleteChoice>() { new("You have no songs", "error") };
+
 			var DbPlaylists = await PlaylistDB.GetPlaylists(ctx.Guild, ctx.Member.Id);
 
 			List<KeyValuePair<string, Playlist>> playlists = new(25);
@@ -62,15 +63,20 @@ internal class AutocompleteProviders
 			return playlists.Select(x => new DiscordApplicationCommandAutocompleteChoice(x.Value.Name, x.Key));
 		}
 	}
+
 	internal class SongProvider : IAutocompleteProvider
 	{
 		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
 		{
 			var playlist = Convert.ToString(ctx.Options.First(x => x.Name == "playlist").Value);
-			if (playlist == null)
-				return new List<DiscordApplicationCommandAutocompleteChoice>() { new("You have no playlist selected", "error") };
-			if (playlist == "error")
-				return new List<DiscordApplicationCommandAutocompleteChoice>() { new("You have no valid playlist selected", "error") };
+
+			switch (playlist)
+			{
+				case null:
+					return new List<DiscordApplicationCommandAutocompleteChoice>() { new("You have no playlist selected", "error") };
+				case "error":
+					return new List<DiscordApplicationCommandAutocompleteChoice>() { new("You have no valid playlist selected", "error") };
+			}
 
 			var pls = await PlaylistDB.GetPlaylist(ctx.Guild, ctx.Member.Id, playlist);
 			var tracks = await pls.GetEntries();
@@ -80,13 +86,14 @@ internal class AutocompleteProviders
 			else if (int.TryParse(Convert.ToString(ctx.FocusedOption.Value), out var pos))
 				songs.AddRange(tracks.Where(x => x.Position.ToString().StartsWith(pos.ToString())).Take(25));
 			else
-				songs.AddRange(tracks.Where(x => x.track.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
+				songs.AddRange(tracks.Where(x => x.Track.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
 
-			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.track.Title}", x.Position.ToString()));
+			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Info.Title}", x.Position.ToString()));
 		}
 	}
+	*/
 
-	internal class QueueProvider : IAutocompleteProvider
+	internal sealed class QueueProvider : IAutocompleteProvider
 	{
 		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
 		{
@@ -95,11 +102,11 @@ internal class AutocompleteProviders
 			if (ctx.FocusedOption.Value == null)
 				songs.AddRange(queue.Take(25));
 			else if (int.TryParse(Convert.ToString(ctx.FocusedOption.Value), out var pos))
-				songs.AddRange(queue.Where(x => x.position.ToString().StartsWith(pos.ToString())).Take(25));
+				songs.AddRange(queue.Where(x => x.Position.ToString().StartsWith(pos.ToString())).Take(25));
 			else
-				songs.AddRange(queue.Where(x => x.track.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
+				songs.AddRange(queue.Where(x => x.Track.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
 
-			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.position}: {x.track.Title}", x.position.ToString()));
+			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Info.Title}", x.Position.ToString()));
 		}
-	}*/
+	}
 }

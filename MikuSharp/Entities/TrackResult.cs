@@ -1,4 +1,4 @@
-﻿/*using DisCatSharp.Lavalink;
+﻿using DisCatSharp.Lavalink.Entities;
 
 using System.Collections.Generic;
 
@@ -8,20 +8,20 @@ public class TrackResult
 {
 	public LavalinkPlaylistInfo PlaylistInfo { get; set; }
 	public List<LavalinkTrack> Tracks { get; set; }
+
 	public TrackResult(LavalinkPlaylistInfo pl, IEnumerable<LavalinkTrack> tr)
 	{
-		PlaylistInfo = pl;
-		Tracks = new List<LavalinkTrack>();
-		Tracks.AddRange(tr);
+		this.PlaylistInfo = pl;
+		this.Tracks = new();
+		this.Tracks.AddRange(tr);
 	}
+
 	public TrackResult(LavalinkPlaylistInfo pl, LavalinkTrack tr)
 	{
-		PlaylistInfo = pl;
-		Tracks = new List<LavalinkTrack>
-			{
-				tr
-			};
+		this.PlaylistInfo = pl;
+		this.Tracks = new()
+		{
+			tr
+		};
 	}
 }
-*/
-

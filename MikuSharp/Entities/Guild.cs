@@ -1,36 +1,36 @@
-﻿/*using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Entities;
 
 public class Guild
 {
-	public int shardId { get; set; }
+	public int ShardId { get; set; }
+
 	//CustomPrefix stuff
-	public MusicInstance musicInstance { get; set; }
+	public MusicInstance? MusicInstance { get; set; }
 	public Task AloneCheckThread { get; set; }
 
-	public Guild(int id, MusicInstance mi = null)
+	public Guild(int id, MusicInstance? mi = null)
 	{
-		shardId = id;
-		musicInstance = mi;
+		this.ShardId = id;
+		this.MusicInstance = mi;
 	}
 
 	public async Task CheckAlone()
 	{
-		while (DateTime.UtcNow.Subtract(musicInstance.aloneTime).Minutes != 5 && !musicInstance.aloneCTS.IsCancellationRequested)
+		while (DateTime.UtcNow.Subtract(this.MusicInstance.AloneTime).Minutes != 5 && !this.MusicInstance.AloneCts.IsCancellationRequested)
 		{
 			await Task.Delay(1000);
-			if (musicInstance == null || musicInstance.guildConnection == null)
+			if (this.MusicInstance?.GuildConnection is null)
 				return;
 		}
-		if (DateTime.UtcNow.Subtract(musicInstance.aloneTime).Minutes == 5 && !musicInstance.aloneCTS.IsCancellationRequested)
+
+		if (DateTime.UtcNow.Subtract(this.MusicInstance.AloneTime).Minutes == 5 && !this.MusicInstance.AloneCts.IsCancellationRequested)
 		{
-			await Task.Run(async () => await musicInstance.guildConnection.DisconnectAsync());
+			await Task.Run(async () => await this.MusicInstance.GuildConnection.DisconnectAsync());
 			await Task.Delay(500);
-			musicInstance = null;
+			this.MusicInstance = null;
 		}
 	}
 }
-*/
-

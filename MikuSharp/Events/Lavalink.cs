@@ -1,5 +1,6 @@
-﻿/*using DisCatSharp.Entities;
+﻿using DisCatSharp.Entities;
 using DisCatSharp.Lavalink;
+using DisCatSharp.Lavalink.Enums;
 using DisCatSharp.Lavalink.EventArgs;
 
 using Microsoft.Extensions.Logging;
@@ -14,69 +15,62 @@ namespace MikuSharp.Events;
 
 public class Lavalink
 {
-	public static async Task LavalinkTrackFinish(LavalinkGuildConnection lava, TrackFinishEventArgs e)
+	public static async Task LavalinkTrackFinish(LavalinkGuildPlayer lava, LavalinkTrackEndedEventArgs e)
 	{
 		try
 		{
-			var g = MikuBot.Guilds[e.Player.Guild.Id];
-			var lastPlayedSongs = await Database.GetLastPlayingListAsync(e.Player.Guild);
-			if (g.musicInstance == null)
+			var g = MikuBot.Guilds[e.GuildId];
+			var lastPlayedSongs = await Database.GetLastPlayingListAsync(e.Guild);
+			if (g.MusicInstance == null!)
 				return;
+
 			switch (e.Reason)
 			{
-				case TrackEndReason.Stopped:
-					{
-						g.musicInstance.playstate = Playstate.Stopped;
-						g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-						g.musicInstance.lastSong = g.musicInstance.currentSong;
-						g.musicInstance.currentSong = null;
-						break;
-					}
-				case TrackEndReason.Replaced:
-					{
-						break;
-					}
-				case TrackEndReason.LoadFailed:
-					{
-						await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithTitle("Track failed to play")
-							.WithDescription($"**{g.musicInstance.currentSong.track.Title}**\nby {g.musicInstance.currentSong.track.Author}\n" +
-							$"**Failed to load, Skipping to next track**"));
-						g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-						await Database.RemoveFromQueueAsync(g.musicInstance.currentSong.position, e.Player.Guild);
-						if (lastPlayedSongs.Count == 0)
-						{
-							await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-						}
-						else if (lastPlayedSongs[0].track.Uri != g.musicInstance.currentSong.track.Uri)
-						{
-							await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-						}
-						g.musicInstance.lastSong = g.musicInstance.currentSong;
-						g.musicInstance.currentSong = null;
-						var queue = await Database.GetQueueAsync(e.Player.Guild);
-						if (queue.Count != 0) await g.musicInstance.PlaySong();
-						else g.musicInstance.playstate = Playstate.NotPlaying;
-						break;
-					}
-				case TrackEndReason.Finished:
-					{
-						g.musicInstance.guildConnection.PlaybackFinished -= LavalinkTrackFinish;
-						if (g.musicInstance.repeatMode != RepeatMode.On && g.musicInstance.repeatMode != RepeatMode.All) await Database.RemoveFromQueueAsync(g.musicInstance.currentSong.position, e.Player.Guild);
-						if (lastPlayedSongs.Count == 0)
-						{
-							await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-						}
-						else if (lastPlayedSongs[0].track.Uri != g.musicInstance.currentSong.track.Uri)
-						{
-							await Database.AddToLastPlayingListAsync(e.Player.Guild.Id, g.musicInstance.currentSong.track.TrackString);
-						}
-						g.musicInstance.lastSong = g.musicInstance.currentSong;
-						g.musicInstance.currentSong = null;
-						var queue = await Database.GetQueueAsync(e.Player.Guild);
-						if (queue.Count != 0) await g.musicInstance.PlaySong();
-						else g.musicInstance.playstate = Playstate.NotPlaying;
-						break;
-					}
+				case LavalinkTrackEndReason.Stopped:
+				{
+					g.MusicInstance.Playstate = Playstate.Stopped;
+					g.MusicInstance.GuildConnection.TrackEnded -= LavalinkTrackFinish;
+					g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
+					g.MusicInstance.CurrentSong = null;
+					break;
+				}
+				case LavalinkTrackEndReason.Replaced:
+				{
+					break;
+				}
+				case LavalinkTrackEndReason.LoadFailed:
+				{
+					await g.MusicInstance.UsedChannel.SendMessageAsync(new DiscordEmbedBuilder().WithTitle("Track failed to play")
+						.WithDescription($"**{g.MusicInstance.CurrentSong.Track.Info.Title}**\nby {g.MusicInstance.CurrentSong.Track.Info.Author}\n" + $"**Failed to load, Skipping to next Track**"));
+					g.MusicInstance.GuildConnection.TrackEnded -= LavalinkTrackFinish;
+					await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, e.Guild);
+					if (lastPlayedSongs.Count == 0)
+						await Database.AddToLastPlayingListAsync(e.GuildId, g.MusicInstance.CurrentSong.Track.Encoded);
+					else if (lastPlayedSongs[0].Track.Info.Uri != g.MusicInstance.CurrentSong.Track.Info.Uri)
+						await Database.AddToLastPlayingListAsync(e.GuildId, g.MusicInstance.CurrentSong.Track.Encoded);
+					g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
+					g.MusicInstance.CurrentSong = null;
+					var queue = await Database.GetQueueAsync(e.Guild);
+					if (queue.Count != 0) await g.MusicInstance.PlaySong();
+					else g.MusicInstance.Playstate = Playstate.NotPlaying;
+					break;
+				}
+				case LavalinkTrackEndReason.Finished:
+				{
+					g.MusicInstance.GuildConnection.TrackEnded -= LavalinkTrackFinish;
+					if (g.MusicInstance.RepeatMode != RepeatMode.On && g.MusicInstance.RepeatMode != RepeatMode.All)
+						await Database.RemoveFromQueueAsync(g.MusicInstance.CurrentSong.Position, e.Guild);
+					if (lastPlayedSongs.Count == 0)
+						await Database.AddToLastPlayingListAsync(e.GuildId, g.MusicInstance.CurrentSong.Track.Encoded);
+					else if (lastPlayedSongs[0].Track.Info.Uri != g.MusicInstance.CurrentSong.Track.Info.Uri)
+						await Database.AddToLastPlayingListAsync(e.GuildId, g.MusicInstance.CurrentSong.Track.Encoded);
+					g.MusicInstance.LastSong = g.MusicInstance.CurrentSong;
+					g.MusicInstance.CurrentSong = null;
+					var queue = await Database.GetQueueAsync(e.Guild);
+					if (queue.Count != 0) await g.MusicInstance.PlaySong();
+					else g.MusicInstance.Playstate = Playstate.NotPlaying;
+					break;
+				}
 			}
 		}
 		catch (Exception ex)
@@ -85,7 +79,4 @@ public class Lavalink
 			MikuBot.ShardedClient.Logger.LogError(ex.StackTrace);
 		}
 	}
-
 }
-*/
-

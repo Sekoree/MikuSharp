@@ -24,7 +24,7 @@ public sealed class RequireUserVoicechatConnection : ApplicationCommandCheckBase
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false)]
 public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandCheckBaseAttribute
 {
-	public async override Task<bool> ExecuteChecksAsync(BaseContext ctx)
+	public override async Task<bool> ExecuteChecksAsync(BaseContext ctx)
 	{
 		var bot = await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id);
 		return ctx.Member.VoiceState?.Channel is not null && bot.VoiceState?.Channel is not null

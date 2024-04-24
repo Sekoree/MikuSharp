@@ -1,4 +1,4 @@
-﻿/*using DisCatSharp;
+﻿using DisCatSharp;
 using DisCatSharp.Entities;
 using DisCatSharp.EventArgs;
 
@@ -8,7 +8,6 @@ using MikuSharp.Enums;
 
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Events;
@@ -19,47 +18,47 @@ public class VoiceChat
 	{
 		try
 		{
-			if (!MikuBot.Guilds.Any(x => x.Key == e.Guild.Id)) return;
+			if (MikuBot.Guilds.All(x => x.Key != e.Guild.Id)) return;
+
 			var g = MikuBot.Guilds[e.Guild.Id];
-			if (g.musicInstance == null
-				|| g.musicInstance?.guildConnection?.IsConnected == false) return;
-			if ((e.After?.Channel?.Users.Where(x => !x.IsBot).Count() == 0
-			|| e.Before?.Channel?.Users.Where(x => !x.IsBot).Count() == 0
-			|| e.Channel?.Users.Where(x => !x.IsBot).Count() == 0)
-			&& (e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true
-			|| e.Before?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true
-			|| e.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
-			&& g.musicInstance?.guildConnection?.Channel?.Users.Where(x => !x.IsBot).Count() == 0)
+			if (g.MusicInstance == null
+			    || g.MusicInstance?.GuildConnection?.IsConnected == false) return;
+
+			if (((e.After?.Channel?.Users).Count(x => !x.IsBot) == 0
+			     || (e.Before?.Channel?.Users).Count(x => !x.IsBot) == 0
+			     || (e.Channel?.Users).Count(x => !x.IsBot) == 0)
+			    && (e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true
+			        || e.Before?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true
+			        || e.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
+			    && (g.MusicInstance?.GuildConnection?.Channel?.Users).Count(x => !x.IsBot) == 0)
 			{
-				if (g.musicInstance.playstate == Playstate.Playing)
+				if (g.MusicInstance.Playstate == Playstate.Playing)
 				{
-					await g.musicInstance.guildConnection.PauseAsync();
-					g.musicInstance.playstate = Playstate.Paused;
+					await g.MusicInstance.GuildConnection.PauseAsync();
+					g.MusicInstance.Playstate = Playstate.Paused;
+
 					try
 					{
-						await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("**Paused** since everyone left the VC, connect back and use m%resume to continue playback otherwise I will disconnect in 5 min").Build());
+						await g.MusicInstance.UsedChannel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription("**Paused** since everyone left the VC, connect back and use m%resume to continue playback otherwise I will disconnect in 5 min").Build());
 					}
-					catch { }
+					catch
+					{ }
 				}
 				else
-				{
 					try
 					{
-						await g.musicInstance.usedChannel.SendMessageAsync(embed: new DiscordEmbedBuilder().WithDescription("Since everyone left the VC I will disconnect too in 5 min").Build());
+						await g.MusicInstance.UsedChannel.SendMessageAsync(new DiscordEmbedBuilder().WithDescription("Since everyone left the VC I will disconnect too in 5 min").Build());
 					}
-					catch { }
-				}
-				g.musicInstance.aloneTime = DateTime.UtcNow;
-				g.musicInstance.aloneCTS = new CancellationTokenSource();
+					catch
+					{ }
+
+				g.MusicInstance.AloneTime = DateTime.UtcNow;
+				g.MusicInstance.AloneCts = new();
 				g.AloneCheckThread = Task.Run(g.CheckAlone);
 			}
-			else if (e.After?.Channel?.Users.Where(x => !x.IsBot).Count() != 0 && e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
-			{
-				if (g.musicInstance != null && g.musicInstance?.aloneCTS != null)
-				{
-					g.musicInstance.aloneCTS.Cancel();
-				}
-			}
+			else if ((e.After?.Channel?.Users).Count(x => !x.IsBot) != 0 && e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
+				if (g.MusicInstance is { AloneCts: not null })
+					g.MusicInstance.AloneCts.Cancel();
 		}
 		catch (Exception ex)
 		{
@@ -68,5 +67,3 @@ public class VoiceChat
 		}
 	}
 }
-*/
-

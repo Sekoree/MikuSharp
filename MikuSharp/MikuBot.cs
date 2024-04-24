@@ -8,7 +8,7 @@ using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
 using DisCatSharp.Interactivity.EventHandling;
 using DisCatSharp.Interactivity.Extensions;
-//using DisCatSharp.Lavalink;
+using DisCatSharp.Lavalink;
 using DisCatSharp.Net;
 
 using DiscordBotsList.Api;
@@ -41,7 +41,7 @@ internal sealed class MikuBot : IDisposable
 	internal static CancellationTokenSource Cts { get; set; }
 
 	internal static BotConfig Config { get; set; }
-	//internal LavalinkConfiguration LavalinkConfig { get; set; }
+	internal LavalinkConfiguration LavalinkConfig { get; set; }
 
 	internal Task GameSetThread { get; set; }
 	internal Task StatusThread { get; set; }
@@ -55,10 +55,10 @@ internal sealed class MikuBot : IDisposable
 	internal IReadOnlyDictionary<int, ApplicationCommandsExtension> ApplicationCommandsModules { get; set; }
 
 	internal IReadOnlyDictionary<int, CommandsNextExtension> CommandsNextModules { get; set; }
-	//internal IReadOnlyDictionary<int, LavalinkExtension> LavalinkModules { get; set; }
+	internal IReadOnlyDictionary<int, LavalinkExtension> LavalinkModules { get; set; }
 
-	//internal static Dictionary<int, LavalinkNodeConnection> LavalinkNodeConnections = new();
-	//internal static Dictionary<ulong, Guild> Guilds = new();
+	internal static Dictionary<int, LavalinkSession> LavalinkSessions = new();
+	internal static Dictionary<ulong, Guild> Guilds = new();
 
 	internal static Playstate Ps = Playstate.Playing;
 	internal static Stopwatch Psc = new();
@@ -142,14 +142,14 @@ internal sealed class MikuBot : IDisposable
 			DefaultHelpChecks = new(1) { new Attributes.NotStaffAttribute() }
 		}).Result;
 
-		/*LavalinkConfig = new()
+		this.LavalinkConfig = new()
 		{
-			SocketEndpoint = new ConnectionEndpoint { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
-			RestEndpoint = new ConnectionEndpoint { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
+			SocketEndpoint = new() { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
+			RestEndpoint = new() { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
 			Password = Config.LavaConfig.Password
 		};
 
-		LavalinkModules = ShardedClient.UseLavalinkAsync().Result;*/
+		this.LavalinkModules = ShardedClient.UseLavalinkAsync().Result;
 	}
 
 	internal static async Task RegisterEvents()
@@ -165,7 +165,7 @@ internal sealed class MikuBot : IDisposable
 
 		foreach (var discordClientKvp in ShardedClient.ShardClients)
 		{
-			//discordClientKvp.Value.VoiceStateUpdated += VoiceChat.LeftAlone;
+			discordClientKvp.Value.VoiceStateUpdated += VoiceChat.LeftAlone;
 
 			discordClientKvp.Value.GetApplicationCommands().ApplicationCommandsModuleStartupFinished += (sender, args) =>
 			{
@@ -211,33 +211,32 @@ internal sealed class MikuBot : IDisposable
 		}
 	}
 
-/*
 	internal async Task ShowConnections()
 	{
 		while (true)
 		{
-			var al = Guilds.Where(x => x.Value?.musicInstance != null);
-			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.musicInstance.guildConnection?.IsConnected == true).Count());
+			var al = Guilds.Where(x => x.Value?.MusicInstance != null);
+			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.MusicInstance.GuildConnection?.IsConnected == true).Count());
 			await Task.Delay(15000);
 		}
 	}
-*/
+
 	internal static async Task UpdateBotList()
 	{
 		await Task.Delay(15000);
+
 		while (true)
 		{
 			var me = await DiscordBotListApi.GetMeAsync();
 			var count = Array.Empty<int>();
 			var clients = ShardedClient.ShardClients.Values;
-			foreach (var client in clients)
-				count = count.Append(client.Guilds.Count).ToArray();
+			count = clients.Aggregate(count, (current, client) => current.Append(client.Guilds.Count).ToArray());
 			await me.UpdateStatsAsync(0, ShardedClient.ShardClients.Count, count);
 			await Task.Delay(TimeSpan.FromMinutes(15));
 		}
 	}
 
-	internal async Task SetActivity()
+	internal static async Task SetActivity()
 	{
 		while (true)
 		{
@@ -275,7 +274,7 @@ internal sealed class MikuBot : IDisposable
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Fun>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.About>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Moderation>();
-		//ApplicationCommandsModules.RegisterGlobalCommands<Commands.Music>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Music>();
 		//ApplicationCommandsModules.RegisterGlobalCommands<Commands.Playlists>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Utility>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Weeb>();
@@ -289,17 +288,20 @@ internal sealed class MikuBot : IDisposable
 		await WeebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
 		await ShardedClient.StartAsync();
 		await Task.Delay(5000);
-		/*foreach (var lavalinkShard in LavalinkModules)
+
+		foreach (var lavalinkShard in this.LavalinkModules)
 		{
-			var LCon = await lavalinkShard.Value.ConnectAsync(LavalinkConfig);
-			LavalinkNodeConnections.Add(lavalinkShard.Key, LCon);
-		}*/
-		this.GameSetThread = Task.Run(this.SetActivity);
+			var connection = await lavalinkShard.Value.ConnectAsync(this.LavalinkConfig);
+			LavalinkSessions.Add(lavalinkShard.Key, connection);
+		}
+
+		//this.GameSetThread = Task.Run(SetActivity);
 		//StatusThread = Task.Run(ShowConnections);
 		//DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
 		//BotListThread = Task.Run(UpdateBotList);
 		while (!Cts.IsCancellationRequested)
 			await Task.Delay(25);
+		_ = this.LavalinkModules.Select(lavalinkShard => lavalinkShard.Value.ConnectedSessions.Select(async connectedSession => await connectedSession.Value.DestroyAsync()));
 		await ShardedClient.StopAsync();
 	}
 

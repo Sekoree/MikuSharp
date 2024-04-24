@@ -30,6 +30,7 @@ public static class Bilibili
 			youtubeDl.VideoUrl = "https://www.bilibili.com/video/" + s;
 			await youtubeDl.DownloadAsync();
 			var ms = new MemoryStream();
+
 			if (File.Exists($@"{s}.mp3"))
 			{
 				var song = File.Open($@"{s}.mp3", FileMode.Open);
