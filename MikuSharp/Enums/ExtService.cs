@@ -1,8 +1,8 @@
 ﻿namespace MikuSharp.Enums;
 
-public enum ExtService : int
+public enum ExtService
 {
-	None = 0,
-	Youtube = 1,
-	Soundcloud = 2
+    None = 0,
+    Youtube = 1,
+    Soundcloud = 2
 }

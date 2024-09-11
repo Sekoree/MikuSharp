@@ -1,20 +1,27 @@
-﻿using DisCatSharp;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+using DisCatSharp;
 using DisCatSharp.ApplicationCommands;
 using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Interactivity;
 using DisCatSharp.Interactivity.Enums;
-using DisCatSharp.Interactivity.EventHandling;
 using DisCatSharp.Interactivity.Extensions;
 using DisCatSharp.Lavalink;
-using DisCatSharp.Net;
 
 using DiscordBotsList.Api;
 
 using Microsoft.Extensions.Logging;
 
+using MikuSharp.Attributes;
+using MikuSharp.Commands;
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 using MikuSharp.Events;
@@ -24,294 +31,298 @@ using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 using Weeb.net;
+
+using Action = MikuSharp.Commands.Action;
+using MikuGuild = MikuSharp.Events.MikuGuild;
+using TokenType = DisCatSharp.Enums.TokenType;
 
 namespace MikuSharp;
 
 internal sealed class MikuBot : IDisposable
 {
-	internal static CancellationTokenSource Cts { get; set; }
+    internal static readonly WeebClient WeebClient = new("Hatsune Miku Bot", "4.0.0");
 
-	internal static BotConfig Config { get; set; }
-	internal LavalinkConfiguration LavalinkConfig { get; set; }
+    internal static readonly Dictionary<int, LavalinkSession> LavalinkSessions = [];
+    internal static readonly Dictionary<ulong, Guild> Guilds = [];
 
-	internal Task GameSetThread { get; set; }
-	internal Task StatusThread { get; set; }
-	internal Task BotListThread { get; set; }
+    internal static Playstate Ps = Playstate.Playing;
+    internal static Stopwatch Psc = new();
 
-	internal static readonly WeebClient WeebClient = new("Hatsune Miku Bot", "4.0.0");
-	internal static AuthDiscordBotListApi DiscordBotListApi { get; set; }
-	internal static DiscordShardedClient ShardedClient { get; set; }
+    internal MikuBot()
+    {
+        var fileData = File.ReadAllText(@"config.json") ?? throw new ArgumentNullException(null, "config.json is null or missing");
 
-	internal IReadOnlyDictionary<int, InteractivityExtension> InteractivityModules { get; set; }
-	internal IReadOnlyDictionary<int, ApplicationCommandsExtension> ApplicationCommandsModules { get; set; }
+        Config = JsonConvert.DeserializeObject<BotConfig>(fileData);
+        if (Config == null)
+            throw new ArgumentNullException(null, "config.json is null");
 
-	internal IReadOnlyDictionary<int, CommandsNextExtension> CommandsNextModules { get; set; }
-	internal IReadOnlyDictionary<int, LavalinkExtension> LavalinkModules { get; set; }
+        Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database={Config.DbConfig.Database}";
+        Cts = new();
 
-	internal static Dictionary<int, LavalinkSession> LavalinkSessions = new();
-	internal static Dictionary<ulong, Guild> Guilds = new();
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.File("miku_log.txt", fileSizeLimitBytes: null, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2, shared: true)
+            .WriteTo.Console(LogEventLevel.Debug)
+            .CreateLogger();
+        Log.Logger.Information("Starting up!");
 
-	internal static Playstate Ps = Playstate.Playing;
-	internal static Stopwatch Psc = new();
+        ShardedClient = new(new()
+        {
+            Token = Config.DiscordToken,
+            TokenType = TokenType.Bot,
+            MinimumLogLevel = LogLevel.Debug,
+            AutoReconnect = true,
+            ApiChannel = ApiChannel.Canary,
+            HttpTimeout = TimeSpan.FromMinutes(1),
+            Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
+            MessageCacheSize = 2048,
+            LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger),
+            ShowReleaseNotesInUpdateCheck = false,
+            IncludePrereleaseInUpdateCheck = true,
+            DisableUpdateCheck = true,
+            EnableSentry = true,
+            FeedbackEmail = "aiko@aitsys.dev",
+            DeveloperUserId = 856780995629154305,
+            AttachUserInfo = true,
+            ReconnectIndefinitely = true
+        });
 
-	internal MikuBot()
-	{
-		var fileData = File.ReadAllText(@"config.json") ?? throw new ArgumentNullException(null, "config.json is null or missing");
+        this.InteractivityModules = ShardedClient.UseInteractivityAsync(new()
+        {
+            Timeout = TimeSpan.FromMinutes(2),
+            PaginationBehaviour = PaginationBehaviour.WrapAround,
+            PaginationDeletion = PaginationDeletion.DeleteEmojis,
+            PollBehaviour = PollBehaviour.DeleteEmojis,
+            AckPaginationButtons = true,
+            ButtonBehavior = ButtonPaginationBehavior.Disable,
+            PaginationButtons = new()
+            {
+                SkipLeft = new(ButtonStyle.Primary, "pgb-skip-left", "First", false, new("⏮️")),
+                Left = new(ButtonStyle.Primary, "pgb-left", "Previous", false, new("◀️")),
+                Stop = new(ButtonStyle.Danger, "pgb-stop", "Cancel", false, new("⏹️")),
+                Right = new(ButtonStyle.Primary, "pgb-right", "Next", false, new("▶️")),
+                SkipRight = new(ButtonStyle.Primary, "pgb-skip-right", "Last", false, new("⏭️"))
+            },
+            ResponseMessage = "Something went wrong.",
+            ResponseBehavior = InteractionResponseBehavior.Ignore
+        }).Result;
 
-		Config = JsonConvert.DeserializeObject<BotConfig>(fileData);
-		if (Config == null)
-			throw new ArgumentNullException(null, "config.json is null");
+        this.ApplicationCommandsModules = ShardedClient.UseApplicationCommandsAsync(new()
+        {
+            EnableDefaultHelp = true,
+            DebugStartup = true,
+            EnableLocalization = false,
+            GenerateTranslationFilesOnly = false
+        }).Result;
 
-		Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database={Config.DbConfig.Database}";
-		Cts = new();
+        this.CommandsNextModules = ShardedClient.UseCommandsNextAsync(new()
+        {
+            CaseSensitive = false,
+            EnableMentionPrefix = true,
+            DmHelp = false,
+            EnableDefaultHelp = true,
+            IgnoreExtraArguments = true,
+            StringPrefixes = [],
+            UseDefaultCommandHandler = true,
+            DefaultHelpChecks = [new NotStaffAttribute()]
+        }).Result;
 
-		Log.Logger = new LoggerConfiguration()
-			.MinimumLevel.Debug()
-			.WriteTo.File("miku_log.txt", fileSizeLimitBytes: null, rollingInterval: RollingInterval.Day, retainedFileCountLimit: 2, shared: true)
-			.WriteTo.Console(LogEventLevel.Debug, "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-			.CreateLogger();
-		Log.Logger.Information("Starting up!");
+        this.LavalinkConfig = new()
+        {
+            SocketEndpoint = new()
+            {
+                Hostname = Config.LavaConfig.Hostname,
+                Port = Config.LavaConfig.Port
+            },
+            RestEndpoint = new()
+            {
+                Hostname = Config.LavaConfig.Hostname,
+                Port = Config.LavaConfig.Port
+            },
+            Password = Config.LavaConfig.Password
+        };
 
-		ShardedClient = new(new()
-		{
-			Token = Config.DiscordToken,
-			TokenType = DisCatSharp.Enums.TokenType.Bot,
-			MinimumLogLevel = LogLevel.Debug,
-			AutoReconnect = true,
-			ApiChannel = ApiChannel.Canary,
-			HttpTimeout = TimeSpan.FromMinutes(1),
-			Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
-			MessageCacheSize = 2048,
-			LoggerFactory = new LoggerFactory().AddSerilog(Log.Logger),
-			ShowReleaseNotesInUpdateCheck = false,
-			IncludePrereleaseInUpdateCheck = true,
-			DisableUpdateCheck = true,
-			EnableSentry = true,
-			FeedbackEmail = "aiko@aitsys.dev",
-			DeveloperUserId = 856780995629154305,
-			AttachUserInfo = true,
-			ReconnectIndefinitely = true
-		});
+        this.LavalinkModules = ShardedClient.UseLavalinkAsync().Result;
+    }
 
-		this.InteractivityModules = ShardedClient.UseInteractivityAsync(new()
-		{
-			Timeout = TimeSpan.FromMinutes(2),
-			PaginationBehaviour = PaginationBehaviour.WrapAround,
-			PaginationDeletion = PaginationDeletion.DeleteEmojis,
-			PollBehaviour = PollBehaviour.DeleteEmojis,
-			AckPaginationButtons = true,
-			ButtonBehavior = ButtonPaginationBehavior.Disable,
-			PaginationButtons = new()
-			{
-				SkipLeft = new(ButtonStyle.Primary, "pgb-skip-left", "First", false, new("⏮️")),
-				Left = new(ButtonStyle.Primary, "pgb-left", "Previous", false, new("◀️")),
-				Stop = new(ButtonStyle.Danger, "pgb-stop", "Cancel", false, new("⏹️")),
-				Right = new(ButtonStyle.Primary, "pgb-right", "Next", false, new("▶️")),
-				SkipRight = new(ButtonStyle.Primary, "pgb-skip-right", "Last", false, new("⏭️"))
-			},
-			ResponseMessage = "Something went wrong.",
-			ResponseBehavior = InteractionResponseBehavior.Ignore
-		}).Result;
+    internal static CancellationTokenSource Cts { get; set; }
 
-		this.ApplicationCommandsModules = ShardedClient.UseApplicationCommandsAsync(new()
-		{
-			EnableDefaultHelp = true,
-			DebugStartup = true,
-			EnableLocalization = false,
-			GenerateTranslationFilesOnly = false,
-		}).Result;
+    internal static BotConfig Config { get; set; }
+    internal LavalinkConfiguration LavalinkConfig { get; set; }
 
-		this.CommandsNextModules = ShardedClient.UseCommandsNextAsync(new()
-		{
-			CaseSensitive = false,
-			EnableMentionPrefix = true,
-			DmHelp = false,
-			EnableDefaultHelp = true,
-			IgnoreExtraArguments = true,
-			StringPrefixes = new(),
-			UseDefaultCommandHandler = true,
-			DefaultHelpChecks = new(1) { new Attributes.NotStaffAttribute() }
-		}).Result;
+    internal Task GameSetThread { get; set; }
+    internal Task StatusThread { get; set; }
+    internal Task BotListThread { get; set; }
+    internal static AuthDiscordBotListApi DiscordBotListApi { get; set; }
+    internal static DiscordShardedClient ShardedClient { get; set; }
 
-		this.LavalinkConfig = new()
-		{
-			SocketEndpoint = new() { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
-			RestEndpoint = new() { Hostname = Config.LavaConfig.Hostname, Port = Config.LavaConfig.Port },
-			Password = Config.LavaConfig.Password
-		};
+    internal IReadOnlyDictionary<int, InteractivityExtension> InteractivityModules { get; set; }
+    internal IReadOnlyDictionary<int, ApplicationCommandsExtension> ApplicationCommandsModules { get; set; }
 
-		this.LavalinkModules = ShardedClient.UseLavalinkAsync().Result;
-	}
+    internal IReadOnlyDictionary<int, CommandsNextExtension> CommandsNextModules { get; set; }
+    internal IReadOnlyDictionary<int, LavalinkExtension> LavalinkModules { get; set; }
 
-	internal static async Task RegisterEvents()
-	{
-		ShardedClient.ClientErrored += (sender, args) =>
-		{
-			sender.Logger.LogError(args.Exception.Message);
-			sender.Logger.LogError(args.Exception.StackTrace);
-			return Task.CompletedTask;
-		};
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+    }
 
-		await Task.Delay(1);
+    internal static async Task RegisterEvents()
+    {
+        ShardedClient.ClientErrored += (sender, args) =>
+        {
+            sender.Logger.LogError(args.Exception.Message);
+            sender.Logger.LogError(args.Exception.StackTrace);
+            return Task.CompletedTask;
+        };
 
-		foreach (var discordClientKvp in ShardedClient.ShardClients)
-		{
-			discordClientKvp.Value.VoiceStateUpdated += VoiceChat.LeftAlone;
+        await Task.Delay(1);
 
-			discordClientKvp.Value.GetApplicationCommands().ApplicationCommandsModuleStartupFinished += (sender, args) =>
-			{
-				sender.Client.Logger.LogInformation("Shard {shard} finished application command startup.", args.ShardId);
-				args.Handled = true;
-				return Task.CompletedTask;
-			};
+        foreach (var discordClientKvp in ShardedClient.ShardClients)
+        {
+            discordClientKvp.Value.VoiceStateUpdated += VoiceChat.LeftAlone;
 
-			discordClientKvp.Value.GetApplicationCommands().ApplicationCommandsModuleReady += (sender, args) =>
-			{
-				sender.Client.Logger.LogInformation("Application commands module is ready");
-				args.Handled = true;
-				return Task.CompletedTask;
-			};
+            discordClientKvp.Value.GetApplicationCommands().ApplicationCommandsModuleStartupFinished += (sender, args) =>
+            {
+                sender.Client.Logger.LogInformation("Shard {shard} finished application command startup.", args.ShardId);
+                args.Handled = true;
+                return Task.CompletedTask;
+            };
 
-			discordClientKvp.Value.GuildMemberAdded += async (sender, args) =>
-			{
-				if (sender.CurrentApplication.Team.Members.Any(x => x.User.Id == args.Member.Id))
-				{
-					var text = $"Heywo <:MikuWave:655783221942026271>!"
-					           + $"\n\nOne of my developers joined your server!"
-					           + $"\nAs you're the owner of the server ({args.Guild.Name}) I want to inform you about that. But don't worry, they won't disturb anyone!"
-					           + $"\nThey're here to debug me on different servers to transition to slash commands because discord forces us bots to use it (Read more here: https://support-dev.discord.com/hc/en-us/articles/4404772028055)."
-					           + $"\nThe problem is the _message content intent_ which means I can't listen to my `m%` prefix anymore :(."
-					           + $"\n\nIf you have a problem please contact my developer {args.Member.UsernameWithGlobalName}!"
-					           + $"\n\n\nI wish you a happy day <:mikuthumbsup:623933340520546306>";
-					var message = await args.Guild.Owner.SendMessageAsync(text);
-					sender.Logger.LogInformation("I wrote {owner} a message", args.Guild.Owner.UsernameWithGlobalName);
-					sender.Logger.LogInformation("Message content: {content}", message.Content);
-				}
-				else
-					await Task.FromResult(true);
-			};
-			discordClientKvp.Value.GuildMemberUpdated += async (sender, args) =>
-			{
-				if (args.Guild.Id == 483279257431441410)
-					await MikuGuild.OnUpdateAsync(sender, args);
-				else
-					await Task.FromResult(true);
-			};
+            discordClientKvp.Value.GetApplicationCommands().ApplicationCommandsModuleReady += (sender, args) =>
+            {
+                sender.Client.Logger.LogInformation("Application commands module is ready");
+                args.Handled = true;
+                return Task.CompletedTask;
+            };
 
-			discordClientKvp.Value.Logger.LogInformation("Registered events for shard {shard}", discordClientKvp.Value.ShardId);
-		}
-	}
+            discordClientKvp.Value.GuildMemberAdded += async (sender, args) =>
+            {
+                if (sender.CurrentApplication.Team.Members.Any(x => x.User.Id == args.Member.Id))
+                {
+                    var text = $"Heywo <:MikuWave:655783221942026271>!" +
+                               $"\n\nOne of my developers joined your server!" +
+                               $"\nAs you're the owner of the server ({args.Guild.Name}) I want to inform you about that. But don't worry, they won't disturb anyone!" +
+                               $"\nThey're here to debug me on different servers to transition to slash commands because discord forces us bots to use it (Read more here: https://support-dev.discord.com/hc/en-us/articles/4404772028055)." +
+                               $"\nThe problem is the _message content intent_ which means I can't listen to my `m%` prefix anymore :(." +
+                               $"\n\nIf you have a problem please contact my developer {args.Member.UsernameWithGlobalName}!" +
+                               $"\n\n\nI wish you a happy day <:mikuthumbsup:623933340520546306>";
+                    var message = await args.Guild.Owner.SendMessageAsync(text);
+                    sender.Logger.LogInformation("I wrote {owner} a message", args.Guild.Owner.UsernameWithGlobalName);
+                    sender.Logger.LogInformation("Message content: {content}", message.Content);
+                }
+                else
+                    await Task.FromResult(true);
+            };
+            discordClientKvp.Value.GuildMemberUpdated += async (sender, args) =>
+            {
+                if (args.Guild.Id == 483279257431441410)
+                    await MikuGuild.OnUpdateAsync(sender, args);
+                else
+                    await Task.FromResult(true);
+            };
 
-	internal async Task ShowConnections()
-	{
-		while (true)
-		{
-			var al = Guilds.Where(x => x.Value?.MusicInstance != null);
-			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Where(x => x.Value.MusicInstance.GuildConnection?.IsConnected == true).Count());
-			await Task.Delay(15000);
-		}
-	}
+            discordClientKvp.Value.Logger.LogInformation("Registered events for shard {shard}", discordClientKvp.Value.ShardId);
+        }
+    }
 
-	internal static async Task UpdateBotList()
-	{
-		await Task.Delay(15000);
+    internal async Task ShowConnections()
+    {
+        while (true)
+        {
+            var al = Guilds.Where(x => x.Value?.MusicInstance != null);
+            ShardedClient.Logger.LogInformation("Voice Connections: " + al.Count(x => x.Value.MusicInstance.GuildConnection?.IsConnected == true));
+            await Task.Delay(15000);
+        }
+    }
 
-		while (true)
-		{
-			var me = await DiscordBotListApi.GetMeAsync();
-			var count = Array.Empty<int>();
-			var clients = ShardedClient.ShardClients.Values;
-			count = clients.Aggregate(count, (current, client) => current.Append(client.Guilds.Count).ToArray());
-			await me.UpdateStatsAsync(0, ShardedClient.ShardClients.Count, count);
-			await Task.Delay(TimeSpan.FromMinutes(15));
-		}
-	}
+    internal static async Task UpdateBotList()
+    {
+        await Task.Delay(15000);
 
-	internal static async Task SetActivity()
-	{
-		while (true)
-		{
-			DiscordActivity test = new()
-			{
-				Name = "I'm using slash commands now!",
-				ActivityType = ActivityType.Playing
-			};
-			await ShardedClient.UpdateStatusAsync(test, UserStatus.Online);
-			await Task.Delay(TimeSpan.FromMinutes(20));
-			DiscordActivity test2 = new()
-			{
-				Name = "Mention me with help for nsfw commands!",
-				ActivityType = ActivityType.Playing
-			};
-			await ShardedClient.UpdateStatusAsync(test2, UserStatus.Online);
-			await Task.Delay(TimeSpan.FromMinutes(20));
-			DiscordActivity test3 = new()
-			{
-				Name = "Full NND support!",
-				ActivityType = ActivityType.Playing
-			};
-			await ShardedClient.UpdateStatusAsync(test3, UserStatus.Online);
-			await Task.Delay(TimeSpan.FromMinutes(20));
-		}
-	}
+        while (true)
+        {
+            var me = await DiscordBotListApi.GetMeAsync();
+            var count = Array.Empty<int>();
+            var clients = ShardedClient.ShardClients.Values;
+            count = clients.Aggregate(count, (current, client) => [.. current, client.Guilds.Count]);
+            await me.UpdateStatsAsync(0, ShardedClient.ShardClients.Count, count);
+            await Task.Delay(TimeSpan.FromMinutes(15));
+        }
+    }
 
-	internal void RegisterCommands()
-	{
-		// Nsfw stuff needs to be hidden, that's why we use commands next
-		this.CommandsNextModules.RegisterCommands<Commands.Nsfw>();
+    internal static async Task SetActivity()
+    {
+        while (true)
+        {
+            DiscordActivity test = new()
+            {
+                Name = "I'm using slash commands now!",
+                ActivityType = ActivityType.Playing
+            };
+            await ShardedClient.UpdateStatusAsync(test, UserStatus.Online);
+            await Task.Delay(TimeSpan.FromMinutes(20));
+            DiscordActivity test2 = new()
+            {
+                Name = "Mention me with help for nsfw commands!",
+                ActivityType = ActivityType.Playing
+            };
+            await ShardedClient.UpdateStatusAsync(test2, UserStatus.Online);
+            await Task.Delay(TimeSpan.FromMinutes(20));
+            DiscordActivity test3 = new()
+            {
+                Name = "Full NND support!",
+                ActivityType = ActivityType.Playing
+            };
+            await ShardedClient.UpdateStatusAsync(test3, UserStatus.Online);
+            await Task.Delay(TimeSpan.FromMinutes(20));
+        }
+    }
 
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Action>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Developer>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Fun>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.About>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Moderation>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Music>();
-		//ApplicationCommandsModules.RegisterGlobalCommands<Commands.Playlists>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Utility>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Weeb>();
+    internal void RegisterCommands()
+    {
+        // Nsfw stuff needs to be hidden, that's why we use commands next
+        this.CommandsNextModules.RegisterCommands<Nsfw>();
 
-		// Smolcar command, only guild command
-		this.ApplicationCommandsModules.RegisterGuildCommands<Commands.MikuGuild>(483279257431441410);
-	}
+        this.ApplicationCommandsModules.RegisterGlobalCommands<Action>();
+        this.ApplicationCommandsModules.RegisterGlobalCommands<Developer>();
+        this.ApplicationCommandsModules.RegisterGlobalCommands<Fun>();
+        this.ApplicationCommandsModules.RegisterGlobalCommands<About>();
+        this.ApplicationCommandsModules.RegisterGlobalCommands<Moderation>();
+        this.ApplicationCommandsModules.RegisterGlobalCommands<Music>();
+        //ApplicationCommandsModules.RegisterGlobalCommands<Commands.Playlists>();
+        this.ApplicationCommandsModules.RegisterGlobalCommands<Utility>();
+        this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Weeb>();
 
-	internal async Task RunAsync()
-	{
-		await WeebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
-		await ShardedClient.StartAsync();
-		await Task.Delay(5000);
+        // Smolcar command, only guild command
+        this.ApplicationCommandsModules.RegisterGuildCommands<Commands.MikuGuild>(483279257431441410);
+    }
 
-		foreach (var lavalinkShard in this.LavalinkModules)
-		{
-			var connection = await lavalinkShard.Value.ConnectAsync(this.LavalinkConfig);
-			LavalinkSessions.Add(lavalinkShard.Key, connection);
-		}
+    internal async Task RunAsync()
+    {
+        await WeebClient.Authenticate(Config.WeebShToken, Weeb.net.TokenType.Wolke);
+        await ShardedClient.StartAsync();
+        await Task.Delay(5000);
 
-		//this.GameSetThread = Task.Run(SetActivity);
-		//StatusThread = Task.Run(ShowConnections);
-		//DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
-		//BotListThread = Task.Run(UpdateBotList);
-		while (!Cts.IsCancellationRequested)
-			await Task.Delay(25);
-		_ = this.LavalinkModules.Select(lavalinkShard => lavalinkShard.Value.ConnectedSessions.Select(async connectedSession => await connectedSession.Value.DestroyAsync()));
-		await ShardedClient.StopAsync();
-	}
+        /*foreach (var lavalinkShard in this.LavalinkModules)
+        {
+            var connection = await lavalinkShard.Value.ConnectAsync(this.LavalinkConfig);
+            LavalinkSessions.Add(lavalinkShard.Key, connection);
+        }*/
 
-	~MikuBot()
-	{
-		this.Dispose();
-	}
+        //this.GameSetThread = Task.Run(SetActivity);
+        //StatusThread = Task.Run(ShowConnections);
+        //DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
+        //BotListThread = Task.Run(UpdateBotList);
+        while (!Cts.IsCancellationRequested)
+            await Task.Delay(25);
+        _ = this.LavalinkModules.Select(lavalinkShard => lavalinkShard.Value.ConnectedSessions.Select(async connectedSession => await connectedSession.Value.DestroyAsync()));
+        await ShardedClient.StopAsync();
+    }
 
-	public void Dispose()
-	{
-		GC.SuppressFinalize(this);
-	}
+    ~MikuBot()
+    {
+        this.Dispose();
+    }
 }

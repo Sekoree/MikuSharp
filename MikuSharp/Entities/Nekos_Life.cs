@@ -2,5 +2,5 @@
 
 public sealed class NekosLife : ImgData
 {
-	public string Url { get; set; }
+    public string Url { get; set; }
 }
