@@ -28,7 +28,7 @@ internal class Action : ApplicationCommandsModule
         builder.AddEmbed(wsh.Embed.Build());
         await ctx.EditResponseAsync(builder);
         if (ctx.Interaction.Context is InteractionContextType.Guild)
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).AddMention(new UserMention(user)));
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
     }
 
     [SlashCommand("kiss", "Kiss someone!")]
@@ -43,7 +43,7 @@ internal class Action : ApplicationCommandsModule
         builder.AddEmbed(wsh.Embed.Build());
         await ctx.EditResponseAsync(builder);
         if (ctx.Interaction.Context is InteractionContextType.Guild)
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).AddMention(new UserMention(user)));
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
     }
 
     [SlashCommand("lick", "Lick someone!")]
@@ -58,7 +58,7 @@ internal class Action : ApplicationCommandsModule
         builder.AddEmbed(wsh.Embed.Build());
         await ctx.EditResponseAsync(builder);
         if (ctx.Interaction.Context is InteractionContextType.Guild)
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).AddMention(new UserMention(user)));
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
     }
 
     [SlashCommand("pat", "Pat someone!")]
@@ -77,7 +77,7 @@ internal class Action : ApplicationCommandsModule
         builder.AddEmbed(em.Build());
         await ctx.EditResponseAsync(builder);
         if (ctx.Interaction.Context is InteractionContextType.Guild)
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).AddMention(new UserMention(user)));
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
     }
 
     [SlashCommand("poke", "Poke someone!")]
@@ -96,7 +96,7 @@ internal class Action : ApplicationCommandsModule
         builder.AddEmbed(em.Build());
         await ctx.EditResponseAsync(builder);
         if (ctx.Interaction.Context is InteractionContextType.Guild)
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).AddMention(new UserMention(user)));
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
     }
 
     [SlashCommand("slap", "Slap someone!")]
@@ -115,7 +115,7 @@ internal class Action : ApplicationCommandsModule
         builder.AddEmbed(em.Build());
         await ctx.EditResponseAsync(builder);
         if (ctx.Interaction.Context is InteractionContextType.Guild)
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).AddMention(new UserMention(user)));
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
     }
 
     [SlashCommand("bite", "Bite someone!")]
@@ -134,7 +134,7 @@ internal class Action : ApplicationCommandsModule
         builder.AddEmbed(em.Build());
         await ctx.EditResponseAsync(builder);
         if (ctx.Interaction.Context is InteractionContextType.Guild)
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).AddMention(new UserMention(user)));
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
     }
 
     [SlashCommand("nom", "Nom someone!")]
@@ -153,7 +153,7 @@ internal class Action : ApplicationCommandsModule
         builder.AddEmbed(em.Build());
         await ctx.EditResponseAsync(builder);
         if (ctx.Interaction.Context is InteractionContextType.Guild)
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).AddMention(new UserMention(user)));
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
     }
 
     [SlashCommand("stare", "Stare at someone!")]
@@ -172,6 +172,6 @@ internal class Action : ApplicationCommandsModule
         builder.AddEmbed(em.Build());
         await ctx.EditResponseAsync(builder);
         if (ctx.Interaction.Context is InteractionContextType.Guild)
-            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).AddMention(new UserMention(user)));
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
     }
 }
