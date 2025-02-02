@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 
 using DisCatSharp.Lavalink.Entities;
 
@@ -15,3 +15,4 @@ public class QueueEntry : Entry
     public int Position { get; set; }
     public ulong AddedBy { set; get; }
 }
+*/

@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Threading.Tasks;
 
 namespace MikuSharp.Entities;
@@ -34,3 +34,4 @@ public class Guild
         }
     }
 }
+*/

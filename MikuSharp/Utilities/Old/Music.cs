@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -240,3 +240,4 @@ public static class Music
         await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(builder.Build()));
     }
 }
+*/

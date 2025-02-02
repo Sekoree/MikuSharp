@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿/*using System.Collections.Generic;
 
 using DisCatSharp.Lavalink.Entities;
 
@@ -22,3 +22,4 @@ public class TrackResult
     public LavalinkPlaylistInfo PlaylistInfo { get; set; }
     public List<LavalinkTrack> Tracks { get; set; }
 }
+*/

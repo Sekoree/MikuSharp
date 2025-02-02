@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 
 using DisCatSharp.Lavalink.Entities;
 
@@ -15,3 +15,4 @@ public class Entry
     public LavalinkTrack Track { get; protected set; }
     public DateTimeOffset AdditionDate { get; protected set; }
 }
+*/

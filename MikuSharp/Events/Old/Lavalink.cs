@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Threading.Tasks;
 
 using DisCatSharp.Entities;
@@ -80,3 +80,4 @@ public class Lavalink
         }
     }
 }
+*/

@@ -11,7 +11,7 @@ using MikuSharp.Entities;
 using MikuSharp.Enums;
 
 namespace MikuSharp.Utilities;
-
+/*
 internal class FixedOptionProviders
 {
     internal sealed class RepeatModeProvider : ChoiceProvider
@@ -27,7 +27,7 @@ internal class FixedOptionProviders
             return Task.FromResult<IEnumerable<DiscordApplicationCommandOptionChoice>>(list);
         }
     }
-}
+}*/
 
 internal class AutocompleteProviders
 {
@@ -93,7 +93,6 @@ internal class AutocompleteProviders
             return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Info.Title}", x.Position.ToString()));
         }
     }
-    */
 
     internal sealed class QueueProvider : IAutocompleteProvider
     {
@@ -111,4 +110,5 @@ internal class AutocompleteProviders
             return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Info.Title}", x.Position.ToString()));
         }
     }
+    */
 }

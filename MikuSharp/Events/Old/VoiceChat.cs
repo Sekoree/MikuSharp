@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -57,7 +57,7 @@ public class VoiceChat
             }
             else if (e.After?.Channel?.Users?.Count(x => !x.IsBot) != 0 && e.After?.Channel?.Users.Contains(e.Guild.Members[client.CurrentUser.Id]) == true)
                 if (g.MusicInstance is { AloneCts: not null })
-                    g.MusicInstance.AloneCts.Cancel();
+                    await g.MusicInstance.AloneCts.CancelAsync();
         }
         catch (Exception ex)
         {
@@ -66,3 +66,4 @@ public class VoiceChat
         }
     }
 }
+*/

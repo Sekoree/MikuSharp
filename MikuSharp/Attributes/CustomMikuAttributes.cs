@@ -7,7 +7,7 @@ using DisCatSharp.CommandsNext;
 using DisCatSharp.CommandsNext.Attributes;
 
 namespace MikuSharp.Attributes;
-
+/*
 /// <summary>
 ///     Defines that usage of this command is restricted to users in a vc.
 /// </summary>
@@ -31,7 +31,7 @@ public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandChe
             ? await Task.FromResult(true)
             : await Task.FromResult(false);
     }
-}
+}*/
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Class)]
 public sealed class NotStaffAttribute : CheckBaseAttribute
