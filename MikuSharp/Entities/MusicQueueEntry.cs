@@ -5,7 +5,7 @@ using DisCatSharp.Lavalink.Entities;
 
 namespace MikuSharp.Entities;
 
-internal class MusicQueueEntry : IQueueEntry
+internal sealed class MusicQueueEntry : IQueueEntry
 {
 	public ulong UserId { get; internal set; }
 
