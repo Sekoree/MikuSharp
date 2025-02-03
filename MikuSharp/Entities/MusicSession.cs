@@ -4,18 +4,73 @@ using DisCatSharp.Lavalink.Enums;
 
 namespace MikuSharp.Entities;
 
-public sealed class MusicSession
+/// <summary>
+///     Represents a music session.
+/// </summary>
+/// <param name="channel">The channel the music session is for.</param>
+/// <param name="guild">The guild the music session is for.</param>
+/// <param name="lavalinkSession">The Lavalink session.</param>
+public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, LavalinkSession lavalinkSession)
 {
-	public DiscordChannel CurrentChannel { get; set; }
+	/// <summary>
+	///     Gets the current channel.
+	/// </summary>
+	public DiscordChannel CurrentChannel { get; } = channel;
 
-	public DiscordGuild CurrentGuild { get; set; }
+	/// <summary>
+	///     Gets the current guild.
+	/// </summary>
+	public DiscordGuild CurrentGuild { get; } = guild;
 
-	public LavalinkSession LavalinkSession { get; set; }
+	/// <summary>
+	///     Gets the Lavalink session.
+	/// </summary>
+	public LavalinkSession LavalinkSession { get; } = lavalinkSession;
 
-	public LavalinkGuildPlayer LavalinkGuildPlayer
-		=> this.LavalinkSession.GetGuildPlayer(this.CurrentGuild);
+	/// <summary>
+	///     Gets the Lavalink guild player.
+	/// </summary>
+	public LavalinkGuildPlayer LavalinkGuildPlayer { get; internal set; }
 
-	public RepeatMode RepeatMode { get; set; }
+	/// <summary>
+	///     Gets the repeat mode.
+	/// </summary>
+	public RepeatMode RepeatMode { get; internal set; }
 
-	public DiscordMember CurrentDj { get; internal set; }
+	/// <summary>
+	///     Gets the status message.
+	/// </summary>
+	public DiscordMessage StatusMessage { get; internal set; }
+
+	/// <summary>
+	///     Injects the player.
+	/// </summary>
+	/// <returns>The current music session.</returns>
+	public MusicSession InjectPlayer()
+	{
+		this.LavalinkGuildPlayer = this.LavalinkSession.GetGuildPlayer(this.CurrentGuild)!;
+		return this;
+	}
+
+	/// <summary>
+	///     Updates the repeat mode.
+	/// </summary>
+	/// <param name="mode">The new repeat mode.</param>
+	/// <returns>The current music session.</returns>
+	public MusicSession UpdateRepeatMode(RepeatMode mode)
+	{
+		this.RepeatMode = mode;
+		return this;
+	}
+
+	/// <summary>
+	///     Updates the status message.
+	/// </summary>
+	/// <param name="message">The new status message.</param>
+	/// <returns>The current music session.</returns>
+	public MusicSession UpdateStatusMessage(DiscordMessage message)
+	{
+		this.StatusMessage = message;
+		return this;
+	}
 }
