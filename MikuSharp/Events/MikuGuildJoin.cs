@@ -11,16 +11,6 @@ namespace MikuSharp.Events;
 public class MikuGuild
 {
 	/// <summary>
-	///     Fired when a new guild member joins.
-	/// </summary>
-	/// <param name="sender">The client.</param>
-	/// <param name="args">The event args.</param>
-	public static async Task OnJoinAsync(DiscordClient sender, GuildMemberAddEventArgs args)
-	{
-		await Task.FromResult(true);
-	}
-
-	/// <summary>
 	///     Fired when a guild member is updated.
 	/// </summary>
 	/// <param name="sender">The discord client.</param>
@@ -30,7 +20,7 @@ public class MikuGuild
 		if (args is { PendingBefore: true, PendingAfter: false })
 		{
 			ulong memberRoleId = 483280207927574528;
-			var memberRole = args.Guild.GetRole(memberRoleId);
+			var memberRole = await args.Guild.GetRoleAsync(memberRoleId);
 			await args.Member.GrantRoleAsync(memberRole);
 		}
 

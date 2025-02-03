@@ -25,7 +25,7 @@ namespace MikuSharp.Commands;
 [ApplicationCommandRequireTeamMember]
 public class Developer : ApplicationCommandsModule
 {
-	private static readonly string[] Units = ["", "ki", "Mi", "Gi"];
+	private static readonly string[] s_units = ["", "ki", "Mi", "Gi"];
 
 	[SlashCommand("test", "Testing")]
 	public static async Task TestAsync(InteractionContext ctx)
@@ -205,13 +205,13 @@ public class Developer : ApplicationCommandsModule
 		double d = l;
 		var u = 0;
 
-		while (d >= 900 && u < Units.Length - 2)
+		while (d >= 900 && u < s_units.Length - 2)
 		{
 			u++;
 			d /= 1024;
 		}
 
-		return $"{d:#,##0.00} {Units[u]}B";
+		return $"{d:#,##0.00} {s_units[u]}B";
 	}
 }
 

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 
 using DisCatSharp.ApplicationCommands.Context;
@@ -26,8 +26,6 @@ public static class Other
 	/// </summary>
 	/// <param name="lavalink">The lavalink extension.</param>
 	/// <returns>The first session or <see langword="null" />.</returns>
-	public static LavalinkSession? DefaultSession(this LavalinkExtension lavalink)
-		=> lavalink.ConnectedSessions.Any()
-			? lavalink.ConnectedSessions.First().Value
-			: null;
+	public static LavalinkSession DefaultSession(this LavalinkExtension lavalink)
+		=> lavalink.ConnectedSessions.First().Value;
 }
