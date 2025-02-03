@@ -29,9 +29,10 @@ public partial class MusicCommands
 		{
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
 			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
-			musicSession.UpdateRepeatMode(mode);
+			musicSession = musicSession.UpdateRepeatMode(mode);
 			await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Set repeat mode to: **{mode}**"));
+			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
 		}
 
 		[SlashCommand("shuffle", "Shuffle the queue")]
@@ -41,6 +42,7 @@ public partial class MusicCommands
 			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
 			musicSession.LavalinkGuildPlayer.ShuffleQueue();
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Shuffled the queue!"));
+			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
 		}
 	}
 }

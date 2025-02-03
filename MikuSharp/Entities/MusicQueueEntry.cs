@@ -1,8 +1,10 @@
 using System.Threading.Tasks;
 
+using DisCatSharp;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
 
+using MikuSharp.Enums;
 using MikuSharp.Utilities;
 
 namespace MikuSharp.Entities;
@@ -12,16 +14,22 @@ internal sealed class MusicQueueEntry : IQueueEntry
 	/// <inheritdoc />
 	public async Task<bool> BeforePlayingAsync(LavalinkGuildPlayer player)
 	{
-		var musicSession = MikuBot.MusicSessions[player.GuildId];
-		await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed($"Playing {this.Track.Info.Title} from {this.Track.Info.Author}"));
+		if (!MikuBot.MusicSessions.TryGetValue(player.GuildId, out var musicSession))
+			return false;
+
+		musicSession.UpdatePlaybackState(PlaybackState.Playing);
+		await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed($"Playing {this.Track.Info.Title.Bold()} from {this.Track.Info.Author.Italic()}"));
 		return true;
 	}
 
 	/// <inheritdoc />
 	public async Task AfterPlayingAsync(LavalinkGuildPlayer player)
 	{
-		var musicSession = MikuBot.MusicSessions[player.GuildId];
-		await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+		if (MikuBot.MusicSessions.TryGetValue(player.GuildId, out var musicSession))
+		{
+			musicSession.UpdatePlaybackState(PlaybackState.Stopped);
+			await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+		}
 	}
 
 	/// <inheritdoc />

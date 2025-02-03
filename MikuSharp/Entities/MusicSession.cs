@@ -1,6 +1,9 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 using DisCatSharp.Entities;
+using DisCatSharp.Exceptions;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Enums;
 
@@ -34,7 +37,7 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 	/// <summary>
 	///     Gets the Lavalink guild player.
 	/// </summary>
-	public LavalinkGuildPlayer LavalinkGuildPlayer { get; internal set; }
+	public LavalinkGuildPlayer? LavalinkGuildPlayer { get; internal set; }
 
 	/// <summary>
 	///     Gets the repeat mode.
@@ -44,10 +47,10 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 	/// <summary>
 	///     Gets the status message.
 	/// </summary>
-	public DiscordMessage StatusMessage { get; internal set; }
+	public DiscordMessage? StatusMessage { get; internal set; }
 
 	/// <summary>
-	///    Gets the play state.
+	///     Gets the play state.
 	/// </summary>
 	public PlaybackState PlaybackState { get; internal set; } = PlaybackState.Stopped;
 
@@ -55,9 +58,11 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 	///     Injects the player.
 	/// </summary>
 	/// <returns>The current music session.</returns>
-	public MusicSession InjectPlayer()
+	public async Task<MusicSession> InjectPlayerAsync()
 	{
 		this.LavalinkGuildPlayer = this.LavalinkSession.GetGuildPlayer(this.CurrentGuild)!;
+		this.LavalinkGuildPlayer.SetRepeatMode(this.RepeatMode);
+		await this.LavalinkGuildPlayer.SetVolumeAsync(20);
 		return this;
 	}
 
@@ -69,6 +74,7 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 	public MusicSession UpdateRepeatMode(RepeatMode mode)
 	{
 		this.RepeatMode = mode;
+		this.LavalinkGuildPlayer?.SetRepeatMode(mode);
 		return this;
 	}
 
@@ -84,7 +90,7 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 	}
 
 	/// <summary>
-	///    Updates the play state.
+	///     Updates the play state.
 	/// </summary>
 	/// <param name="state">The new play state.</param>
 	/// <returns>The current music session.</returns>
@@ -94,10 +100,29 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 		return this;
 	}
 
+	/// <summary>
+	///    Updates the status message.
+	/// </summary>
+	/// <param name="embed">The new status message embed.</param>
+	/// <returns>The current music session.</returns>
 	public async Task<MusicSession> UpdateStatusMessageAsync(DiscordEmbed embed)
 	{
-		await this.StatusMessage.DeleteAsync("Updating miku status");
-		this.StatusMessage = await this.CurrentChannel.SendMessageAsync(embed);
-		return this;
+		try
+		{
+			if (this.StatusMessage is not null)
+				await this.StatusMessage.DeleteAsync("Updating miku status");
+			else
+			{
+				var messages = await this.CurrentChannel.GetMessagesAsync(50);
+				var mikuMessages = messages.Where(msg => msg.Author.Id == MikuBot.ShardedClient.CurrentUser.Id).OrderByDescending(msg => msg.CreationTimestamp).ToList();
+				var targetMessage = mikuMessages.FirstOrDefault(msg => msg.Embeds.Count is 1);
+				if (targetMessage is not null)
+					await targetMessage.DeleteAsync("Updating miku status");
+			}
+		}
+		catch (NotFoundException)
+		{ }
+
+		return this.UpdateStatusMessage(await this.CurrentChannel.SendMessageAsync(embed));
 	}
 }

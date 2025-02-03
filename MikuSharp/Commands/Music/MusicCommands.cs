@@ -34,10 +34,11 @@ public partial class MusicCommands : ApplicationCommandsModule
 		var session = ctx.Client.GetLavalink().DefaultSession();
 		await ctx.Client.GetLavalink().DefaultSession().ConnectAsync(ctx.Member.VoiceState.Channel);
 		MusicSession musicSession = new(ctx.Member.VoiceState.Channel, ctx.Guild, session);
-		MikuBot.MusicSessions.Add(ctx.GuildId.Value, musicSession.InjectPlayer());
+		MikuBot.MusicSessions.Add(ctx.GuildId.Value, await musicSession.InjectPlayerAsync());
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Heya {ctx.Member.Mention}!"));
 		await musicSession.CurrentChannel.SendMessageAsync("Hatsune Miku at your service!");
-		musicSession.UpdateStatusMessage(await musicSession.CurrentChannel.SendMessageAsync(musicSession.BuildMusicStatusEmbed("Nothing playing yet")));
+		musicSession = await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed("Nothing playing yet"));
+		MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
 	}
 
 	/// <summary>
@@ -51,9 +52,11 @@ public partial class MusicCommands : ApplicationCommandsModule
 
 		if (MikuBot.MusicSessions.Remove(ctx.GuildId.Value, out var musicSession))
 		{
-			await musicSession.LavalinkGuildPlayer.DisconnectAsync();
+			if (musicSession.LavalinkGuildPlayer is not null)
+				await musicSession.LavalinkGuildPlayer.DisconnectAsync();
 			await musicSession.CurrentChannel.SendMessageAsync("Bye bye humans 💙");
-			await musicSession.StatusMessage.DeleteAsync("Miku disconnected");
+			if (musicSession.StatusMessage is not null)
+				await musicSession.StatusMessage.DeleteAsync("Miku disconnected");
 		}
 
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Cya! 💙"));

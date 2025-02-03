@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using DisCatSharp;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Lavalink;
+using DisCatSharp.Lavalink.Entities;
+using DisCatSharp.Lavalink.Enums;
+
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using MikuSharp.Entities;
+using MikuSharp.Enums;
 
 namespace MikuSharp.Utilities;
 
@@ -34,7 +40,7 @@ public static class Other
 		=> lavalink.ConnectedSessions.First().Value;
 
 	/// <summary>
-	///    Builds a music status embed.
+	///     Builds a music status embed.
 	/// </summary>
 	/// <param name="session">The music session.</param>
 	/// <param name="description">The description.</param>
@@ -61,7 +67,7 @@ public static class Other
 	}
 
 	/// <summary>
-	///   Builds a music status embed.
+	///     Builds a music status embed.
 	/// </summary>
 	/// <param name="session">The music session.</param>
 	/// <param name="additionalEmbedFields">The additional embed fields.</param>
@@ -70,7 +76,7 @@ public static class Other
 		=> BuildMusicStatusEmbed(session, session.StatusMessage.Embeds.First().Description, additionalEmbedFields);
 
 	/// <summary>
-	/// Formats a <see cref="TimeSpan" /> into a human-readable string.
+	///     Formats a <see cref="TimeSpan" /> into a human-readable string.
 	/// </summary>
 	/// <param name="timeSpan">The time span to format.</param>
 	/// <returns>The formatted time span.</returns>
@@ -80,4 +86,55 @@ public static class Other
 			: timeSpan.TotalMinutes >= 1
 				? $"{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}"
 				: $"{timeSpan.Seconds:D2} sec";
+
+	/// <summary>
+	///     Loads and plays an <paramref name="identifier" />.
+	/// </summary>
+	/// <param name="musicSession">The music session.</param>
+	/// <param name="ctx">The interaction context.</param>
+	/// <param name="identifier">The identifier to load.</param>
+	/// <param name="searchType">The optional search type. Defaults to <see cref="LavalinkSearchType.Plain" />.</param>
+	/// <returns>Whether the track was successfully loaded and added to the queue.</returns>
+	/// <exception cref="ArgumentOutOfRangeException"></exception>
+	public static async Task<MusicSession> LoadAndPlayTrackAsync(this MusicSession musicSession, InteractionContext ctx, string identifier, LavalinkSearchType searchType = LavalinkSearchType.Plain)
+	{
+		var loadResult = await musicSession.LavalinkGuildPlayer.LoadTracksAsync(searchType, identifier);
+		switch (loadResult.LoadType)
+		{
+			case LavalinkLoadResultType.Track:
+				var track = loadResult.GetResultAs<LavalinkTrack>();
+				musicSession.LavalinkGuildPlayer.AddToQueue(track);
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Added {track.Info.Title.Bold()} to the queue!"));
+				break;
+			case LavalinkLoadResultType.Playlist:
+				var playlist = loadResult.GetResultAs<LavalinkPlaylist>();
+				musicSession.LavalinkGuildPlayer.AddToQueue(playlist);
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Added playlist {playlist.Info.Name.Bold()} to the queue."));
+				break;
+			case LavalinkLoadResultType.Search:
+				var tracks = loadResult.GetResultAs<List<LavalinkTrack>>();
+				musicSession.LavalinkGuildPlayer.AddToQueue(tracks.First());
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Added {tracks.First().Info.Title.Bold()} to the queue!"));
+				break;
+			case LavalinkLoadResultType.Empty:
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"No results found for `{identifier.InlineCode()}`"));
+				throw new("No results found");
+			case LavalinkLoadResultType.Error:
+				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Something went wrong..\nReason: {loadResult.GetResultAs<LavalinkException>().Message ?? "unknown"}"));
+				throw new("Lavalink error");
+			default:
+				throw new ArgumentOutOfRangeException();
+		}
+
+		if (musicSession.PlaybackState is PlaybackState.Stopped)
+			musicSession.LavalinkGuildPlayer.PlayQueue();
+		else if (musicSession.PlaybackState is PlaybackState.Paused)
+		{
+			await musicSession.LavalinkGuildPlayer.ResumeAsync();
+			musicSession = musicSession.UpdatePlaybackState(PlaybackState.Playing);
+			musicSession = await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+		}
+
+		return musicSession;
+	}
 }
