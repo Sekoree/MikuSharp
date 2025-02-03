@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 using DisCatSharp.Entities;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Enums;
@@ -89,6 +91,13 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 	public MusicSession UpdatePlayState(PlayState state)
 	{
 		this.PlayState = state;
+		return this;
+	}
+
+	public async Task<MusicSession> UpdateStatusMessageAsync(DiscordEmbed embed)
+	{
+		await this.StatusMessage.DeleteAsync("Updating miku status");
+		this.StatusMessage = await this.CurrentChannel.SendMessageAsync(embed);
 		return this;
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -31,8 +31,7 @@ public partial class MusicCommands
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
 			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
 			musicSession.UpdateRepeatMode(mode);
-			await musicSession.StatusMessage.DeleteAsync("Updating miku status");
-			musicSession.UpdateStatusMessage(await musicSession.CurrentChannel.SendMessageAsync(ctx.BuildMusicStatusEmbed(musicSession, musicSession.StatusMessage.Embeds.First().Description)));
+			await musicSession.UpdateStatusMessageAsync(ctx.BuildMusicStatusEmbed(musicSession));
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Set repeat mode to: **{mode}**"));
 		}
 

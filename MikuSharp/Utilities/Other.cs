@@ -33,6 +33,14 @@ public static class Other
 	public static LavalinkSession DefaultSession(this LavalinkExtension lavalink)
 		=> lavalink.ConnectedSessions.First().Value;
 
+	/// <summary>
+	///    Builds a music status embed.
+	/// </summary>
+	/// <param name="ctx">The interaction context.</param>
+	/// <param name="session">The music session.</param>
+	/// <param name="description">The description.</param>
+	/// <param name="additionalEmbedFields">The additional embed fields.</param>
+	/// <returns>The built embed.</returns>
 	public static DiscordEmbed BuildMusicStatusEmbed(this InteractionContext ctx, MusicSession session, string description, List<DiscordEmbedField>? additionalEmbedFields = null)
 	{
 		var builder = new DiscordEmbedBuilder()
@@ -52,4 +60,26 @@ public static class Other
 
 		return builder.Build();
 	}
+
+	/// <summary>
+	///   Builds a music status embed.
+	/// </summary>
+	/// <param name="ctx">The interaction context.</param>
+	/// <param name="session">The music session.</param>
+	/// <param name="additionalEmbedFields">The additional embed fields.</param>
+	/// <returns>The built embed.</returns>
+	public static DiscordEmbed BuildMusicStatusEmbed(this InteractionContext ctx, MusicSession session, List<DiscordEmbedField>? additionalEmbedFields = null)
+		=> BuildMusicStatusEmbed(ctx, session, session.StatusMessage.Embeds.First().Description, additionalEmbedFields);
+
+	/// <summary>
+	/// Formats a <see cref="TimeSpan" /> into a human-readable string.
+	/// </summary>
+	/// <param name="timeSpan">The time span to format.</param>
+	/// <returns>The formatted time span.</returns>
+	public static string FormatTimeSpan(this TimeSpan timeSpan)
+		=> timeSpan.TotalHours >= 1
+			? $"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}"
+			: timeSpan.TotalMinutes >= 1
+				? $"{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}"
+				: $"{timeSpan.Seconds:D2} sec";
 }
