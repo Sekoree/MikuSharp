@@ -2,6 +2,8 @@ using DisCatSharp.Entities;
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Enums;
 
+using MikuSharp.Enums;
+
 namespace MikuSharp.Entities;
 
 /// <summary>
@@ -35,12 +37,17 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 	/// <summary>
 	///     Gets the repeat mode.
 	/// </summary>
-	public RepeatMode RepeatMode { get; internal set; }
+	public RepeatMode RepeatMode { get; internal set; } = RepeatMode.None;
 
 	/// <summary>
 	///     Gets the status message.
 	/// </summary>
 	public DiscordMessage StatusMessage { get; internal set; }
+
+	/// <summary>
+	///    Gets the play state.
+	/// </summary>
+	public PlayState PlayState { get; internal set; } = PlayState.Stopped;
 
 	/// <summary>
 	///     Injects the player.
@@ -71,6 +78,17 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 	public MusicSession UpdateStatusMessage(DiscordMessage message)
 	{
 		this.StatusMessage = message;
+		return this;
+	}
+
+	/// <summary>
+	///    Updates the play state.
+	/// </summary>
+	/// <param name="state">The new play state.</param>
+	/// <returns>The current music session.</returns>
+	public MusicSession UpdatePlayState(PlayState state)
+	{
+		this.PlayState = state;
 		return this;
 	}
 }

@@ -57,9 +57,9 @@ internal sealed class MikuBot : IDisposable
 	{
 		var fileData = File.ReadAllText(@"config.json") ?? throw new ArgumentNullException(null, "config.json is null or missing");
 
-		Config = JsonConvert.DeserializeObject<BotConfig>(fileData);
-		if (Config == null)
-			throw new ArgumentNullException(null, "config.json is null");
+		var config = JsonConvert.DeserializeObject<BotConfig>(fileData);
+		ArgumentNullException.ThrowIfNull(config);
+		Config = config;
 
 		Config.DbConnectString = $"Host={Config.DbConfig.Hostname};Username={Config.DbConfig.User};Password={Config.DbConfig.Password};Database={Config.DbConfig.Database}";
 		Cts = new();
@@ -178,7 +178,9 @@ internal sealed class MikuBot : IDisposable
 
 	public void Dispose()
 	{
+#pragma warning disable IDE0022 // Use expression body for method
 		GC.SuppressFinalize(this);
+#pragma warning restore IDE0022 // Use expression body for method
 	}
 
 	internal static async Task RegisterEvents()
@@ -277,14 +279,14 @@ internal sealed class MikuBot : IDisposable
 		{
 			DiscordActivity test = new()
 			{
-				Name = "I'm using slash commands now!",
+				Name = "New music system coming up soon!",
 				ActivityType = ActivityType.Playing
 			};
 			await ShardedClient.UpdateStatusAsync(test, UserStatus.Online);
 			await Task.Delay(TimeSpan.FromMinutes(20));
 			DiscordActivity test2 = new()
 			{
-				Name = "Mention me with help for nsfw commands!",
+				Name = "Mention me with help for other commands!",
 				ActivityType = ActivityType.Playing
 			};
 			await ShardedClient.UpdateStatusAsync(test2, UserStatus.Online);
@@ -309,7 +311,7 @@ internal sealed class MikuBot : IDisposable
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Fun>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<About>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Moderation>();
-		this.ApplicationCommandsModules.RegisterGlobalCommands<Music>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<MusicCommands>();
 		//ApplicationCommandsModules.RegisterGlobalCommands<Commands.Playlists>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Utility>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Weeb>();

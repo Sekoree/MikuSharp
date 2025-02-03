@@ -102,10 +102,7 @@ public sealed class EnsureLavalinkSession : ApplicationCommandCheckBaseAttribute
 			return await RespondWithNoSessionAvailableAsync(ctx);
 
 		var session = module.DefaultSession();
-		if (session is null || !session.IsConnected)
-			return await RespondWithNoSessionAvailableAsync(ctx);
-
-		return true;
+		return session is null || !session.IsConnected ? await RespondWithNoSessionAvailableAsync(ctx) : true;
 	}
 
 	/// <summary>

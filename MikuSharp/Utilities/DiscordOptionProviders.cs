@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,25 +6,26 @@ using System.Threading.Tasks;
 using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Context;
 using DisCatSharp.Entities;
+using DisCatSharp.Lavalink.Enums;
 
 namespace MikuSharp.Utilities;
-/*
+
 internal class FixedOptionProviders
 {
-    internal sealed class RepeatModeProvider : ChoiceProvider
-    {
-        public override Task<IEnumerable<DiscordApplicationCommandOptionChoice>> Provider()
-        {
-            var list = new List<DiscordApplicationCommandOptionChoice>(3)
-            {
-                new("Off", $"{(int)RepeatMode.Off}"),
-                new("On", $"{(int)RepeatMode.On}"),
-                new("All", $"{(int)RepeatMode.All}")
-            };
-            return Task.FromResult<IEnumerable<DiscordApplicationCommandOptionChoice>>(list);
-        }
-    }
-}*/
+	internal sealed class RepeatModeProvider : ChoiceProvider
+	{
+		public override Task<IEnumerable<DiscordApplicationCommandOptionChoice>> Provider()
+		{
+			var list = new List<DiscordApplicationCommandOptionChoice>(3)
+			{
+				new("None", $"{(int)RepeatMode.None}"),
+				new("All", $"{(int)RepeatMode.All}"),
+				new("Current", $"{(int)RepeatMode.Current}")
+			};
+			return Task.FromResult<IEnumerable<DiscordApplicationCommandOptionChoice>>(list);
+		}
+	}
+}
 
 internal class AutocompleteProviders
 {
