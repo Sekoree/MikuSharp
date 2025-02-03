@@ -36,20 +36,19 @@ public static class Other
 	/// <summary>
 	///    Builds a music status embed.
 	/// </summary>
-	/// <param name="ctx">The interaction context.</param>
 	/// <param name="session">The music session.</param>
 	/// <param name="description">The description.</param>
 	/// <param name="additionalEmbedFields">The additional embed fields.</param>
 	/// <returns>The built embed.</returns>
-	public static DiscordEmbed BuildMusicStatusEmbed(this InteractionContext ctx, MusicSession session, string description, List<DiscordEmbedField>? additionalEmbedFields = null)
+	public static DiscordEmbed BuildMusicStatusEmbed(this MusicSession session, string description, List<DiscordEmbedField>? additionalEmbedFields = null)
 	{
 		var builder = new DiscordEmbedBuilder()
-			.WithAuthor(ctx.Client.CurrentUser.UsernameWithGlobalName, iconUrl: ctx.Client.CurrentUser.AvatarUrl)
+			.WithAuthor(MikuBot.ShardedClient.CurrentUser.UsernameWithGlobalName, iconUrl: MikuBot.ShardedClient.CurrentUser.AvatarUrl)
 			.WithColor(DiscordColor.Black)
 			.WithTitle("Miku Music Status")
 			.WithDescription(description);
 
-		builder.AddField(new("State", session.PlayState.ToString()));
+		builder.AddField(new("State", session.PlaybackState.ToString()));
 		builder.AddField(new("Repeat Mode", session.RepeatMode.ToString()));
 
 		if (additionalEmbedFields is null)
@@ -64,12 +63,11 @@ public static class Other
 	/// <summary>
 	///   Builds a music status embed.
 	/// </summary>
-	/// <param name="ctx">The interaction context.</param>
 	/// <param name="session">The music session.</param>
 	/// <param name="additionalEmbedFields">The additional embed fields.</param>
 	/// <returns>The built embed.</returns>
-	public static DiscordEmbed BuildMusicStatusEmbed(this InteractionContext ctx, MusicSession session, List<DiscordEmbedField>? additionalEmbedFields = null)
-		=> BuildMusicStatusEmbed(ctx, session, session.StatusMessage.Embeds.First().Description, additionalEmbedFields);
+	public static DiscordEmbed BuildMusicStatusEmbed(this MusicSession session, List<DiscordEmbedField>? additionalEmbedFields = null)
+		=> BuildMusicStatusEmbed(session, session.StatusMessage.Embeds.First().Description, additionalEmbedFields);
 
 	/// <summary>
 	/// Formats a <see cref="TimeSpan" /> into a human-readable string.

@@ -37,7 +37,7 @@ public partial class MusicCommands : ApplicationCommandsModule
 		MikuBot.MusicSessions.Add(ctx.GuildId.Value, musicSession.InjectPlayer());
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Heya {ctx.Member.Mention}!"));
 		await musicSession.CurrentChannel.SendMessageAsync("Hatsune Miku at your service!");
-		musicSession.UpdateStatusMessage(await musicSession.CurrentChannel.SendMessageAsync(ctx.BuildMusicStatusEmbed(musicSession, "Nothing playing yet")));
+		musicSession.UpdateStatusMessage(await musicSession.CurrentChannel.SendMessageAsync(musicSession.BuildMusicStatusEmbed("Nothing playing yet")));
 	}
 
 	/// <summary>

@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 using DisCatSharp.ApplicationCommands;
 using DisCatSharp.ApplicationCommands.Attributes;
@@ -12,7 +12,7 @@ namespace MikuSharp.Commands.Playlist;
 /// <summary>
 ///     The playlist commands
 /// </summary>
-[SlashCommandGroup("playlist", "Playlist commands", allowedContexts: [InteractionContextType.Guild], integrationTypes: [ApplicationCommandIntegrationTypes.GuildInstall]), DeferResponseAsync(true), EnsureLavalinkSession]
+[SlashCommandGroup("playlist", "Playlist commands", allowedContexts: [InteractionContextType.Guild], integrationTypes: [ApplicationCommandIntegrationTypes.GuildInstall]), EnsureLavalinkSession]
 public partial class PlaylistCommands : ApplicationCommandsModule
 {
 	/// <summary>

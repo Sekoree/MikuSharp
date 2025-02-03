@@ -1,37 +1,29 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
+
+using MikuSharp.Utilities;
 
 namespace MikuSharp.Entities;
 
 internal sealed class MusicQueueEntry : IQueueEntry
 {
-	public ulong UserId { get; internal set; }
-
-	public ulong GuildId { get; internal set; }
+	/// <inheritdoc />
+	public async Task<bool> BeforePlayingAsync(LavalinkGuildPlayer player)
+	{
+		var musicSession = MikuBot.MusicSessions[player.GuildId];
+		await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed($"Playing {this.Track.Info.Title} from {this.Track.Info.Author}"));
+		return true;
+	}
 
 	/// <inheritdoc />
-	public Task<bool> BeforePlayingAsync(LavalinkGuildPlayer player)
-		=> Task.FromResult(true);
-
-	/// <inheritdoc />
-	public Task AfterPlayingAsync(LavalinkGuildPlayer player)
-		=> Task.FromResult(true);
+	public async Task AfterPlayingAsync(LavalinkGuildPlayer player)
+	{
+		var musicSession = MikuBot.MusicSessions[player.GuildId];
+		await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+	}
 
 	/// <inheritdoc />
 	public LavalinkTrack Track { get; set; }
-
-	/// <inheritdoc />
-	public IQueueEntry AddTrack(LavalinkTrack track)
-	{
-		this.Track = track;
-		dynamic? userData = track.UserData;
-		if (userData is null)
-			return this;
-
-		this.UserId = userData.UserId;
-		this.GuildId = userData.GuildId;
-		return this;
-	}
 }

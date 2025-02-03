@@ -1,9 +1,8 @@
 namespace MikuSharp.Enums;
 
-public enum PlayState
+public enum PlaybackState
 {
-	NotPlaying = 0,
+	Stopped = 0,
 	Playing = 1,
-	Paused = 2,
-	Stopped = 3
+	Paused = 2
 }

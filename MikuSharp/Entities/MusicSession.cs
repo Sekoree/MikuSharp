@@ -49,7 +49,7 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 	/// <summary>
 	///    Gets the play state.
 	/// </summary>
-	public PlayState PlayState { get; internal set; } = PlayState.Stopped;
+	public PlaybackState PlaybackState { get; internal set; } = PlaybackState.Stopped;
 
 	/// <summary>
 	///     Injects the player.
@@ -88,9 +88,9 @@ public sealed class MusicSession(DiscordChannel channel, DiscordGuild guild, Lav
 	/// </summary>
 	/// <param name="state">The new play state.</param>
 	/// <returns>The current music session.</returns>
-	public MusicSession UpdatePlayState(PlayState state)
+	public MusicSession UpdatePlaybackState(PlaybackState state)
 	{
-		this.PlayState = state;
+		this.PlaybackState = state;
 		return this;
 	}
 

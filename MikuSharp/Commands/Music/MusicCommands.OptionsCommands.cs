@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 using DisCatSharp.ApplicationCommands;
@@ -31,7 +30,7 @@ public partial class MusicCommands
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
 			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
 			musicSession.UpdateRepeatMode(mode);
-			await musicSession.UpdateStatusMessageAsync(ctx.BuildMusicStatusEmbed(musicSession));
+			await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Set repeat mode to: **{mode}**"));
 		}
 

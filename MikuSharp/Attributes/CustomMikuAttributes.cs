@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using DisCatSharp.ApplicationCommands.Attributes;
@@ -9,6 +10,7 @@ using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Lavalink;
 
+using MikuSharp.Enums;
 using MikuSharp.Utilities;
 
 namespace MikuSharp.Attributes;
@@ -129,9 +131,31 @@ public sealed class AutomaticallyDisconnectExistingSessionAttribute : Applicatio
 		if (!MikuBot.MusicSessions.ContainsKey(ctx.GuildId!.Value))
 			return true;
 
-		await ctx.Client.GetLavalink().GetGuildPlayer(ctx.Guild).DisconnectAsync();
+		var player = ctx.Client.GetLavalink().GetGuildPlayer(ctx.Guild);
+		if (player is not null)
+			await player.DisconnectAsync();
 		MikuBot.MusicSessions.Remove(ctx.GuildId.Value);
 
 		return true;
+	}
+}
+
+/// <summary>
+///    Defines that the method or class requires specific playback state(s).
+/// </summary>
+/// <param name="targetStates">The target playback states.</param>
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false)]
+public sealed class RequirePlaybackState(params PlaybackState[] targetStates) : ApplicationCommandCheckBaseAttribute
+{
+	/// <summary>
+	///     Gets the target playback state.
+	/// </summary>
+	public List<PlaybackState> TargetStates { get; } = [..targetStates];
+
+	/// <inheritdoc />
+	public override Task<bool> ExecuteChecksAsync(BaseContext ctx)
+	{
+		var musicSession = MikuBot.MusicSessions[ctx.GuildId!.Value];
+		return Task.FromResult(this.TargetStates.Contains(musicSession.PlaybackState));
 	}
 }
