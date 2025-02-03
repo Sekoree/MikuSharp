@@ -23,6 +23,7 @@ using Microsoft.Extensions.Logging;
 
 using MikuSharp.Attributes;
 using MikuSharp.Commands;
+using MikuSharp.Commands.Music;
 using MikuSharp.Entities;
 
 using Newtonsoft.Json;
@@ -34,6 +35,7 @@ using Weeb.net;
 
 using Action = MikuSharp.Commands.Action;
 using MikuGuild = MikuSharp.Events.MikuGuild;
+using PlaylistCommands = MikuSharp.Commands.Playlist.PlaylistCommands;
 using TokenType = DisCatSharp.Enums.TokenType;
 
 namespace MikuSharp;
@@ -312,7 +314,7 @@ internal sealed class MikuBot : IDisposable
 		this.ApplicationCommandsModules.RegisterGlobalCommands<About>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Moderation>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<MusicCommands>();
-		//ApplicationCommandsModules.RegisterGlobalCommands<Commands.Playlists>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<PlaylistCommands>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Utility>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Weeb>();
 
