@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -47,6 +47,11 @@ internal sealed class MikuBot : IDisposable
 
 	//internal static Playstate Ps = Playstate.Playing;
 	//internal static Stopwatch Psc = new();
+
+	/// <summary>
+	///     Gets the music sessions.
+	/// </summary>
+	internal static readonly Dictionary<ulong, MusicSession> MusicSessions = [];
 
 	internal MikuBot()
 	{
@@ -124,7 +129,7 @@ internal sealed class MikuBot : IDisposable
 			IgnoreExtraArguments = true,
 			StringPrefixes = [],
 			UseDefaultCommandHandler = true,
-			DefaultHelpChecks = [new NotStaffAttribute()]
+			DefaultHelpChecks = [new NotDiscordStaffAttribute()]
 		}).Result;
 
 		this.LavalinkConfig = new()
@@ -243,12 +248,12 @@ internal sealed class MikuBot : IDisposable
 
 	/*internal async Task ShowConnections()
 	{
-		while (true)
-		{
-			var al = Guilds.Where(x => x.Value?.MusicInstance != null);
-			ShardedClient.Logger.LogInformation("Voice Connections: " + al.Count(x => x.Value.MusicInstance.GuildConnection?.IsConnected == true));
-			await Task.Delay(15000);
-		}
+	    while (true)
+	    {
+	        var al = Guilds.Where(x => x.Value?.MusicInstance != null);
+	        ShardedClient.Logger.LogInformation("Voice Connections: " + al.Count(x => x.Value.MusicInstance.GuildConnection?.IsConnected == true));
+	        await Task.Delay(15000);
+	    }
 	}*/
 
 	internal static async Task UpdateBotList()
@@ -304,7 +309,7 @@ internal sealed class MikuBot : IDisposable
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Fun>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<About>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Moderation>();
-		//this.ApplicationCommandsModules.RegisterGlobalCommands<Music>();
+		this.ApplicationCommandsModules.RegisterGlobalCommands<Music>();
 		//ApplicationCommandsModules.RegisterGlobalCommands<Commands.Playlists>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Utility>();
 		this.ApplicationCommandsModules.RegisterGlobalCommands<Commands.Weeb>();
@@ -319,19 +324,16 @@ internal sealed class MikuBot : IDisposable
 		await ShardedClient.StartAsync();
 		await Task.Delay(5000);
 
-		/*foreach (var lavalinkShard in this.LavalinkModules)
-		{
-			var connection = await lavalinkShard.Value.ConnectAsync(this.LavalinkConfig);
-			LavalinkSessions.Add(lavalinkShard.Key, connection);
-		}*/
+		foreach (var lavalinkShard in this.LavalinkModules)
+			await lavalinkShard.Value.ConnectAsync(this.LavalinkConfig);
 
-		//this.GameSetThread = Task.Run(SetActivity);
+		this.GameSetThread = Task.Run(SetActivity);
 		//StatusThread = Task.Run(ShowConnections);
 		//DiscordBotListApi = new AuthDiscordBotListApi(ShardedClient.CurrentApplication.Id, Config.DiscordBotListToken);
 		//BotListThread = Task.Run(UpdateBotList);
 		while (!Cts.IsCancellationRequested)
 			await Task.Delay(25);
-		//_ = this.LavalinkModules.Select(lavalinkShard => lavalinkShard.Value.ConnectedSessions.Select(async connectedSession => await connectedSession.Value.DestroyAsync()));
+		_ = this.LavalinkModules.Select(lavalinkShard => lavalinkShard.Value.ConnectedSessions.Select(async connectedSession => await connectedSession.Value.DestroyAsync()));
 		await ShardedClient.StopAsync();
 	}
 

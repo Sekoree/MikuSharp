@@ -27,10 +27,10 @@
 		<EmbeddedResource Remove="MusicCommands\**" />
 		<None Remove="MusicCommands\**" />
 	</ItemGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<NoWarn>1701;1702;DV2001;CS8603;CS8604;CS8618;CS8601;CS8602;CS8600;CS8625</NoWarn>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<NoWarn>1701;1702;DV2001;CS8603;CS8604;CS8618;CS8601;CS8602;CS8600;CS8625</NoWarn>
 	</PropertyGroup>
 	<ItemGroup>
@@ -43,16 +43,33 @@
 		</None>
 	</ItemGroup>
 
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+		<ProjectReference Include="..\..\DisCatSharp\DisCatSharp\DisCatSharp.csproj" />
+		<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.ApplicationCommands\DisCatSharp.ApplicationCommands.csproj" />
+		<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.CommandsNext\DisCatSharp.CommandsNext.csproj" />
+		<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.Common\DisCatSharp.Common.csproj" />
+		<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.Interactivity\DisCatSharp.Interactivity.csproj" />
+		<ProjectReference Include="..\..\DisCatSharp\DisCatSharp.Lavalink\DisCatSharp.Lavalink.csproj" />
+		<PackageReference Include="DisCatSharp.Analyzer.Roselyn" Version="6.2.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<PackageReference Include="DisCatSharp" Version="10.6.6" />
+		<PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.6.6" />
+		<PackageReference Include="DisCatSharp.CommandsNext" Version="10.6.6" />
+		<PackageReference Include="DisCatSharp.Common" Version="10.6.6" />
+		<PackageReference Include="DisCatSharp.Interactivity" Version="10.6.6" />
+		<PackageReference Include="DisCatSharp.Lavalink" Version="10.6.6" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="AlbumArtExtraction" Version="1.0.2" />
 		<PackageReference Include="AngleSharp" Version="1.2.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.12.0" />
-		<PackageReference Include="DisCatSharp" Version="10.6.6" />
-		<PackageReference Include="DisCatSharp.ApplicationCommands" Version="10.6.6" />
-		<PackageReference Include="DisCatSharp.CommandsNext" Version="10.6.6" />
-		<PackageReference Include="DisCatSharp.Interactivity" Version="10.6.6" />
-		<PackageReference Include="DisCatSharp.Lavalink" Version="10.6.6" />
 		<PackageReference Include="DiscordBotsList.Api" Version="1.5.0" />
 		<PackageReference Include="FluentFTP" Version="52.0.0" />
 		<PackageReference Include="Google.Apis" Version="1.69.0" />

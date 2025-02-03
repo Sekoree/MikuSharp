@@ -2,6 +2,6 @@
 
 public sealed class DogCeo
 {
-    public string Status { get; set; }
-    public string Message { get; set; }
+	public string Status { get; set; }
+	public string Message { get; set; }
 }

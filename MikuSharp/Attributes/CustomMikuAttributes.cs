@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 using DisCatSharp.ApplicationCommands.Attributes;
@@ -9,6 +8,8 @@ using DisCatSharp.CommandsNext.Attributes;
 using DisCatSharp.Entities;
 using DisCatSharp.Enums;
 using DisCatSharp.Lavalink;
+
+using MikuSharp.Utilities;
 
 namespace MikuSharp.Attributes;
 
@@ -32,7 +33,7 @@ public sealed class RequireUserVoicechatConnection : ApplicationCommandCheckBase
 }
 
 /// <summary>
-///     Defines that usage of this command is restricted to users & the bot in a vc.
+///     Defines that usage of this command is restricted to users in a vc and the bot is in a vc.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false)]
 public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandCheckBaseAttribute
@@ -54,7 +55,7 @@ public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandChe
 ///     Defines that usage of this command is forbidden for discord staff.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Class, Inherited = false)]
-public sealed class NotStaffAttribute : CheckBaseAttribute
+public sealed class NotDiscordStaffAttribute : CheckBaseAttribute
 {
 	/// <inheritdoc />
 	public override Task<bool> ExecuteCheckAsync(CommandContext ctx, bool help)
@@ -100,12 +101,8 @@ public sealed class EnsureLavalinkSession : ApplicationCommandCheckBaseAttribute
 		if (module is null)
 			return await RespondWithNoSessionAvailableAsync(ctx);
 
-		var sessions = module.ConnectedSessions;
-		if (!sessions.Any())
-			return await RespondWithNoSessionAvailableAsync(ctx);
-
-		var firstSession = sessions.First().Value;
-		if (!firstSession.IsConnected)
+		var session = module.DefaultSession();
+		if (session is null || !session.IsConnected)
 			return await RespondWithNoSessionAvailableAsync(ctx);
 
 		return true;
@@ -120,5 +117,24 @@ public sealed class EnsureLavalinkSession : ApplicationCommandCheckBaseAttribute
 	{
 		await ctx.EditResponseAsync("No session found that can handle music at the moment.");
 		return false;
+	}
+}
+
+/// <summary>
+///     Defines that the method or class will automatically disconnect an existing session.
+/// </summary>
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false)]
+public sealed class AutomaticallyDisconnectExistingSessionAttribute : ApplicationCommandCheckBaseAttribute
+{
+	/// <inheritdoc />
+	public override async Task<bool> ExecuteChecksAsync(BaseContext ctx)
+	{
+		if (!MikuBot.MusicSessions.ContainsKey(ctx.GuildId!.Value))
+			return true;
+
+		await ctx.Client.GetLavalink().GetGuildPlayer(ctx.Guild).DisconnectAsync();
+		MikuBot.MusicSessions.Remove(ctx.GuildId.Value);
+
+		return true;
 	}
 }
