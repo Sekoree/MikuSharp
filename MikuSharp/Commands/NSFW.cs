@@ -1,10 +1,4 @@
-﻿using System.Threading.Tasks;
-
-using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
-using DisCatSharp.Entities;
-
-using MikuSharp.Attributes;
+﻿using MikuSharp.Attributes;
 using MikuSharp.Utilities;
 
 namespace MikuSharp.Commands;

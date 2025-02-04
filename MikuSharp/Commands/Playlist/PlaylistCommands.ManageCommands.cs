@@ -1,9 +1,3 @@
-using System.Threading.Tasks;
-
-using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-
 namespace MikuSharp.Commands.Playlist;
 
 public partial class PlaylistCommands

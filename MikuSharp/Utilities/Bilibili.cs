@@ -1,13 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-
-using Microsoft.Extensions.Logging;
-
-using NYoutubeDL;
+﻿using NYoutubeDL;
 
 namespace MikuSharp.Utilities;
 

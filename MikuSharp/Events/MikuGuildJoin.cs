@@ -1,6 +1,3 @@
-using System.Threading.Tasks;
-
-using DisCatSharp;
 using DisCatSharp.EventArgs;
 
 namespace MikuSharp.Events;

@@ -1,37 +1,12 @@
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-using DisCatSharp;
-using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
 using DisCatSharp.ApplicationCommands.Exceptions;
-using DisCatSharp.CommandsNext;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.Interactivity;
-using DisCatSharp.Interactivity.Enums;
-using DisCatSharp.Interactivity.Extensions;
-using DisCatSharp.Lavalink;
 
 using DiscordBotsList.Api;
-
-using Microsoft.Extensions.Logging;
 
 using MikuSharp.Attributes;
 using MikuSharp.Commands;
 using MikuSharp.Commands.Music;
 using MikuSharp.Entities;
 
-using NeoSmart.AsyncLock;
-
-using Newtonsoft.Json;
-
-using Serilog;
 using Serilog.Events;
 
 using Weeb.net;

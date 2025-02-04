@@ -1,14 +1,8 @@
-﻿using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-
-using DisCatSharp.Entities;
+﻿using System.Net.Http;
 
 using HeyRed.Mime;
 
 using MikuSharp.Entities;
-
-using Newtonsoft.Json;
 
 using Weeb.net;
 

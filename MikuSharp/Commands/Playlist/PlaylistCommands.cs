@@ -1,10 +1,3 @@
-using System.Threading.Tasks;
-
-using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Enums;
-
 using MikuSharp.Attributes;
 
 namespace MikuSharp.Commands.Playlist;

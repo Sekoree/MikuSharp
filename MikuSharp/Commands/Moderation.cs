@@ -1,14 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-using DisCatSharp;
-using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.Exceptions;
+﻿using DisCatSharp.Exceptions;
 
 using MikuSharp.Utilities;
 

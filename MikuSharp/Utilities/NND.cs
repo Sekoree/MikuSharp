@@ -1,12 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
-
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-
-using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics;
 
 using NicoNicoNii;
 

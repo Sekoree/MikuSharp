@@ -1,12 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
-using DisCatSharp.ApplicationCommands;
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Lavalink.Enums;
-
 using MikuSharp.Attributes;
 using MikuSharp.Enums;
 using MikuSharp.Utilities;

@@ -1,15 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-using DisCatSharp;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
-using DisCatSharp.Lavalink.Enums;
 
 using MikuSharp.Entities;
 using MikuSharp.Enums;

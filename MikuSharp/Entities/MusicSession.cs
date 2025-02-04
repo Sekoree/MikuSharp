@@ -1,11 +1,4 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-using DisCatSharp.Entities;
 using DisCatSharp.Exceptions;
-using DisCatSharp.Lavalink;
-using DisCatSharp.Lavalink.Enums;
 
 using MikuSharp.Enums;
 

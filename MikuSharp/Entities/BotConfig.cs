@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace MikuSharp.Entities;
+﻿namespace MikuSharp.Entities;
 
 public sealed class BotConfig
 {

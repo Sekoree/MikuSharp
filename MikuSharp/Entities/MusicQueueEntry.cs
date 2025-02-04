@@ -1,7 +1,3 @@
-using System.Threading.Tasks;
-
-using DisCatSharp;
-using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
 
 using MikuSharp.Enums;

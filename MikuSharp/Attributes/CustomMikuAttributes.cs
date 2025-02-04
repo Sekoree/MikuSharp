@@ -1,15 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-using DisCatSharp.ApplicationCommands.Attributes;
-using DisCatSharp.ApplicationCommands.Context;
-using DisCatSharp.CommandsNext;
-using DisCatSharp.CommandsNext.Attributes;
-using DisCatSharp.Entities;
-using DisCatSharp.Enums;
-using DisCatSharp.Lavalink;
-
 using MikuSharp.Enums;
 using MikuSharp.Utilities;
 
@@ -128,20 +116,27 @@ public sealed class AutomaticallyDisconnectExistingSessionAttribute : Applicatio
 	/// <inheritdoc />
 	public override async Task<bool> ExecuteChecksAsync(BaseContext ctx)
 	{
-		if (!MikuBot.MusicSessions.ContainsKey(ctx.GuildId!.Value))
-			return true;
+		ArgumentNullException.ThrowIfNull(ctx.GuildId);
+		ArgumentNullException.ThrowIfNull(ctx.Guild);
+		var guildId = ctx.GuildId.Value;
+		var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+		using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+		{
+			if (!MikuBot.MusicSessions.TryGetValue(guildId, out _))
+				return true;
 
-		var player = ctx.Client.GetLavalink().GetGuildPlayer(ctx.Guild);
-		if (player is not null)
-			await player.DisconnectAsync();
-		MikuBot.MusicSessions.Remove(ctx.GuildId.Value);
+			var player = ctx.Client.GetLavalink().GetGuildPlayer(ctx.Guild);
+			if (player is not null)
+				await player.DisconnectAsync();
+			MikuBot.MusicSessions.TryRemove(ctx.GuildId.Value, out _);
+		}
 
 		return true;
 	}
 }
 
 /// <summary>
-///    Defines that the method or class requires specific playback state(s).
+///     Defines that the method or class requires specific playback state(s).
 /// </summary>
 /// <param name="targetStates">The target playback states.</param>
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false)]
@@ -153,9 +148,14 @@ public sealed class RequirePlaybackState(params PlaybackState[] targetStates) : 
 	public List<PlaybackState> TargetStates { get; } = [..targetStates];
 
 	/// <inheritdoc />
-	public override Task<bool> ExecuteChecksAsync(BaseContext ctx)
+	public override async Task<bool> ExecuteChecksAsync(BaseContext ctx)
 	{
-		var musicSession = MikuBot.MusicSessions[ctx.GuildId!.Value];
-		return Task.FromResult(this.TargetStates.Contains(musicSession.PlaybackState));
+		ArgumentNullException.ThrowIfNull(ctx.GuildId);
+		var guildId = ctx.GuildId.Value;
+		var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+		using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+		{
+			return MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession) && this.TargetStates.Contains(musicSession.PlaybackState);
+		}
 	}
 }
