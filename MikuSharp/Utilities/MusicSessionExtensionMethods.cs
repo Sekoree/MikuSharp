@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 
@@ -169,7 +171,7 @@ internal static class MusicSessionExtensionMethods
 	///     exist.
 	/// </param>
 	/// <returns>The result of the action or the default value with given type from <typeparamref name="T" />.</returns>
-	public static async Task<T?> ExecuteWithMusicSessionAsync<T>(this InteractionContext ctx, Func<ulong, MusicSession, Task<T?>> successAction, Func<ulong, Task<T?>>? failureAction = null, T? defaultValue = default)
+	public static async Task<T> ExecuteWithMusicSessionAsync<T>(this InteractionContext ctx, Func<ulong, MusicSession, Task<T>> successAction, Func<ulong, Task<T>>? failureAction = null, T defaultValue = default)
 	{
 		ArgumentNullException.ThrowIfNull(ctx.GuildId);
 		return await ctx.GuildId.Value.ExecuteWithMusicSessionAsync(successAction, failureAction, defaultValue);
@@ -187,7 +189,7 @@ internal static class MusicSessionExtensionMethods
 	///     exist.
 	/// </param>
 	/// <returns>The result of the action or the default value with given type from <typeparamref name="T" />.</returns>
-	public static async Task<T?> ExecuteWithMusicSessionAsync<T>(this AutocompleteContext ctx, Func<ulong, MusicSession, Task<T?>> successAction, Func<ulong, Task<T?>>? failureAction = null, T? defaultValue = default)
+	public static async Task<T> ExecuteWithMusicSessionAsync<T>(this AutocompleteContext ctx, Func<ulong, MusicSession, Task<T>> successAction, Func<ulong, Task<T>>? failureAction = null, T defaultValue = default)
 		=> await ctx.Guild.Id.ExecuteWithMusicSessionAsync(successAction, failureAction, defaultValue);
 
 	/// <summary>
@@ -202,7 +204,7 @@ internal static class MusicSessionExtensionMethods
 	///     exist.
 	/// </param>
 	/// <returns>The result of the action or the default value with given type from <typeparamref name="T" />.</returns>
-	public static async Task<T?> ExecuteWithMusicSessionAsync<T>(this ulong guildId, Func<ulong, MusicSession, Task<T?>> successAction, Func<ulong, Task<T?>>? failureAction = null, T? defaultValue = default)
+	public static async Task<T> ExecuteWithMusicSessionAsync<T>(this ulong guildId, Func<ulong, MusicSession, Task<T>> successAction, Func<ulong, Task<T>>? failureAction = null, T defaultValue = default)
 	{
 		var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
 		using (await asyncLock.LockAsync(MikuBot.Cts.Token))

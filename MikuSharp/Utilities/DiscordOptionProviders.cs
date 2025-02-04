@@ -89,27 +89,31 @@ internal class AutocompleteProviders
 	{
 		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
 		{
-			var queue = await ctx.ExecuteWithMusicSessionAsync((_, musicSession) => Task.FromResult(musicSession.LavalinkGuildPlayer?.Queue.ToList()), null, []);
-			if (queue is null)
-				return [new("The queue is empty", -1)];
-
-			Dictionary<int, LavalinkTrack> queueEntries = [];
-			var i = 1;
-			foreach (var entry in queue)
+			return await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
 			{
-				queueEntries[i] = entry;
-				i++;
-			}
+				await Task.Delay(0);
 
-			Dictionary<int, LavalinkTrack> songs = [];
+				Dictionary<int, LavalinkTrack> queueEntries = [];
+				Dictionary<int, LavalinkTrack> filteredQueueEntries = [];
 
-			var value = ctx.FocusedOption.Value as string;
+				var queue = musicSession.LavalinkGuildPlayer?.Queue.ToList();
+				if (queue is null)
+					return [new("The queue is empty", -1)];
 
-			songs.AddRange(string.IsNullOrEmpty(value)
-				? queueEntries.Take(25)
-				: queueEntries.Where(x => x.Value.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value)!.ToLower())).Take(25));
+				var i = 1;
+				foreach (var entry in queue)
+				{
+					queueEntries[i] = entry;
+					i++;
+				}
 
-			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Key}: {x.Value.Info.Title}", x.Key));
+				var value = ctx.FocusedOption.Value as string;
+				filteredQueueEntries.AddRange(string.IsNullOrEmpty(value)
+					? queueEntries.Take(25)
+					: queueEntries.Where(x => x.Value.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value)!.ToLower())).Take(25));
+
+				return filteredQueueEntries.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Key}: {x.Value.Info.Title}", x.Key - 1));
+			}, null, [new("The queue is empty", -1)]);
 		}
 	}
 }
