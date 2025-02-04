@@ -308,8 +308,20 @@ internal sealed class MikuBot : IDisposable
 		await ShardedClient.StartAsync();
 		await Task.Delay(5000);
 
-		foreach (var lavalinkShard in this.LavalinkModules)
-			await lavalinkShard.Value.ConnectAsync(this.LavalinkConfig);
+		var success = false;
+		while (!success)
+		{
+			try
+			{
+				foreach (var lavalinkShard in this.LavalinkModules)
+					await lavalinkShard.Value.ConnectAsync(this.LavalinkConfig);
+				success = true;
+			}
+			catch
+			{
+				success = false;
+			}
+		}
 
 		this.GameSetThread = Task.Run(SetActivity);
 		//StatusThread = Task.Run(ShowConnections);

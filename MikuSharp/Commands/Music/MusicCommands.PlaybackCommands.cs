@@ -70,7 +70,7 @@ public partial class MusicCommands
 					musicSession.LavalinkGuildPlayer.ClearQueue();
 					await musicSession.LavalinkGuildPlayer.StopAsync();
 					musicSession.UpdatePlaybackState(PlaybackState.Stopped);
-					await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+					await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed("Nothing playing"));
 					await ctx.EditResponseAsync("Stopped the playback!");
 				}
 			}
