@@ -15,7 +15,7 @@ public partial class MusicCommands : ApplicationCommandsModule
 	/// </summary>
 	/// <param name="ctx">The interaction context.</param>
 	[SlashCommand("join", "Joins the voice channel you're in"), RequireUserVoicechatConnection, AutomaticallyDisconnectExistingSession]
-	public static async Task JoinAsync(InteractionContext ctx)
+	public async Task JoinAsync(InteractionContext ctx)
 	{
 		ArgumentNullException.ThrowIfNull(ctx.Member?.VoiceState?.Channel);
 		ArgumentNullException.ThrowIfNull(ctx.Guild);
@@ -46,7 +46,7 @@ public partial class MusicCommands : ApplicationCommandsModule
 	/// </summary>
 	/// <param name="ctx">The interaction context.</param>
 	[SlashCommand("leave", "Leaves the voice channel"), RequireUserAndBotVoicechatConnection]
-	public static async Task LeaveAsync(InteractionContext ctx)
+	public async Task LeaveAsync(InteractionContext ctx)
 	{
 		ArgumentNullException.ThrowIfNull(ctx.GuildId);
 
