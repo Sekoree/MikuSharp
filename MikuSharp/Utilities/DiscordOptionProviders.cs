@@ -1,5 +1,3 @@
-using NuGet.Packaging;
-
 namespace MikuSharp.Utilities;
 
 internal class FixedOptionProviders
@@ -27,9 +25,9 @@ internal class AutocompleteProviders
 		{
 			var bans = await ctx.Guild.GetBansAsync();
 			List<DiscordBan> bannedUsers = new(25);
-			bannedUsers.AddRange(ctx.FocusedOption.Value is null
+			bannedUsers.AddRange(ctx.FocusedOption.Value is not string value
 				? bans.Take(25)
-				: bans.Where(x => x.User.Username.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value))).Take(25));
+				: bans.Where(x => x.User.Username.ToLower().Contains(Convert.ToString(value))).Take(25));
 
 			return bannedUsers.Select(x => new DiscordApplicationCommandAutocompleteChoice(x.User.UsernameWithGlobalName, x.User.Id.ToString()));
 		}
@@ -89,30 +87,20 @@ internal class AutocompleteProviders
 	{
 		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
 		{
-			return await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
+			return await ctx.ExecuteWithMusicSessionAsync((_, musicSession) =>
 			{
-				await Task.Delay(0);
-
-				Dictionary<int, LavalinkTrack> queueEntries = [];
-				Dictionary<int, LavalinkTrack> filteredQueueEntries = [];
-
 				var queue = musicSession.LavalinkGuildPlayer?.Queue.ToList();
-				if (queue is null)
-					return [new("The queue is empty", -1)];
+				if (queue is null || queue.Count is 0)
+					return Task.FromResult<IEnumerable<DiscordApplicationCommandAutocompleteChoice>>([new("The queue is empty", -1)]);
 
-				var i = 1;
-				foreach (var entry in queue)
-				{
-					queueEntries[i] = entry;
-					i++;
-				}
-
+				var queueEntries = queue
+					.Select((entry, index) => (index: index + 1, entry))
+					.ToDictionary(x => x.index, x => x.entry);
 				var value = ctx.FocusedOption.Value as string;
-				filteredQueueEntries.AddRange(string.IsNullOrEmpty(value)
+				var filteredQueueEntries = string.IsNullOrEmpty(value)
 					? queueEntries.Take(25)
-					: queueEntries.Where(x => x.Value.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value)!.ToLower())).Take(25));
-
-				return filteredQueueEntries.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Key}: {x.Value.Info.Title}", x.Key - 1));
+					: queueEntries.Where(x => x.Value.Info.Title.ToLower().Contains(value.ToLower())).Take(25);
+				return Task.FromResult(filteredQueueEntries.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Key}: {x.Value.Info.Title}", x.Key - 1)));
 			}, null, [new("The queue is empty", -1)]);
 		}
 	}
