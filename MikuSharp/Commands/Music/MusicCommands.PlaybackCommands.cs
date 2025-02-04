@@ -86,14 +86,14 @@ public partial class MusicCommands
 		///     Seeks the currently playing song to given position.
 		/// </summary>
 		/// <param name="ctx">The interaction context.</param>
-		/// <param name="position">The position to seek to.</param>
+		/// <param name="seconds">The seconds to seek to.</param>
 		[SlashCommand("seek", "Seeks the currently playing song to given position"), RequirePlaybackState(PlaybackState.Playing, PlaybackState.Paused)]
-		public static async Task SeekAsync(InteractionContext ctx, [Option("position", "Position to seek to")] double position)
+		public static async Task SeekAsync(InteractionContext ctx, [Option("seconds", "Seconds to seek to")] int seconds)
 		{
 			await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
 			{
-				var targetSeek = TimeSpan.FromSeconds(position);
-				await musicSession.LavalinkGuildPlayer.SeekAsync(targetSeek);
+				var targetSeek = TimeSpan.FromSeconds(seconds);
+				await musicSession.LavalinkGuildPlayer.SeekAsync(seconds);
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Seeked to **{targetSeek.FormatTimeSpan()}**!"));
 			});
 		}

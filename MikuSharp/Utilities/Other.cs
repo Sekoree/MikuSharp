@@ -74,10 +74,10 @@ public static class Other
 	/// <returns>The formatted time span.</returns>
 	public static string FormatTimeSpan(this TimeSpan timeSpan)
 		=> timeSpan.TotalHours >= 1
-			? $"{(int)timeSpan.TotalHours:D2}:{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}"
+			? $"{(int)timeSpan.TotalHours:D2}h:{timeSpan.Minutes:D2}m:{timeSpan.Seconds:D2}s"
 			: timeSpan.TotalMinutes >= 1
-				? $"{timeSpan.Minutes:D2}:{timeSpan.Seconds:D2}"
-				: $"{timeSpan.Seconds:D2} sec";
+				? $"{(int)timeSpan.TotalMinutes:D2}m:{timeSpan.Seconds:D2}s"
+				: $"{(int)timeSpan.TotalSeconds:D2}s";
 
 	/// <summary>
 	///     Loads and plays an <paramref name="identifier" />.
