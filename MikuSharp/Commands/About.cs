@@ -1,4 +1,6 @@
-﻿namespace MikuSharp.Commands;
+using MikuSharp.Attributes;
+
+namespace MikuSharp.Commands;
 
 [SlashCommandGroup("about", "About")]
 internal class About : ApplicationCommandsModule
@@ -13,10 +15,9 @@ internal class About : ApplicationCommandsModule
 		await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(emb.Build()).AsEphemeral());
 	}
 
-	[SlashCommand("bot", "About the bot")]
+	[SlashCommand("bot", "About the bot"), DeferResponseAsync(true)]
 	public static async Task BotAsync(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 		var emb = new DiscordEmbedBuilder();
 		emb.WithThumbnail(ctx.Client.CurrentUser.AvatarUrl).WithTitle($"About {ctx.Client.CurrentUser.UsernameWithGlobalName}!").WithAuthor("Miku MikuBot uwu").WithUrl("https://meek.moe/").WithColor(new("#348573"))
 			.WithDescription(ctx.Client.CurrentApplication.Description);
@@ -27,7 +28,7 @@ internal class About : ApplicationCommandsModule
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
 	}
 
-	[SlashCommand("news", "Get news about the bot in your server", dmPermission: false)]
+	[SlashCommand("news", "Get news about the bot in your server", allowedContexts: [InteractionContextType.Guild], integrationTypes: [ApplicationCommandIntegrationTypes.GuildInstall]), DeferResponseAsync(true)]
 	public static async Task FollowNewsAsync(
 		InteractionContext ctx,
 		[Option("target_channel", "Target channel to post updates."), ChannelTypes(ChannelType.Text)]
@@ -35,14 +36,6 @@ internal class About : ApplicationCommandsModule
 		[Option("name", "Name of webhook")] string name = "Miku Bot Announcements"
 	)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
-
-		if (ctx.Client.CurrentApplication.Team.Members.All(x => x.User != ctx.User) && ctx.User.Id != ctx.Guild.OwnerId)
-		{
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not allowed to execute this request!"));
-			return;
-		}
-
 		var announcementChannel = await ctx.Client.GetChannelAsync(483290389047017482);
 		var f = await announcementChannel.FollowAsync(channel);
 		await Task.Delay(5000);
@@ -107,10 +100,9 @@ internal class About : ApplicationCommandsModule
 	public static async Task GetExecutingShardAsync(InteractionContext ctx)
 		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Shard {ctx.Client.ShardId}"));
 
-	[SlashCommand("stats", "Some stats of the MikuBot!")]
+	[SlashCommand("stats", "Some stats of the MikuBot!"), DeferResponseAsync(true)]
 	public static async Task StatsAsync(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 		var guildCount = 0;
 		var userCount = 0;
 		var channelCount = 0;
@@ -132,10 +124,9 @@ internal class About : ApplicationCommandsModule
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
 	}
 
-	[SlashCommand("support", "Link to my support server")]
+	[SlashCommand("support", "Link to my support server"), DeferResponseAsync(true)]
 	public static async Task SupportAsybc(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 		var guild = await MikuBot.ShardedClient.GetShard(483279257431441410).GetGuildAsync(483279257431441410);
 		var widget = await guild.GetWidgetAsync();
 		var emb = new DiscordEmbedBuilder().WithTitle("Support Server").WithDescription("Need help or is something broken?").WithThumbnail(ctx.Client.CurrentUser.AvatarUrl);

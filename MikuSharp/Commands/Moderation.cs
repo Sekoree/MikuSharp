@@ -1,17 +1,16 @@
-﻿using DisCatSharp.Exceptions;
+using DisCatSharp.Exceptions;
 
+using MikuSharp.Attributes;
 using MikuSharp.Utilities;
 
 namespace MikuSharp.Commands;
 
-[SlashCommandGroup("mod", "Moderation", (long)Permissions.BanMembers, dmPermission: false)]
+[SlashCommandGroup("mod", "Moderation", (long)Permissions.BanMembers, allowedContexts: [InteractionContextType.Guild], integrationTypes: [ApplicationCommandIntegrationTypes.GuildInstall])]
 internal class Moderation : ApplicationCommandsModule
 {
 	[SlashCommand("disable_invites", "Disable invites usage for guild")]
 	public static async Task DisableInvitesAsync(InteractionContext ctx, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
-		await ctx.DeferAsync(false);
-
 		try
 		{
 			await ctx.Guild.DisableInvitesAsync(reason);
@@ -26,8 +25,6 @@ internal class Moderation : ApplicationCommandsModule
 	[SlashCommand("enable_invites", "Enable invites usage for guild")]
 	public static async Task EnableInvitesAsync(InteractionContext ctx, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
-		await ctx.DeferAsync(false);
-
 		try
 		{
 			await ctx.Guild.EnableInvitesAsync(reason);
@@ -48,8 +45,6 @@ internal class Moderation : ApplicationCommandsModule
 		[Option("reason", "Auditlog reason")] string? reason = null
 	)
 	{
-		await ctx.DeferAsync(false);
-
 		try
 		{
 			await ctx.Guild.BanMemberAsync(user.Id, deletionDays, reason);
@@ -64,7 +59,6 @@ internal class Moderation : ApplicationCommandsModule
 	[SlashCommand("unban", "Unban someone")]
 	public static async Task UnbanAsync(InteractionContext ctx, [Option("username", "User to unban", true), Autocomplete(typeof(AutocompleteProviders.BanProvider))] string id, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
-		await ctx.DeferAsync(false);
 		var userId = Convert.ToUInt64(id);
 		var user = await ctx.Client.GetUserAsync(userId, true);
 		await ctx.Guild.UnbanMemberAsync(user, reason);
@@ -74,8 +68,6 @@ internal class Moderation : ApplicationCommandsModule
 	[SlashCommand("kick", "Kick someone")]
 	public static async Task KickAsync(InteractionContext ctx, [Option("user", "User to kick")] DiscordUser user, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
-		await ctx.DeferAsync(false);
-
 		try
 		{
 			var member = await user.ConvertToMember(ctx.Guild);
@@ -91,8 +83,6 @@ internal class Moderation : ApplicationCommandsModule
 	[SlashCommand("purge", "Delete a large amount of messages fast")]
 	public static async Task PurgeAsync(InteractionContext ctx, [Option("amount", "Amount of messages to purge"), MinimumValue(1), MaximumValue(100)] int amount, [Option("reason", "Auditlog reason")] string? reason = null)
 	{
-		await ctx.DeferAsync();
-
 		try
 		{
 			var msgs = await ctx.Channel.GetMessagesAsync(amount);

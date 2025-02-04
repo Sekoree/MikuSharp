@@ -65,7 +65,7 @@ public static class Other
 	/// <param name="additionalEmbedFields">The additional embed fields.</param>
 	/// <returns>The built embed.</returns>
 	public static DiscordEmbed BuildMusicStatusEmbed(this MusicSession session, List<DiscordEmbedField>? additionalEmbedFields = null)
-		=> session.StatusMessage is not null ? BuildMusicStatusEmbed(session, session.StatusMessage.Embeds.First().Description, additionalEmbedFields) : throw new NullReferenceException();
+		=> session.StatusMessage is not null ? BuildMusicStatusEmbed(session, session.StatusMessage.Embeds[0].Description, additionalEmbedFields) : throw new NullReferenceException();
 
 	/// <summary>
 	///     Formats a <see cref="TimeSpan" /> into a human-readable string.
@@ -115,7 +115,7 @@ public static class Other
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Something went wrong..\nReason: {loadResult.GetResultAs<LavalinkException>().Message ?? "unknown"}"));
 				throw new("Lavalink error");
 			default:
-				throw new ArgumentOutOfRangeException();
+				throw new ArgumentOutOfRangeException(null, "Could not determine the type of the lavalink search result");
 		}
 
 		switch (musicSession.PlaybackState)

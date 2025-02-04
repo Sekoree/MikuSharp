@@ -1,21 +1,21 @@
-﻿using DisCatSharp.Exceptions;
+using DisCatSharp.Exceptions;
 
 using Kitsu.Anime;
 using Kitsu.Manga;
+
+using MikuSharp.Attributes;
 
 namespace MikuSharp.Commands;
 
 [SlashCommandGroup("utility", "Utilities")]
 internal class Utility : ApplicationCommandsModule
 {
-	[SlashCommandGroup("am", "Anime & Mange")]
+	[SlashCommandGroup("am", "Anime & Mange"), DeferResponseAsync]
 	internal class AnimeMangaUtility : ApplicationCommandsModule
 	{
 		[SlashCommand("anime_search", "Search for an anime")]
 		public static async Task SearchAnimeAsync(InteractionContext ctx, [Option("search_query", "Search query")] string searchQuery)
 		{
-			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
 			try
 			{
 				var ine = ctx.Client.GetInteractivity();
@@ -73,8 +73,6 @@ internal class Utility : ApplicationCommandsModule
 		[SlashCommand("manga_search", "Search for an manga")]
 		public static async Task SearchMangaAsync(InteractionContext ctx, [Option("search_query", "Search query")] string searchQuery)
 		{
-			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
 			try
 			{
 				var ine = ctx.Client.GetInteractivity();
@@ -136,12 +134,10 @@ internal class Utility : ApplicationCommandsModule
 				? user.AvatarUrl
 				: ctx.User.AvatarUrl).Build()));
 
-		[SlashCommand("server_info", "Get information about the server")]
+		[SlashCommand("server_info", "Get information about the server"), DeferResponseAsync(true)]
 		public static async Task GuildInfoAsync(InteractionContext ctx)
 		{
-			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
-			if (ctx.Guild == null)
+			if (ctx.Guild is null)
 			{
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You have to execute this command on a server!"));
 				return;
@@ -164,17 +160,14 @@ internal class Utility : ApplicationCommandsModule
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
 		}
 
-		[SlashCommand("user_info", "Get information about a user")]
+		[SlashCommand("user_info", "Get information about a user"), DeferResponseAsync(true)]
 		public static async Task UserInfoAsync(InteractionContext ctx, [Option("user", "The user to view")] DiscordUser? user = null)
 		{
-			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
-
-			if (user == null)
-				user = ctx.User;
+			user ??= ctx.User;
 
 			DiscordMember? member = null;
 
-			if (ctx.Guild != null)
+			if (ctx.Guild is not null)
 				try
 				{
 					member = await user.ConvertToMember(ctx.Guild);
@@ -186,12 +179,12 @@ internal class Utility : ApplicationCommandsModule
 			emb.WithColor(new(0212255));
 			emb.WithTitle("User Info");
 			emb.AddField(new("Username", $"{user.Username}#{user.Discriminator}", true));
-			if (member != null)
+			if (member is not null)
 				if (member.DisplayName != user.Username)
 					emb.AddField(new("Nickname", $"{member.DisplayName}", true));
 			emb.AddField(new("ID", $"{user.Id}", true));
 			emb.AddField(new("Account Creation", $"{user.CreationTimestamp.Timestamp()}", true));
-			if (member != null)
+			if (member is not null)
 				emb.AddField(new("Join Date", $"{member.JoinedAt.Timestamp()}", true));
 			emb.WithThumbnail(user.AvatarUrl);
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(emb.Build()));
@@ -200,15 +193,10 @@ internal class Utility : ApplicationCommandsModule
 		[SlashCommand("emojilist", "Lists all custom emoji on this server")]
 		public static async Task EmojiListAsync(InteractionContext ctx)
 		{
-			await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral());
 			var wat = "You have to execute this command in a server!";
 
-			if (ctx.Guild != null && ctx.Guild.Emojis.Any())
-			{
-				wat = "**Emojies:** ";
-				foreach (var em in ctx.Guild.Emojis.Values)
-					wat += em + " ";
-			}
+			if (ctx.Guild is not null && ctx.Guild.Emojis.Any())
+				wat = ctx.Guild.Emojis.Values.Aggregate("**Emojies:** ", (current, em) => current + (em + " "));
 
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(wat));
 		}

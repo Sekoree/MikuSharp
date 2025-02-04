@@ -1,17 +1,17 @@
-﻿using HeyRed.Mime;
+using HeyRed.Mime;
 
+using MikuSharp.Attributes;
 using MikuSharp.Entities;
 using MikuSharp.Utilities;
 
 namespace MikuSharp.Commands;
 
-[SlashCommandGroup("fun", "Fun commands", false, [InteractionContextType.Guild, InteractionContextType.PrivateChannel], [ApplicationCommandIntegrationTypes.GuildInstall, ApplicationCommandIntegrationTypes.UserInstall])]
+[SlashCommandGroup("fun", "Fun commands", allowedContexts: [InteractionContextType.Guild, InteractionContextType.PrivateChannel], integrationTypes: [ApplicationCommandIntegrationTypes.GuildInstall, ApplicationCommandIntegrationTypes.UserInstall]), DeferResponseAsync]
 internal class Fun : ApplicationCommandsModule
 {
 	[SlashCommand("8ball", "Yes? No? Maybe?")]
 	public static async Task EightBallAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var responses = new[] { "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful.", "No." };
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"> {text}\n\n{responses[new Random().Next(0, responses.Length)]}"));
 	}
@@ -19,7 +19,6 @@ internal class Fun : ApplicationCommandsModule
 	[SlashCommand("cat", "Get a random cat image!")]
 	public static async Task CatAsync(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var imgUrl = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/v2/img/meow");
 
 		DiscordWebhookBuilder builder = new();
@@ -31,7 +30,6 @@ internal class Fun : ApplicationCommandsModule
 	[SlashCommand("clyde", "Say something as clyde bot")]
 	public static async Task ClydeAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}"));
 		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.Message));
 
@@ -51,7 +49,6 @@ internal class Fun : ApplicationCommandsModule
 	[SlashCommand("dog", "Random Dog Image")]
 	public static async Task DogAsync(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var dc = JsonConvert.DeserializeObject<DogCeo>(await ctx.Client.RestClient.GetStringAsync("https://dog.ceo/api/breeds/image/random"));
 		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(dc.Message)));
 		var em = new DiscordEmbedBuilder();
@@ -95,7 +92,6 @@ internal class Fun : ApplicationCommandsModule
 	[SlashCommand("lizard", "Get a random lizard image")]
 	public static async Task LizardAsync(InteractionContext ctx)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var get = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/lizard");
 		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(get.Url)));
 
@@ -141,7 +137,6 @@ internal class Fun : ApplicationCommandsModule
 	[SlashCommand("rps", "Play rock paper scissors!")]
 	public static async Task RpsAsync(InteractionContext ctx, [Option("rps", "Your rock paper scissor choice")] string rps)
 	{
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, new());
 		var rock = new[] { $"Rock {DiscordEmoji.FromName(ctx.Client, ":black_circle:")}", $"Paper {DiscordEmoji.FromName(ctx.Client, ":pencil:")}", $"Scissors {DiscordEmoji.FromName(ctx.Client, ":scissors:")}" };
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"{ctx.User.Mention} choose {rps}!\n\nI choose {rock[new Random().Next(0, rock.Length)]}"));
 	}

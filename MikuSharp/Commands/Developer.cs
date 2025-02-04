@@ -12,7 +12,7 @@ public class Developer : ApplicationCommandsModule
 	private static readonly string[] s_units = ["", "ki", "Mi", "Gi"];
 
 	[SlashCommand("test", "Testing")]
-	public static async Task TestAsync(InteractionContext ctx) 
+	public static async Task TestAsync(InteractionContext ctx)
 		=> await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AsEphemeral().WithContent($"Meep meep. Shard {ctx.Client.ShardId}"));
 
 	[SlashCommand("guild_shard_test", "Testing")]

@@ -1,17 +1,17 @@
-﻿using HeyRed.Mime;
+using HeyRed.Mime;
 
+using MikuSharp.Attributes;
 using MikuSharp.Entities;
 using MikuSharp.Utilities;
 
 namespace MikuSharp.Commands;
 
-[SlashCommandGroup("weeb", "Weeb Stuff!", false, [InteractionContextType.Guild, InteractionContextType.PrivateChannel], [ApplicationCommandIntegrationTypes.GuildInstall, ApplicationCommandIntegrationTypes.UserInstall])]
+[SlashCommandGroup("weeb", "Weeb Stuff!", allowedContexts: [InteractionContextType.Guild, InteractionContextType.PrivateChannel], integrationTypes: [ApplicationCommandIntegrationTypes.GuildInstall, ApplicationCommandIntegrationTypes.UserInstall]), DeferResponseAsync]
 internal class Weeb : ApplicationCommandsModule
 {
 	[SlashCommand("awooify", "Awooify your or someones avatar!")]
 	public static async Task AwooifyAsync(InteractionContext ctx, [Option("user", "User to awooify")] DiscordUser? user = null)
 	{
-		await ctx.DeferAsync(false);
 		var url = (await (user ?? ctx.User).ConvertToMember(ctx.Guild)).GuildAvatarUrl;
 		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=awooify&url={url}"));
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithImageUrl(e.Message).Build()));
@@ -20,7 +20,6 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("diva", "Radnom PJD Loading image")]
 	public static async Task DivaPic(InteractionContext ctx)
 	{
-		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/diva"));
 		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
 		{
@@ -44,7 +43,6 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("gumi", "Random Gumi image")]
 	public static async Task GumiPic(InteractionContext ctx)
 	{
-		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/gumi"));
 		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
 		{
@@ -69,7 +67,6 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("kaito", "Random Kaito image")]
 	public static async Task KaitoPic(InteractionContext ctx)
 	{
-		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/kaito"));
 		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
 		{
@@ -94,7 +91,6 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("len", "Random Len image")]
 	public static async Task KLenPic(InteractionContext ctx)
 	{
-		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/len"));
 		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
 		{
@@ -119,7 +115,6 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("luka", "Random Luka image")]
 	public static async Task LukaPic(InteractionContext ctx)
 	{
-		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/luka"));
 		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
 		{
@@ -144,7 +139,6 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("meiko", "Random Meiko image")]
 	public static async Task MeikoPic(InteractionContext ctx)
 	{
-		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/meiko"));
 		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
 		{
@@ -169,7 +163,6 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("miku", "Random Miku image")]
 	public static async Task HMikuPic(InteractionContext ctx)
 	{
-		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/miku"));
 		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
 		{
@@ -194,7 +187,6 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("neko", "Get a random neko image")]
 	public static async Task Cat(InteractionContext ctx)
 	{
-		await ctx.DeferAsync(false);
 		var imgUrl = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/v2/img/neko");
 		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(imgUrl.Url)));
 		var em = new DiscordEmbedBuilder();
@@ -210,7 +202,6 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("rin", "Random Rin image")]
 	public static async Task KRinPic(InteractionContext ctx)
 	{
-		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/rin"));
 		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
 		{
@@ -235,7 +226,6 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("teto", "Random Teto image")]
 	public static async Task KTetoPic(InteractionContext ctx)
 	{
-		await ctx.DeferAsync(false);
 		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/teto"));
 		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
 		{
