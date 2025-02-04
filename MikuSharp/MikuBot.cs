@@ -97,7 +97,7 @@ internal sealed class MikuBot : IDisposable
 		this.ApplicationCommandsModules = ShardedClient.UseApplicationCommandsAsync(new()
 		{
 			EnableDefaultHelp = true,
-			DebugStartup = true,
+			DebugStartup = false,
 			EnableLocalization = false,
 			GenerateTranslationFilesOnly = false
 		}).Result;
