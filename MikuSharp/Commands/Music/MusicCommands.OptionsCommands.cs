@@ -11,6 +11,11 @@ public partial class MusicCommands
 	[SlashCommandGroup("options", "Music options commands"), RequireUserAndBotVoicechatConnection]
 	public class OptionsCommands : ApplicationCommandsModule
 	{
+		/// <summary>
+		///     Changes the repeat mode.
+		/// </summary>
+		/// <param name="ctx">The interaction context.</param>
+		/// <param name="mode">The new repeat mode.</param>
 		[SlashCommand("repeat", "Repeat the current song or the entire queue")]
 		public static async Task RepeatAsync(
 			InteractionContext ctx,
@@ -26,6 +31,10 @@ public partial class MusicCommands
 			});
 		}
 
+		/// <summary>
+		///     Shuffles the queue.
+		/// </summary>
+		/// <param name="ctx">The interaction context.</param>
 		[SlashCommand("shuffle", "Shuffle the queue")]
 		public static async Task ShuffleAsync(InteractionContext ctx)
 		{

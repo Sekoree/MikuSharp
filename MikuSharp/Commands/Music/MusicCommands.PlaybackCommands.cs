@@ -44,6 +44,10 @@ public partial class MusicCommands
 			});
 		}
 
+		/// <summary>
+		///     Stops the playback.
+		/// </summary>
+		/// <param name="ctx">The interaction context.</param>
 		[SlashCommand("stop", "Stop Playback"), RequirePlaybackState(PlaybackState.Playing, PlaybackState.Paused)]
 		public static async Task StopAsync(InteractionContext ctx)
 		{
@@ -58,6 +62,11 @@ public partial class MusicCommands
 			});
 		}
 
+		/// <summary>
+		///     Changes the volume of the music player.
+		/// </summary>
+		/// <param name="ctx">The interaction context.</param>
+		/// <param name="volume">The volume to set.</param>
 		[SlashCommand("volume", "Change the music volume")]
 		public static async Task ModifyVolumeAsync(
 			InteractionContext ctx,
@@ -73,6 +82,11 @@ public partial class MusicCommands
 			});
 		}
 
+		/// <summary>
+		///     Seeks the currently playing song to given position.
+		/// </summary>
+		/// <param name="ctx">The interaction context.</param>
+		/// <param name="position">The position to seek to.</param>
 		[SlashCommand("seek", "Seeks the currently playing song to given position"), RequirePlaybackState(PlaybackState.Playing, PlaybackState.Paused)]
 		public static async Task SeekAsync(InteractionContext ctx, [Option("position", "Position to seek to")] double position)
 		{
@@ -84,26 +98,16 @@ public partial class MusicCommands
 			});
 		}
 
+		/// <summary>
+		///     Plays a url.
+		/// </summary>
+		/// <param name="ctx">The interaction context.</param>
+		/// <param name="url">The url to play.</param>
 		[SlashCommand("play", "Plays a url")]
 		public async Task PlayUrlAsync(InteractionContext ctx, [Option("url", "The url to play")] string url)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Searching for `{url}`.."));
 			await ctx.ExecuteWithMusicSessionAsync(async musicSession => await musicSession.LoadAndPlayTrackAsync(ctx, url));
-		}
-
-		[SlashCommand("skip", "Skips to the next song")]
-		public async Task SkipAsync(InteractionContext ctx)
-		{
-			await ctx.ExecuteWithMusicSessionAsync(async musicSession =>
-			{
-				if (musicSession.LavalinkGuildPlayer.TryPeekQueue(out _))
-				{
-					await musicSession.LavalinkGuildPlayer.SkipAsync();
-					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Successfully skipped the song!"));
-				}
-				else
-					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Cannot skip as there are no more songs in the queue."));
-			});
 		}
 	}
 }
