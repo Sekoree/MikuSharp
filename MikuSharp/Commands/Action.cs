@@ -1,4 +1,4 @@
-﻿using HeyRed.Mime;
+using HeyRed.Mime;
 
 using MikuSharp.Utilities;
 
@@ -17,9 +17,9 @@ internal class Action : ApplicationCommandsModule
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{wsh.Extension}", wsh.ImgData);
 		builder.AddEmbed(wsh.Embed.Build());
+		builder.WithContent(user.Mention);
+		builder.WithAllowedMention(new UserMention(user));
 		await ctx.EditResponseAsync(builder);
-		if (ctx.Interaction.Context is InteractionContextType.Guild)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
 	}
 
 	[SlashCommand("kiss", "Kiss someone!")]
@@ -32,9 +32,9 @@ internal class Action : ApplicationCommandsModule
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{wsh.Extension}", wsh.ImgData);
 		builder.AddEmbed(wsh.Embed.Build());
+		builder.WithContent(user.Mention);
+		builder.WithAllowedMention(new UserMention(user));
 		await ctx.EditResponseAsync(builder);
-		if (ctx.Interaction.Context is InteractionContextType.Guild)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
 	}
 
 	[SlashCommand("lick", "Lick someone!")]
@@ -47,9 +47,9 @@ internal class Action : ApplicationCommandsModule
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{wsh.Extension}", wsh.ImgData);
 		builder.AddEmbed(wsh.Embed.Build());
+		builder.WithContent(user.Mention);
+		builder.WithAllowedMention(new UserMention(user));
 		await ctx.EditResponseAsync(builder);
-		if (ctx.Interaction.Context is InteractionContextType.Guild)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
 	}
 
 	[SlashCommand("pat", "Pat someone!")]
@@ -66,9 +66,9 @@ internal class Action : ApplicationCommandsModule
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
 		builder.AddEmbed(em.Build());
+		builder.WithContent(user.Mention);
+		builder.WithAllowedMention(new UserMention(user));
 		await ctx.EditResponseAsync(builder);
-		if (ctx.Interaction.Context is InteractionContextType.Guild)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
 	}
 
 	[SlashCommand("poke", "Poke someone!")]
@@ -85,9 +85,9 @@ internal class Action : ApplicationCommandsModule
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
 		builder.AddEmbed(em.Build());
+		builder.WithContent(user.Mention);
+		builder.WithAllowedMention(new UserMention(user));
 		await ctx.EditResponseAsync(builder);
-		if (ctx.Interaction.Context is InteractionContextType.Guild)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
 	}
 
 	[SlashCommand("slap", "Slap someone!")]
@@ -104,9 +104,9 @@ internal class Action : ApplicationCommandsModule
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
 		builder.AddEmbed(em.Build());
+		builder.WithContent(user.Mention);
+		builder.WithAllowedMention(new UserMention(user));
 		await ctx.EditResponseAsync(builder);
-		if (ctx.Interaction.Context is InteractionContextType.Guild)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
 	}
 
 	[SlashCommand("bite", "Bite someone!")]
@@ -123,9 +123,9 @@ internal class Action : ApplicationCommandsModule
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
 		builder.AddEmbed(em.Build());
+		builder.WithContent(user.Mention);
+		builder.WithAllowedMention(new UserMention(user));
 		await ctx.EditResponseAsync(builder);
-		if (ctx.Interaction.Context is InteractionContextType.Guild)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
 	}
 
 	[SlashCommand("nom", "Nom someone!")]
@@ -142,9 +142,9 @@ internal class Action : ApplicationCommandsModule
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
 		builder.AddEmbed(em.Build());
+		builder.WithContent(user.Mention);
+		builder.WithAllowedMention(new UserMention(user));
 		await ctx.EditResponseAsync(builder);
-		if (ctx.Interaction.Context is InteractionContextType.Guild)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
 	}
 
 	[SlashCommand("stare", "Stare at someone!")]
@@ -161,8 +161,8 @@ internal class Action : ApplicationCommandsModule
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);
 		builder.AddEmbed(em.Build());
+		builder.WithContent(user.Mention);
+		builder.WithAllowedMention(new UserMention(user));
 		await ctx.EditResponseAsync(builder);
-		if (ctx.Interaction.Context is InteractionContextType.Guild)
-			await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().WithContent(user.Mention).WithAllowedMention(new UserMention(user)));
 	}
 }
