@@ -23,7 +23,7 @@ public partial class MusicCommands
 			RepeatMode mode
 		)
 		{
-			await ctx.ExecuteWithMusicSessionAsync(async musicSession =>
+			await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
 			{
 				musicSession.UpdateRepeatMode(mode);
 				await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
@@ -38,7 +38,7 @@ public partial class MusicCommands
 		[SlashCommand("shuffle", "Shuffle the queue")]
 		public static async Task ShuffleAsync(InteractionContext ctx)
 		{
-			await ctx.ExecuteWithMusicSessionAsync(async musicSession =>
+			await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
 			{
 				musicSession.LavalinkGuildPlayer.ShuffleQueue();
 				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Shuffled the queue!"));

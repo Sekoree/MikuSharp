@@ -1,5 +1,7 @@
 using DisCatSharp.Exceptions;
 
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 using MikuSharp.Enums;
 
 namespace MikuSharp.Entities;

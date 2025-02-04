@@ -26,7 +26,7 @@ public partial class MusicCommands
 		[SlashCommand("skip", "Skips to the next song")]
 		public async Task SkipAsync(InteractionContext ctx)
 		{
-			await ctx.ExecuteWithMusicSessionAsync(async musicSession =>
+			await ctx.ExecuteWithMusicSessionAsync(async (discard, musicSession) =>
 			{
 				if (musicSession.LavalinkGuildPlayer.TryPeekQueue(out _))
 				{

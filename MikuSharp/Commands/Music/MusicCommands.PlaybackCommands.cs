@@ -19,7 +19,7 @@ public partial class MusicCommands
 		[SlashCommand("pause", "Pauses the playback"), RequirePlaybackState(PlaybackState.Playing)]
 		public async Task PauseAsync(InteractionContext ctx)
 		{
-			await ctx.ExecuteWithMusicSessionAsync(async musicSession =>
+			await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
 			{
 				await musicSession.LavalinkGuildPlayer.PauseAsync();
 				musicSession.UpdatePlaybackState(PlaybackState.Paused);
@@ -35,7 +35,7 @@ public partial class MusicCommands
 		[SlashCommand("resume", "Resumes the playback"), RequirePlaybackState(PlaybackState.Paused)]
 		public async Task ResumeAsync(InteractionContext ctx)
 		{
-			await ctx.ExecuteWithMusicSessionAsync(async musicSession =>
+			await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
 			{
 				await musicSession.LavalinkGuildPlayer.ResumeAsync();
 				musicSession.UpdatePlaybackState(PlaybackState.Playing);
@@ -51,7 +51,7 @@ public partial class MusicCommands
 		[SlashCommand("stop", "Stop Playback"), RequirePlaybackState(PlaybackState.Playing, PlaybackState.Paused)]
 		public static async Task StopAsync(InteractionContext ctx)
 		{
-			await ctx.ExecuteWithMusicSessionAsync(async musicSession =>
+			await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
 			{
 				musicSession.UpdateRepeatMode(RepeatMode.None);
 				musicSession.LavalinkGuildPlayer.ClearQueue();
@@ -74,7 +74,7 @@ public partial class MusicCommands
 			int volume = 100
 		)
 		{
-			await ctx.ExecuteWithMusicSessionAsync(async musicSession =>
+			await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
 			{
 				await musicSession.LavalinkGuildPlayer.SetVolumeAsync(volume);
 				await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
@@ -90,7 +90,7 @@ public partial class MusicCommands
 		[SlashCommand("seek", "Seeks the currently playing song to given position"), RequirePlaybackState(PlaybackState.Playing, PlaybackState.Paused)]
 		public static async Task SeekAsync(InteractionContext ctx, [Option("position", "Position to seek to")] double position)
 		{
-			await ctx.ExecuteWithMusicSessionAsync(async musicSession =>
+			await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
 			{
 				var targetSeek = TimeSpan.FromSeconds(position);
 				await musicSession.LavalinkGuildPlayer.SeekAsync(targetSeek);
@@ -107,7 +107,7 @@ public partial class MusicCommands
 		public async Task PlayUrlAsync(InteractionContext ctx, [Option("url", "The url to play")] string url)
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Searching for `{url}`.."));
-			await ctx.ExecuteWithMusicSessionAsync(async musicSession => await musicSession.LoadAndPlayTrackAsync(ctx, url));
+			await ctx.ExecuteWithMusicSessionAsync(async (_, musicSession) => await musicSession.LoadAndPlayTrackAsync(ctx, url));
 		}
 	}
 }

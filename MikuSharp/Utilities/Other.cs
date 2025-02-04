@@ -137,38 +137,82 @@ public static class Other
 	}
 
 	/// <summary>
-	///    Executes an action with the music session.
+	///     Executes an action with the music session.
 	/// </summary>
 	/// <param name="ctx">The interaction context.</param>
-	/// <param name="action">The action to execute.</param>
+	/// <param name="successAction">The action to execute.</param>
+	/// <param name="failureAction">The action to execute if the music session does not exist.</param>
+	/// <param name="finalAction">The action to execute after the success or failure action.</param>
 	/// <returns>A task that represents the asynchronous operation.</returns>
-	public static async Task ExecuteWithMusicSessionAsync(this InteractionContext ctx, Func<MusicSession, Task> action)
+	public static async Task ExecuteWithMusicSessionAsync(this InteractionContext ctx, Func<ulong, MusicSession, Task> successAction, Func<ulong, Task>? failureAction = null, Func<ulong, Task>? finalAction = null)
 	{
 		ArgumentNullException.ThrowIfNull(ctx.GuildId);
-		var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(ctx.GuildId.Value, _ => new());
-		using (await asyncLock.LockAsync(MikuBot.Cts.Token))
-		{
-			if (MikuBot.MusicSessions.TryGetValue(ctx.GuildId.Value, out var musicSession))
-				await action(musicSession);
-		}
+		await ctx.GuildId.Value.ExecuteWithMusicSessionAsync(successAction, failureAction, finalAction);
 	}
 
 	/// <summary>
-	///    Executes an action with the music session.
+	///     Executes an action with the music session.
+	/// </summary>
+	/// <param name="guildId">The guild ID.</param>
+	/// <param name="successAction">The action to execute.</param>
+	/// <param name="failureAction">The action to execute if the music session does not exist.</param>
+	/// <param name="finalAction">The action to execute after the success or failure action.</param>
+	/// <returns>A task that represents the asynchronous operation.</returns>
+	public static async Task ExecuteWithMusicSessionAsync(this ulong guildId, Func<ulong, MusicSession, Task> successAction, Func<ulong, Task>? failureAction = null, Func<ulong, Task>? finalAction = null)
+	{
+		var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+		using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+		{
+			if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				await successAction(guildId, musicSession);
+			else if (failureAction is not null)
+				await failureAction(guildId);
+		}
+
+		if (finalAction is not null)
+			await finalAction(guildId);
+	}
+
+	/// <summary>
+	///     Executes an action with the music session.
 	/// </summary>
 	/// <typeparam name="T">The type of the result.</typeparam>
 	/// <param name="ctx">The interaction context.</param>
-	/// <param name="action">The action to execute.</param>
-	/// <param name="defaultValue">The default value of <typeparamref name="T"/> to return if the music session does not exist.</param>
-	/// <returns>The result of the action or the default value with given type from <typeparamref name="T"/>.</returns>
-	public static async Task<T?> ExecuteWithMusicSessionAsync<T>(this InteractionContext ctx, Func<MusicSession, Task<T?>> action, T? defaultValue = default)
+	/// <param name="successAction">The action to execute.</param>
+	/// <param name="failureAction">The action to execute if the music session does not exist.</param>
+	/// <param name="defaultValue">
+	///     The default value of <typeparamref name="T" /> to return if the music session does not
+	///     exist.
+	/// </param>
+	/// <returns>The result of the action or the default value with given type from <typeparamref name="T" />.</returns>
+	public static async Task<T?> ExecuteWithMusicSessionAsync<T>(this InteractionContext ctx, Func<ulong, MusicSession, Task<T?>> successAction, Func<ulong, Task<T?>>? failureAction = null, T? defaultValue = default)
 	{
 		ArgumentNullException.ThrowIfNull(ctx.GuildId);
-		var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(ctx.GuildId.Value, _ => new());
+		return await ctx.GuildId.Value.ExecuteWithMusicSessionAsync(successAction, failureAction, defaultValue);
+	}
+
+	/// <summary>
+	///     Executes an action with the music session.
+	/// </summary>
+	/// <typeparam name="T">The type of the result.</typeparam>
+	/// <param name="guildId">The guild ID.</param>
+	/// <param name="successAction">The action to execute.</param>
+	/// <param name="func"></param>
+	/// <param name="failureAction">The action to execute if the music session does not exist.</param>
+	/// <param name="defaultValue">
+	///     The default value of <typeparamref name="T" /> to return if the music session does not
+	///     exist.
+	/// </param>
+	/// <returns>The result of the action or the default value with given type from <typeparamref name="T" />.</returns>
+	public static async Task<T?> ExecuteWithMusicSessionAsync<T>(this ulong guildId, Func<ulong, MusicSession, Task<T?>> successAction, Func<ulong, Task<T?>>? failureAction = null, T? defaultValue = default)
+	{
+		var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
 		using (await asyncLock.LockAsync(MikuBot.Cts.Token))
 		{
-			if (MikuBot.MusicSessions.TryGetValue(ctx.GuildId.Value, out var musicSession))
-				return await action(musicSession);
+			if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				return await successAction(guildId, musicSession);
+			if (failureAction is not null)
+				return await failureAction(guildId);
 		}
 
 		return defaultValue;
