@@ -28,21 +28,34 @@ public partial class MusicCommands
 		)
 		{
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
-			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
-			musicSession = musicSession.UpdateRepeatMode(mode);
-			await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Set repeat mode to: **{mode}**"));
-			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
+
+			var guildId = ctx.GuildId.Value;
+			var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+			using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+			{
+				if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				{
+					musicSession.UpdateRepeatMode(mode);
+					await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Set repeat mode to: **{mode}**"));
+				}
+			}
 		}
 
 		[SlashCommand("shuffle", "Shuffle the queue")]
 		public static async Task ShuffleAsync(InteractionContext ctx)
 		{
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
-			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
-			musicSession.LavalinkGuildPlayer.ShuffleQueue();
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Shuffled the queue!"));
-			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
+			var guildId = ctx.GuildId.Value;
+			var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+			using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+			{
+				if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				{
+					musicSession.LavalinkGuildPlayer.ShuffleQueue();
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Shuffled the queue!"));
+				}
+			}
 		}
 	}
 }

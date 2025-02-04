@@ -11,8 +11,6 @@ using DisCatSharp.Lavalink;
 using DisCatSharp.Lavalink.Entities;
 using DisCatSharp.Lavalink.Enums;
 
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 
@@ -73,7 +71,7 @@ public static class Other
 	/// <param name="additionalEmbedFields">The additional embed fields.</param>
 	/// <returns>The built embed.</returns>
 	public static DiscordEmbed BuildMusicStatusEmbed(this MusicSession session, List<DiscordEmbedField>? additionalEmbedFields = null)
-		=> BuildMusicStatusEmbed(session, session.StatusMessage.Embeds.First().Description, additionalEmbedFields);
+		=> session.StatusMessage is not null ? BuildMusicStatusEmbed(session, session.StatusMessage.Embeds.First().Description, additionalEmbedFields) : throw new NullReferenceException();
 
 	/// <summary>
 	///     Formats a <see cref="TimeSpan" /> into a human-readable string.
@@ -126,13 +124,19 @@ public static class Other
 				throw new ArgumentOutOfRangeException();
 		}
 
-		if (musicSession.PlaybackState is PlaybackState.Stopped)
-			musicSession.LavalinkGuildPlayer.PlayQueue();
-		else if (musicSession.PlaybackState is PlaybackState.Paused)
+		switch (musicSession.PlaybackState)
 		{
-			await musicSession.LavalinkGuildPlayer.ResumeAsync();
-			musicSession = musicSession.UpdatePlaybackState(PlaybackState.Playing);
-			musicSession = await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+			case PlaybackState.Stopped:
+				musicSession.LavalinkGuildPlayer.PlayQueue();
+				break;
+			case PlaybackState.Paused:
+				await musicSession.LavalinkGuildPlayer.ResumeAsync();
+				musicSession.UpdatePlaybackState(PlaybackState.Playing);
+				await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+				break;
+			case PlaybackState.Playing:
+			default:
+				break;
 		}
 
 		return musicSession;

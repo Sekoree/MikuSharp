@@ -29,12 +29,18 @@ public partial class MusicCommands
 		public async Task PauseAsync(InteractionContext ctx)
 		{
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
-			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
-			await musicSession.LavalinkGuildPlayer.PauseAsync();
-			musicSession = musicSession.UpdatePlaybackState(PlaybackState.Paused);
-			musicSession = await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
-			await ctx.EditResponseAsync("Paused the playback! ");
-			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
+			var guildId = ctx.GuildId.Value;
+			var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+			using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+			{
+				if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				{
+					await musicSession.LavalinkGuildPlayer.PauseAsync();
+					musicSession.UpdatePlaybackState(PlaybackState.Paused);
+					await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+					await ctx.EditResponseAsync("Paused the playback! ");
+				}
+			}
 		}
 
 		/// <summary>
@@ -45,26 +51,38 @@ public partial class MusicCommands
 		public async Task ResumeAsync(InteractionContext ctx)
 		{
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
-			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
-			await musicSession.LavalinkGuildPlayer.ResumeAsync();
-			musicSession = musicSession.UpdatePlaybackState(PlaybackState.Playing);
-			musicSession = await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
-			await ctx.EditResponseAsync("Resumed the playback!");
-			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
+			var guildId = ctx.GuildId.Value;
+			var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+			using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+			{
+				if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				{
+					await musicSession.LavalinkGuildPlayer.ResumeAsync();
+					musicSession.UpdatePlaybackState(PlaybackState.Playing);
+					await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+					await ctx.EditResponseAsync("Resumed the playback!");
+				}
+			}
 		}
 
 		[SlashCommand("stop", "Stop Playback"), RequirePlaybackState(PlaybackState.Playing, PlaybackState.Paused)]
 		public static async Task StopAsync(InteractionContext ctx)
 		{
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
-			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
-			musicSession = musicSession.UpdateRepeatMode(RepeatMode.None);
-			musicSession.LavalinkGuildPlayer.ClearQueue();
-			await musicSession.LavalinkGuildPlayer.StopAsync();
-			musicSession = musicSession.UpdatePlaybackState(PlaybackState.Stopped);
-			musicSession = await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
-			await ctx.EditResponseAsync("Stopped the playback!");
-			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
+			var guildId = ctx.GuildId.Value;
+			var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+			using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+			{
+				if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				{
+					musicSession.UpdateRepeatMode(RepeatMode.None);
+					musicSession.LavalinkGuildPlayer.ClearQueue();
+					await musicSession.LavalinkGuildPlayer.StopAsync();
+					musicSession.UpdatePlaybackState(PlaybackState.Stopped);
+					await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+					await ctx.EditResponseAsync("Stopped the playback!");
+				}
+			}
 		}
 
 		[SlashCommand("volume", "Change the music volume")]
@@ -75,23 +93,34 @@ public partial class MusicCommands
 		)
 		{
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
-			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
-			await musicSession.LavalinkGuildPlayer.SetVolumeAsync(volume);
-			musicSession = await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Set the volume to **{volume}%**!"));
-			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
+			var guildId = ctx.GuildId.Value;
+			var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+			using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+			{
+				if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				{
+					await musicSession.LavalinkGuildPlayer.SetVolumeAsync(volume);
+					await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Set the volume to **{volume}%**!"));
+				}
+			}
 		}
 
 		[SlashCommand("seek", "Seeks the currently playing song to given position"), RequirePlaybackState(PlaybackState.Playing, PlaybackState.Paused)]
 		public static async Task SeekAsync(InteractionContext ctx, [Option("position", "Position to seek to")] double position)
 		{
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
-
-			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
-			var targetSeek = TimeSpan.FromSeconds(position);
-			await musicSession.LavalinkGuildPlayer.SeekAsync(targetSeek);
-			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Seeked to **{targetSeek.FormatTimeSpan()}**!"));
-			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
+			var guildId = ctx.GuildId.Value;
+			var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+			using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+			{
+				if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				{
+					var targetSeek = TimeSpan.FromSeconds(position);
+					await musicSession.LavalinkGuildPlayer.SeekAsync(targetSeek);
+					await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Seeked to **{targetSeek.FormatTimeSpan()}**!"));
+				}
+			}
 		}
 
 		[SlashCommand("play", "Plays a url")]
@@ -99,25 +128,34 @@ public partial class MusicCommands
 		{
 			await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Searching for `{url}`.."));
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
-			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
-			musicSession = await musicSession.LoadAndPlayTrackAsync(ctx, url);
-			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
+			var guildId = ctx.GuildId.Value;
+			var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+			using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+			{
+				if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+					await musicSession.LoadAndPlayTrackAsync(ctx, url);
+			}
 		}
 
 		[SlashCommand("skip", "Skips to the next song")]
 		public async Task SkipAsync(InteractionContext ctx)
 		{
 			ArgumentNullException.ThrowIfNull(ctx.GuildId);
-			var musicSession = MikuBot.MusicSessions[ctx.GuildId.Value];
-			if (musicSession.LavalinkGuildPlayer.TryPeekQueue(out _))
+			var guildId = ctx.GuildId.Value;
+			var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+			using (await asyncLock.LockAsync(MikuBot.Cts.Token))
 			{
-				await musicSession.LavalinkGuildPlayer.SkipAsync();
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Successfully skipped the song!"));
+				if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				{
+					if (musicSession.LavalinkGuildPlayer.TryPeekQueue(out _))
+					{
+						await musicSession.LavalinkGuildPlayer.SkipAsync();
+						await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Successfully skipped the song!"));
+					}
+					else
+						await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Cannot skip as there are no more songs in the queue."));
+				}
 			}
-			else
-				await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Cannot skip as there are no more songs in the queue."));
-
-			MikuBot.MusicSessions[ctx.GuildId.Value] = musicSession;
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,6 +27,8 @@ using MikuSharp.Commands;
 using MikuSharp.Commands.Music;
 using MikuSharp.Entities;
 
+using NeoSmart.AsyncLock;
+
 using Newtonsoft.Json;
 
 using Serilog;
@@ -44,20 +47,22 @@ internal sealed class MikuBot : IDisposable
 {
 	internal static readonly WeebClient WeebClient = new("Hatsune Miku Bot", "5.0.0");
 
-	//internal static readonly Dictionary<int, LavalinkSession> LavalinkSessions = [];
-	//internal static readonly Dictionary<ulong, Guild> Guilds = [];
-
 	//internal static Playstate Ps = Playstate.Playing;
 	//internal static Stopwatch Psc = new();
 
 	/// <summary>
 	///     Gets the music sessions.
 	/// </summary>
-	internal static readonly Dictionary<ulong, MusicSession> MusicSessions = [];
+	internal static readonly ConcurrentDictionary<ulong, MusicSession> MusicSessions = [];
+
+	/// <summary>
+	///    Gets the music session locks.
+	/// </summary>
+	internal static readonly ConcurrentDictionary<ulong, AsyncLock> MusicSessionLocks = [];
 
 	internal MikuBot()
 	{
-		var fileData = File.ReadAllText(@"config.json") ?? throw new ArgumentNullException(null, "config.json is null or missing");
+		var fileData = File.ReadAllText("config.json") ?? throw new ArgumentNullException(null, "config.json is null or missing");
 
 		var config = JsonConvert.DeserializeObject<BotConfig>(fileData);
 		ArgumentNullException.ThrowIfNull(config);

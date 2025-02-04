@@ -14,21 +14,31 @@ internal sealed class MusicQueueEntry : IQueueEntry
 	/// <inheritdoc />
 	public async Task<bool> BeforePlayingAsync(LavalinkGuildPlayer player)
 	{
-		if (!MikuBot.MusicSessions.TryGetValue(player.GuildId, out var musicSession))
-			return false;
+		var guildId = player.GuildId;
+		var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+		using (await asyncLock.LockAsync(MikuBot.Cts.Token))
+		{
+			if (!MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+				return false;
 
-		musicSession.UpdatePlaybackState(PlaybackState.Playing);
-		await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed($"Playing {this.Track.Info.Title.Bold()} from {this.Track.Info.Author.Italic()}"));
-		return true;
+			musicSession.UpdatePlaybackState(PlaybackState.Playing);
+			await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed($"Playing {this.Track.Info.Title.Bold()} from {this.Track.Info.Author.Italic()}"));
+			return true;
+		}
 	}
 
 	/// <inheritdoc />
 	public async Task AfterPlayingAsync(LavalinkGuildPlayer player)
 	{
-		if (MikuBot.MusicSessions.TryGetValue(player.GuildId, out var musicSession))
+		var guildId = player.GuildId;
+		var asyncLock = MikuBot.MusicSessionLocks.GetOrAdd(guildId, _ => new());
+		using (await asyncLock.LockAsync(MikuBot.Cts.Token))
 		{
-			musicSession.UpdatePlaybackState(PlaybackState.Stopped);
-			await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+			if (MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
+			{
+				musicSession.UpdatePlaybackState(PlaybackState.Stopped);
+				await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+			}
 		}
 	}
 
