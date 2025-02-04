@@ -7,7 +7,7 @@ namespace MikuSharp.Commands;
 public class Nsfw : BaseCommandModule
 {
 	[Command("4k"), Description("lewd")]
-	public static async Task FourK(CommandContext ctx)
+	public async Task FourK(CommandContext ctx)
 	{
 		var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/image?type=4k");
 		DiscordMessageBuilder builder = new();
@@ -17,7 +17,7 @@ public class Nsfw : BaseCommandModule
 	}
 
 	[Command("anal"), Description("lewd")]
-	public static async Task Anal(CommandContext ctx)
+	public async Task Anal(CommandContext ctx)
 	{
 		var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/image?type=anal");
 		DiscordMessageBuilder builder = new();
@@ -27,7 +27,7 @@ public class Nsfw : BaseCommandModule
 	}
 
 	[Command("ass"), Description("lewd")]
-	public static async Task Ass(CommandContext ctx)
+	public async Task Ass(CommandContext ctx)
 	{
 		var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/image?type=ass");
 		DiscordMessageBuilder builder = new();
@@ -37,7 +37,7 @@ public class Nsfw : BaseCommandModule
 	}
 
 	[Command("gonewild"), Description("lewd")]
-	public static async Task Gonewild(CommandContext ctx)
+	public async Task Gonewild(CommandContext ctx)
 	{
 		var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/image?type=gonewild");
 		DiscordMessageBuilder builder = new();
@@ -47,7 +47,7 @@ public class Nsfw : BaseCommandModule
 	}
 
 	[Command("lewdkitsune"), Description("lewd")]
-	public static async Task LewdKitsune(CommandContext ctx)
+	public async Task LewdKitsune(CommandContext ctx)
 	{
 		var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/image?type=lewdkitsune");
 		DiscordMessageBuilder builder = new();
@@ -57,7 +57,7 @@ public class Nsfw : BaseCommandModule
 	}
 
 	[Command("lewdneko"), Description("lewd")]
-	public static async Task LewdNeko(CommandContext ctx)
+	public async Task LewdNeko(CommandContext ctx)
 	{
 		var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/image?type=lewdneko");
 		DiscordMessageBuilder builder = new();
@@ -67,7 +67,7 @@ public class Nsfw : BaseCommandModule
 	}
 
 	[Command("porngif"), Description("lewd")]
-	public static async Task PornGif(CommandContext ctx)
+	public async Task PornGif(CommandContext ctx)
 	{
 		var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/image?type=pgif");
 		DiscordMessageBuilder builder = new();
@@ -77,7 +77,7 @@ public class Nsfw : BaseCommandModule
 	}
 
 	[Command("pussy"), Description("lewd")]
-	public static async Task Pussy(CommandContext ctx)
+	public async Task Pussy(CommandContext ctx)
 	{
 		var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/image?type=pussy");
 		DiscordMessageBuilder builder = new();
@@ -87,7 +87,7 @@ public class Nsfw : BaseCommandModule
 	}
 
 	[Command("thighs"), Aliases("thigh"), Description("lewd")]
-	public static async Task Thighs(CommandContext ctx)
+	public async Task Thighs(CommandContext ctx)
 	{
 		var d = await ctx.Client.RestClient.GetNekobotAsync("https://nekobot.xyz/api/image?type=thigh");
 		DiscordMessageBuilder builder = new();
