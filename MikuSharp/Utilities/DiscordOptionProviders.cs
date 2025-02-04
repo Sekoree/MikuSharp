@@ -1,3 +1,5 @@
+using NuGet.Packaging;
+
 namespace MikuSharp.Utilities;
 
 internal class FixedOptionProviders
@@ -81,22 +83,33 @@ internal class AutocompleteProviders
 	        return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Info.Title}", x.Position.ToString()));
 	    }
 	}
+	*/
 
 	internal sealed class QueueProvider : IAutocompleteProvider
 	{
-	    public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
-	    {
-	        var queue = await Database.GetQueueAsync(ctx.Guild);
-	        List<QueueEntry> songs = new(25);
-	        if (ctx.FocusedOption.Value == null)
-	            songs.AddRange(queue.Take(25));
-	        else if (int.TryParse(Convert.ToString(ctx.FocusedOption.Value), out var pos))
-	            songs.AddRange(queue.Where(x => x.Position.ToString().StartsWith(pos.ToString())).Take(25));
-	        else
-	            songs.AddRange(queue.Where(x => x.Track.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value).ToLower())).Take(25));
+		public async Task<IEnumerable<DiscordApplicationCommandAutocompleteChoice>> Provider(AutocompleteContext ctx)
+		{
+			var queue = await ctx.ExecuteWithMusicSessionAsync((_, musicSession) => Task.FromResult(musicSession.LavalinkGuildPlayer?.Queue.ToList()), null, []);
+			if (queue is null)
+				return [new("The queue is empty", -1)];
 
-	        return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Position}: {x.Track.Info.Title}", x.Position.ToString()));
-	    }
+			Dictionary<int, LavalinkTrack> queueEntries = [];
+			var i = 1;
+			foreach (var entry in queue)
+			{
+				queueEntries[i] = entry;
+				i++;
+			}
+
+			Dictionary<int, LavalinkTrack> songs = [];
+
+			var value = ctx.FocusedOption.Value as string;
+
+			songs.AddRange(string.IsNullOrEmpty(value)
+				? queueEntries.Take(25)
+				: queueEntries.Where(x => x.Value.Info.Title.ToLower().Contains(Convert.ToString(ctx.FocusedOption.Value)!.ToLower())).Take(25));
+
+			return songs.Select(x => new DiscordApplicationCommandAutocompleteChoice($"{x.Key}: {x.Value.Info.Title}", x.Key));
+		}
 	}
-	*/
 }

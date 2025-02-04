@@ -13,15 +13,27 @@ internal class Weeb : ApplicationCommandsModule
 	public static async Task AwooifyAsync(InteractionContext ctx, [Option("user", "User to awooify")] DiscordUser? user = null)
 	{
 		var url = (await (user ?? ctx.User).ConvertToMember(ctx.Guild)).GuildAvatarUrl;
-		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=awooify&url={url}"));
+		var e = JsonConvert.DeserializeObject<NekoBot?>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=awooify&url={url}"));
+		if (e is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
 		await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(new DiscordEmbedBuilder().WithImageUrl(e.Message).Build()));
 	}
 
 	[SlashCommand("diva", "Radnom PJD Loading image")]
 	public static async Task DivaPic(InteractionContext ctx)
 	{
-		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/diva"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<MeekMoe?>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/diva"));
+		if (res is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(res.Url.ResizeLink()))
 		{
 			Position = 0
 		};
@@ -43,8 +55,14 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("gumi", "Random Gumi image")]
 	public static async Task GumiPic(InteractionContext ctx)
 	{
-		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/gumi"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<MeekMoe?>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/gumi"));
+		if (res is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(res.Url.ResizeLink()))
 		{
 			Position = 0
 		};
@@ -67,8 +85,14 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("kaito", "Random Kaito image")]
 	public static async Task KaitoPic(InteractionContext ctx)
 	{
-		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/kaito"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<MeekMoe?>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/kaito"));
+		if (res is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(res.Url.ResizeLink()))
 		{
 			Position = 0
 		};
@@ -91,8 +115,14 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("len", "Random Len image")]
 	public static async Task KLenPic(InteractionContext ctx)
 	{
-		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/len"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<MeekMoe?>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/len"));
+		if (res is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(res.Url.ResizeLink()))
 		{
 			Position = 0
 		};
@@ -115,8 +145,14 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("luka", "Random Luka image")]
 	public static async Task LukaPic(InteractionContext ctx)
 	{
-		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/luka"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<MeekMoe?>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/luka"));
+		if (res is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(res.Url.ResizeLink()))
 		{
 			Position = 0
 		};
@@ -139,8 +175,8 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("meiko", "Random Meiko image")]
 	public static async Task MeikoPic(InteractionContext ctx)
 	{
-		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/meiko"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<MeekMoe?>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/meiko"));
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(res.Url.ResizeLink()))
 		{
 			Position = 0
 		};
@@ -163,8 +199,14 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("miku", "Random Miku image")]
 	public static async Task HMikuPic(InteractionContext ctx)
 	{
-		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/miku"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<MeekMoe?>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/miku"));
+		if (res is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(res.Url.ResizeLink()))
 		{
 			Position = 0
 		};
@@ -188,7 +230,13 @@ internal class Weeb : ApplicationCommandsModule
 	public static async Task Cat(InteractionContext ctx)
 	{
 		var imgUrl = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/v2/img/neko");
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(imgUrl.Url)));
+		if (imgUrl is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(imgUrl.Url.ResizeLink()));
 		var em = new DiscordEmbedBuilder();
 		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
 		em.WithFooter("by nekos.life");
@@ -202,8 +250,14 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("rin", "Random Rin image")]
 	public static async Task KRinPic(InteractionContext ctx)
 	{
-		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/rin"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<MeekMoe?>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/rin"));
+		if (res is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(res.Url.ResizeLink()))
 		{
 			Position = 0
 		};
@@ -226,8 +280,14 @@ internal class Weeb : ApplicationCommandsModule
 	[SlashCommand("teto", "Random Teto image")]
 	public static async Task KTetoPic(InteractionContext ctx)
 	{
-		var res = JsonConvert.DeserializeObject<MeekMoe>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/teto"));
-		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(res.Url)))
+		var res = JsonConvert.DeserializeObject<MeekMoe?>(await ctx.Client.RestClient.GetStringAsync("https://api.meek.moe/teto"));
+		if (res is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(res.Url.ResizeLink()))
 		{
 			Position = 0
 		};

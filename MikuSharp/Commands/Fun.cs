@@ -20,6 +20,11 @@ internal class Fun : ApplicationCommandsModule
 	public static async Task CatAsync(InteractionContext ctx)
 	{
 		var imgUrl = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/v2/img/meow");
+		if (imgUrl is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
 
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{imgUrl.Filetype}", imgUrl.Data);
@@ -31,7 +36,13 @@ internal class Fun : ApplicationCommandsModule
 	public static async Task ClydeAsync(InteractionContext ctx, [Option("text", "Text to modify")] string text)
 	{
 		var e = JsonConvert.DeserializeObject<NekoBot>(await ctx.Client.RestClient.GetStringAsync($"https://nekobot.xyz/api/imagegen?type=clyde&text={text}"));
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.Message));
+		if (e is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(e.Message));
 
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile("clyde.png", img);
@@ -50,7 +61,13 @@ internal class Fun : ApplicationCommandsModule
 	public static async Task DogAsync(InteractionContext ctx)
 	{
 		var dc = JsonConvert.DeserializeObject<DogCeo>(await ctx.Client.RestClient.GetStringAsync("https://dog.ceo/api/breeds/image/random"));
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(dc.Message)));
+		if (dc is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(dc.Message.ResizeLink()));
 		var em = new DiscordEmbedBuilder();
 		em.WithImageUrl($"attachment://image.{MimeGuesser.GuessExtension(img)}");
 		em.WithFooter("by dog.ceo", "https://dog.ceo/img/favicon.png");
@@ -93,7 +110,13 @@ internal class Fun : ApplicationCommandsModule
 	public static async Task LizardAsync(InteractionContext ctx)
 	{
 		var get = await ctx.Client.RestClient.GetNekosLifeAsync("https://nekos.life/api/lizard");
-		Stream img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(Other.ResizeLink(get.Url)));
+		if (get is null)
+		{
+			await ctx.EditResponseAsync("Something went wrong while fetching the image.");
+			return;
+		}
+
+		var img = new MemoryStream(await ctx.Client.RestClient.GetByteArrayAsync(get.Url.ResizeLink()));
 
 		DiscordWebhookBuilder builder = new();
 		builder.AddFile($"image.{MimeGuesser.GuessExtension(img)}", img);

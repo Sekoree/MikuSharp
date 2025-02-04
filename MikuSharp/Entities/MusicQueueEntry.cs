@@ -1,5 +1,3 @@
-using DisCatSharp.Lavalink.Entities;
-
 using MikuSharp.Enums;
 using MikuSharp.Utilities;
 
@@ -24,7 +22,7 @@ internal sealed class MusicQueueEntry : IQueueEntry
 		await player.GuildId.ExecuteWithMusicSessionAsync(async (_, musicSession) =>
 		{
 			musicSession.UpdatePlaybackState(PlaybackState.Stopped);
-			await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed());
+			await musicSession.UpdateStatusMessageAsync(musicSession.BuildMusicStatusEmbed("Nothing playing"));
 		});
 	}
 

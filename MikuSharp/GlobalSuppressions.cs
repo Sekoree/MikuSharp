@@ -1,4 +1,4 @@
-﻿// This file is used by Code Analysis to maintain SuppressMessage
+// This file is used by Code Analysis to maintain SuppressMessage
 // attributes that are applied to this project.
 // Project-level suppressions either have no target or are given
 // a specific target and scoped to a namespace, type, member, etc.
@@ -399,7 +399,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("DocumentationHeader", "ClassDocumentationHeader:The class must have a documentation header.", Justification = "<Pending>", Scope = "type", Target = "~T:MikuSharp.Utilities.NND")]
 [assembly: SuppressMessage("DocumentationHeader", "ClassDocumentationHeader:The class must have a documentation header.", Justification = "<Pending>", Scope = "type", Target = "~T:MikuSharp.Utilities.Other")]
 [assembly: SuppressMessage("DocumentationHeader", "ClassDocumentationHeader:The class must have a documentation header.", Justification = "<Pending>", Scope = "type", Target = "~T:MikuSharp.Utilities.PlaylistDB")]
-[assembly: SuppressMessage("DocumentationHeader", "ClassDocumentationHeader:The class must have a documentation header.", Justification = "<Pending>", Scope = "type", Target = "~T:MikuSharp.Utilities.Web")]
+[assembly: SuppressMessage("DocumentationHeader", "ClassDocumentationHeader:The class must have a documentation header.", Justification = "<Pending>", Scope = "type", Target = "~T:MikuSharp.Utilities.WebExtensionMethods")]
 [assembly:
 	SuppressMessage("DocumentationHeader", "MethodDocumentationHeader:The method must have a documentation header.", Justification = "<Pending>", Scope = "member",
 		Target = "~M:MikuSharp.Commands.Music.SizeToString(System.Int64)~System.String")]
@@ -446,7 +446,7 @@ using System.Diagnostics.CodeAnalysis;
 			"~M:MikuSharp.Utilities.Music.GetUrlPlayingInformationAsync(DisCatSharp.Entities.DiscordEmbedBuilder,DisCatSharp.DiscordClient,MikuSharp.Entities.Guild,System.Collections.Generic.List{MikuSharp.Entities.Entry})~System.Threading.Tasks.Task{DisCatSharp.Entities.DiscordEmbedBuilder}")]
 [assembly:
 	SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>", Scope = "member",
-		Target = "~M:MikuSharp.Utilities.Web.GetKsoftSiRanImgAsync(System.Net.Http.HttpClient,System.String,System.Boolean)~System.Threading.Tasks.Task{MikuSharp.Entities.KsoftSiRanImg}")]
+		Target = "~M:MikuSharp.Utilities.WebExtensionMethods.GetKsoftSiRanImgAsync(System.Net.Http.HttpClient,System.String,System.Boolean)~System.Threading.Tasks.Task{MikuSharp.Entities.KsoftSiRanImg}")]
 [assembly:
 	SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>", Scope = "member",
 		Target =

@@ -19,6 +19,7 @@ global using DisCatSharp.Interactivity;
 global using DisCatSharp.Interactivity.Enums;
 global using DisCatSharp.Interactivity.Extensions;
 global using DisCatSharp.Lavalink;
+global using DisCatSharp.Lavalink.Entities;
 global using DisCatSharp.Lavalink.Enums;
 
 global using Microsoft.Extensions.Logging;

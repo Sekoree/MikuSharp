@@ -1,28 +1,13 @@
-using DisCatSharp.Lavalink.Entities;
-
 using MikuSharp.Entities;
 using MikuSharp.Enums;
 
 namespace MikuSharp.Utilities;
 
-public static class Other
+/// <summary>
+///     Provides extension methods for use with <see cref="MusicSession"/>s.
+/// </summary>
+internal static class MusicSessionExtensionMethods
 {
-	/// <summary>
-	///     Resizes an image link.
-	/// </summary>
-	/// <param name="url">The url of the image to resize.</param>
-	/// <returns>The resized image.</returns>
-	public static string ResizeLink(string url)
-		=> $"https://api.meek.moe/im/?image={url}&resize=500";
-
-	public static async Task DeferAsync(this InteractionContext ctx, bool ephemeral = true)
-	{
-		var builder = new DiscordInteractionResponseBuilder();
-		if (ephemeral)
-			builder.AsEphemeral();
-		await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource, builder);
-	}
-
 	/// <summary>
 	///     Gets the default session.
 	/// </summary>
@@ -66,18 +51,6 @@ public static class Other
 	/// <returns>The built embed.</returns>
 	public static DiscordEmbed BuildMusicStatusEmbed(this MusicSession session, List<DiscordEmbedField>? additionalEmbedFields = null)
 		=> session.StatusMessage is not null ? BuildMusicStatusEmbed(session, session.StatusMessage.Embeds[0].Description, additionalEmbedFields) : throw new NullReferenceException();
-
-	/// <summary>
-	///     Formats a <see cref="TimeSpan" /> into a human-readable string.
-	/// </summary>
-	/// <param name="timeSpan">The time span to format.</param>
-	/// <returns>The formatted time span.</returns>
-	public static string FormatTimeSpan(this TimeSpan timeSpan)
-		=> timeSpan.TotalHours >= 1
-			? $"{(int)timeSpan.TotalHours:D2}h:{timeSpan.Minutes:D2}m:{timeSpan.Seconds:D2}s"
-			: timeSpan.TotalMinutes >= 1
-				? $"{(int)timeSpan.TotalMinutes:D2}m:{timeSpan.Seconds:D2}s"
-				: $"{(int)timeSpan.TotalSeconds:D2}s";
 
 	/// <summary>
 	///     Loads and plays an <paramref name="identifier" />.
@@ -153,6 +126,17 @@ public static class Other
 	/// <summary>
 	///     Executes an action with the music session.
 	/// </summary>
+	/// <param name="ctx">The autocomplete context.</param>
+	/// <param name="successAction">The action to execute.</param>
+	/// <param name="failureAction">The action to execute if the music session does not exist.</param>
+	/// <param name="finalAction">The action to execute after the success or failure action.</param>
+	/// <returns>A task that represents the asynchronous operation.</returns>
+	public static async Task ExecuteWithMusicSessionAsync(this AutocompleteContext ctx, Func<ulong, MusicSession, Task> successAction, Func<ulong, Task>? failureAction = null, Func<ulong, Task>? finalAction = null)
+		=> await ctx.Guild.Id.ExecuteWithMusicSessionAsync(successAction, failureAction, finalAction);
+
+	/// <summary>
+	///     Executes an action with the music session.
+	/// </summary>
 	/// <param name="guildId">The guild ID.</param>
 	/// <param name="successAction">The action to execute.</param>
 	/// <param name="failureAction">The action to execute if the music session does not exist.</param>
@@ -195,9 +179,23 @@ public static class Other
 	///     Executes an action with the music session.
 	/// </summary>
 	/// <typeparam name="T">The type of the result.</typeparam>
+	/// <param name="ctx">The autocomplete context.</param>
+	/// <param name="successAction">The action to execute.</param>
+	/// <param name="failureAction">The action to execute if the music session does not exist.</param>
+	/// <param name="defaultValue">
+	///     The default value of <typeparamref name="T" /> to return if the music session does not
+	///     exist.
+	/// </param>
+	/// <returns>The result of the action or the default value with given type from <typeparamref name="T" />.</returns>
+	public static async Task<T?> ExecuteWithMusicSessionAsync<T>(this AutocompleteContext ctx, Func<ulong, MusicSession, Task<T?>> successAction, Func<ulong, Task<T?>>? failureAction = null, T? defaultValue = default)
+		=> await ctx.Guild.Id.ExecuteWithMusicSessionAsync(successAction, failureAction, defaultValue);
+
+	/// <summary>
+	///     Executes an action with the music session.
+	/// </summary>
+	/// <typeparam name="T">The type of the result.</typeparam>
 	/// <param name="guildId">The guild ID.</param>
 	/// <param name="successAction">The action to execute.</param>
-	/// <param name="func"></param>
 	/// <param name="failureAction">The action to execute if the music session does not exist.</param>
 	/// <param name="defaultValue">
 	///     The default value of <typeparamref name="T" /> to return if the music session does not
