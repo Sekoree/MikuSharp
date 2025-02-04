@@ -7,6 +7,11 @@ namespace MikuSharp.Utilities;
 
 public static class Other
 {
+	/// <summary>
+	///     Resizes an image link.
+	/// </summary>
+	/// <param name="url">The url of the image to resize.</param>
+	/// <returns>The resized image.</returns>
 	public static string ResizeLink(string url)
 		=> $"https://api.meek.moe/im/?image={url}&resize=500";
 
@@ -23,8 +28,8 @@ public static class Other
 	/// </summary>
 	/// <param name="lavalink">The lavalink extension.</param>
 	/// <returns>The first session or <see langword="null" />.</returns>
-	public static LavalinkSession DefaultSession(this LavalinkExtension lavalink)
-		=> lavalink.ConnectedSessions.First().Value;
+	public static LavalinkSession? DefaultSession(this LavalinkExtension lavalink)
+		=> lavalink.ConnectedSessions.Count > 0 ? lavalink.ConnectedSessions.First().Value : null;
 
 	/// <summary>
 	///     Builds a music status embed.

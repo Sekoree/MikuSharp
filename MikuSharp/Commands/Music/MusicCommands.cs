@@ -29,6 +29,7 @@ public partial class MusicCommands : ApplicationCommandsModule
 			if (!MikuBot.MusicSessions.TryGetValue(guildId, out var musicSession))
 			{
 				var session = ctx.Client.GetLavalink().DefaultSession();
+				ArgumentNullException.ThrowIfNull(session);
 				await session.ConnectAsync(ctx.Member.VoiceState.Channel);
 				musicSession = await new MusicSession(ctx.Member.VoiceState.Channel, ctx.Guild, session).InjectPlayerAsync();
 				MikuBot.MusicSessions[guildId] = musicSession;

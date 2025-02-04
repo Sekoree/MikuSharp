@@ -12,7 +12,7 @@ public sealed class RequireUserVoicechatConnection : ApplicationCommandCheckBase
 	/// <inheritdoc />
 	public override async Task<bool> ExecuteChecksAsync(BaseContext ctx)
 	{
-		var connected = ctx.Member.VoiceState?.Channel is not null;
+		var connected = ctx.Member?.VoiceState?.Channel is not null;
 
 		if (connected)
 			return true;
@@ -31,8 +31,9 @@ public sealed class RequireUserAndBotVoicechatConnection : ApplicationCommandChe
 	/// <inheritdoc />
 	public override async Task<bool> ExecuteChecksAsync(BaseContext ctx)
 	{
+		ArgumentNullException.ThrowIfNull(ctx.Guild);
 		var bot = await ctx.Guild.GetMemberAsync(ctx.Client.CurrentUser.Id);
-		var connected = ctx.Member.VoiceState?.Channel is not null && bot.VoiceState?.Channel is not null;
+		var connected = ctx.Member?.VoiceState?.Channel is not null && bot.VoiceState?.Channel is not null;
 		if (connected)
 			return true;
 
@@ -92,7 +93,7 @@ public sealed class EnsureLavalinkSession : ApplicationCommandCheckBaseAttribute
 			return await RespondWithNoSessionAvailableAsync(ctx);
 
 		var session = module.DefaultSession();
-		return session is null || !session.IsConnected ? await RespondWithNoSessionAvailableAsync(ctx) : true;
+		return (session is not null && session.IsConnected) || await RespondWithNoSessionAvailableAsync(ctx);
 	}
 
 	/// <summary>
